@@ -1,0 +1,3 @@
+Background1: background1.bmp
+Background2: background2.bmp
+BackgroundForDraw: backgroundDraw.bmp

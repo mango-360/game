@@ -1,0 +1,3 @@
+BackgroundMusic: background.wav
+xPlace: xPlace.wav
+oPlace: oPlace.wav
