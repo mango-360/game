@@ -29,7 +29,7 @@ void Player::init()
 
 void Player::update()
 {
-	if (InputManager::isKeyPressed(SDL_SCANCODE_D))
+	if (InputManager::isKeyPressed(SDL_SCANCODE_D)) // doesn't work properly when both keys are pressed
 	{
 		if(InputManager::isKeyPressed(SDL_SCANCODE_A))
 		{
