@@ -1,4 +1,4 @@
-BackgroundImg: bob.bmp
+BackgroundImg: background.bmp
 CircleImg: circle.bmp
 CircleRect: 0 0 270 270
 CrossImg: cross.bmp
