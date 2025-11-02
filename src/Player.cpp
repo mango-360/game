@@ -23,6 +23,9 @@ void Player::init()
 	stream >> tmp >> rect.x >> rect.y >> rect.w >> rect.h;
 	
 	texture = loadTexture(playerImg);
+	if (texture) {
+	    SDL_SetTextureScaleMode(texture, SDL_ScaleModeNearest); // prevents linear filtering for this texture
+	}
 
 	stream.close();
 }
@@ -51,7 +54,7 @@ void Player::update()
 			lastKeyPressed = SDL_SCANCODE_D;
 		}
 	}
-	if (InputManager::isKeyPressed(SDL_SCANCODE_A))
+	else if (InputManager::isKeyPressed(SDL_SCANCODE_A))
 	{
 		rect.x -= 5;
 		srcRect.x = srcRect.w;

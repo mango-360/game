@@ -7,7 +7,8 @@
 #include "Engine.h"
 #include "Presenter.h"
 #include "TextField.h"
-#include <Player.h>
+#include "Player.h"
+#include "Ground.h"
 
 class Board
 {
@@ -24,4 +25,6 @@ private:
 	SDL_Texture* m_background;
 
 	Player m_player;
+
+	Ground m_ground;
 };

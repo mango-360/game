@@ -2,7 +2,6 @@
 #include "InputManager.h"
 #include "SoundManager.h"
 #include "World.h"
-#include "Player.h"
 
 extern World world;
 
@@ -41,6 +40,7 @@ void Board::update()
 void Board::draw()
 {
 	drawObject(m_background);
+	m_ground.draw();
 	drawObject(m_player);
 
 }
