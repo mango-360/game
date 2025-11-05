@@ -1,3 +1,9 @@
 PlayerImage: bob.bmp
 SourceRect: 0 0 32 32
-DestinationRect: 900 700 100 100
+DestinationRect: 900 700 32 32
+hitBox: 905 710 24 15
+PlayerRenderMultiplier(float): 3
+moveSpeed: 8
+JumpStrength: 15
+Gravity: 1
+hitBoxOffset: 5 10

@@ -24,7 +24,6 @@ void TitleScreen::run()
 	if (InputManager::isMousePressed() || InputManager::isAnyKeyPressed())
 	{
 		world.m_stateManager.changeState(GAME_STATE::GAME);
-		printf("Changing state to GAME\n");
 		return;
 	}
 }

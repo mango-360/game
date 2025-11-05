@@ -30,6 +30,8 @@ void Board::init()
 	m_background = loadTexture(backgroundImg);
 
 	m_player.init();
+
+	m_ground.init();
 }
 
 void Board::update()

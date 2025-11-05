@@ -10,6 +10,7 @@ class Ground
 	void init();
 	void draw();
 	void destroy();
-private:
+
 	DrawableWithSrc m_groundTile;
+private:
 };
