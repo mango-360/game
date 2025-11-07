@@ -9,6 +9,7 @@
 #include "TextField.h"
 #include "Player.h"
 #include "Ground.h"
+#include "Tile.h"
 
 class Board
 {
@@ -17,6 +18,7 @@ public:
 	~Board();
 
 	void init();
+	void initMap(); 
 	void update();
 	void draw();
 	void destroy();
@@ -27,4 +29,6 @@ private:
 	Player m_player;
 
 	Ground m_ground;
+
+	Tile m_map[24][32];
 };

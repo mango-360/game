@@ -1,9 +1,7 @@
 #include "Player.h"
 #include <Presenter.h>
 #include "InputManager.h"
-#include "Board.h" // temporary, for Ground access
 
-extern Ground m_ground; // temporary, for Ground access
 
 Player::Player()
 {
