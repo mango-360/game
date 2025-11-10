@@ -9,18 +9,18 @@ public:
 	~Player();
 	void init();
 	void update();
+
+	int2 mapCoords;
 private:
 	void move();
 	void jump();
-	void moveVertical();
 	void moveSprite();
 
 	void gravityEffect();
 	bool checkIfWillHitGround();
 	void landOnGround(SDL_Rect ground);
 
-	int lastKeyPressed = -1;
-	int moveSpeed;
+	
 	int jumpStrength;
 	int VelocityX = 0;
 	int VelocityY = 0;

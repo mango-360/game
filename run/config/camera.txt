@@ -1,0 +1,3 @@
+Position: 100 452
+Zoom: 3
+MoveSpeed: 3

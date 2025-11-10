@@ -26,7 +26,6 @@ void Player::init()
 	stream >> tmp >> rect.x >> rect.y >> rect.w >> rect.h;
 	stream >> tmp >> hitBox.x >> hitBox.y >> hitBox.w >> hitBox.h;
 	stream >> tmp >> playerRenderMultiplier;
-	stream >> tmp >> moveSpeed;
 	stream >> tmp >> jumpStrength;
 	stream >> tmp >> Gravity;
 	stream >> tmp >> hitBoxOffsetX >> hitBoxOffsetY;
@@ -49,6 +48,8 @@ void Player::init()
 	hitBoxOffsetY *= playerRenderMultiplier;
 
 	std::cout << "Player dimention: " << rect.w << std::endl;
+
+	mapCoords = { 16, 12 };
 }
 
 void Player::update()
@@ -67,8 +68,6 @@ void Player::jump()
 
 void Player::move()
 {
-	moveVertical();
-
 	if (InputManager::isKeyPressed(SDL_SCANCODE_W) && isOnGround)
 	{
 		jump();
@@ -82,37 +81,7 @@ void Player::move()
 	moveSprite();
 }
 
-void Player::moveVertical()
-{
-	if (InputManager::isKeyPressed(SDL_SCANCODE_D))
-	{
-		if (InputManager::isKeyPressed(SDL_SCANCODE_A))
-		{
-			if (lastKeyPressed == SDL_SCANCODE_D)
-			{
-				rect.x -= moveSpeed;
-				srcRect.x = srcRect.w;
-			}
-			else
-			{
-				rect.x += moveSpeed;
-				srcRect.x = 0;
-			}
-		}
-		else
-		{
-			rect.x += moveSpeed;
-			srcRect.x = 0;
-			lastKeyPressed = SDL_SCANCODE_D;
-		}
-	}
-	else if (InputManager::isKeyPressed(SDL_SCANCODE_A))
-	{
-		rect.x -= moveSpeed;
-		srcRect.x = srcRect.w;
-		lastKeyPressed = SDL_SCANCODE_A;
-	}
-}
+
 
 void Player::moveSprite()
 {

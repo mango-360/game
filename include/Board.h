@@ -10,6 +10,7 @@
 #include "Player.h"
 #include "Ground.h"
 #include "Tile.h"
+#include "Camera.h"
 
 class Board
 {
@@ -23,6 +24,7 @@ public:
 	void draw();
 	void destroy();
 
+	Tile m_map[24][32];
 private:
 	SDL_Texture* m_background;
 
@@ -30,5 +32,6 @@ private:
 
 	Ground m_ground;
 
-	Tile m_map[24][32];
+
+	Camera m_camera;
 };

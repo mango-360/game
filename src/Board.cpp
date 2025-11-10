@@ -36,6 +36,8 @@ void Board::init()
 	m_ground.init();
 
 	initMap();
+
+	m_camera.init(&m_ground);
 }
 
 void Board::initMap()
@@ -80,14 +82,15 @@ void Board::initMap()
 void Board::update()
 {
 	m_player.update();
+	m_camera.update();
 }
 
 void Board::draw()
 {
 	drawObject(m_background);
-	m_ground.draw();
+	//m_ground.draw();
 	drawObject(m_player);
-
+	m_camera.draw();
 }
 
 void Board::destroy()
