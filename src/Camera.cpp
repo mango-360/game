@@ -13,7 +13,7 @@ Camera::~Camera()
 {
 }
 
-void Camera::init(Ground* ground)
+void Camera::init(Player* player, Ground* ground)
 {
 	string tmp, cameraFile = "camera.txt";
 
@@ -21,33 +21,42 @@ void Camera::init(Ground* ground)
 
 	stream.open(CONFIG_FOLDER + cameraFile);
 
-	stream >> tmp >> position.x >> position.y;
-	stream >> tmp >> zoom;
 	stream >> tmp >> moveSpeed;
 
 	stream.close();
 
-	m_ground = ground;
-
 	// Ensure ground tile size is consistent with zoom after init
-	if (m_ground)
+	/*if (m_ground)
 	{
-		int tileSize = std::max(1, static_cast<int>(32 * zoom));
+		int tileSize = max(1, static_cast<int>(TILE_SIZE * zoom));
 		m_ground->m_groundTile.rect.w = tileSize;
 		m_ground->m_groundTile.rect.h = tileSize;
-	}
+	}*/
+
+	m_player = player;
+	m_ground = ground;
 }
 
 void Camera::update()
 {
-	zoomUpdate();
 	move();
 }
 
 void Camera::draw()
 {
 	
-	int tileSize = static_cast<int>(32 * zoom);
+	
+}
+
+void Camera::move()
+{
+
+}
+
+void Camera::updateMap()
+{
+	m_ground->updateZoom();
+	int tileSize = static_cast<int>(TILE_SIZE * InputManager::getZoom());
 
 	int firstTileX = static_cast<int>(floor(position.x / static_cast<double>(tileSize)));
 	int firstTileY = static_cast<int>(floor(position.y / static_cast<double>(tileSize)));
@@ -55,6 +64,11 @@ void Camera::draw()
 	// How many tiles are needed to fill the screen (add 2 for margin)
 	int tilesX = (1920 / tileSize) + 1;
 	int tilesY = (1080 / tileSize) + 1;
+}
+
+void Camera::drawMap()
+{
+	
 
 	for (int tx = firstTileX; tx <= firstTileX + tilesX; ++tx)
 	{
@@ -72,60 +86,3 @@ void Camera::draw()
 		}
 	}
 }
-
-void Camera::move()
-{
-	if (InputManager::isKeyPressed(SDL_SCANCODE_D))
-	{
-		if (InputManager::isKeyPressed(SDL_SCANCODE_A))
-		{
-			if (lastKeyPressed == SDL_SCANCODE_D)
-			{
-				position.x -= static_cast<int>(moveSpeed * zoom);
-			}
-			else
-			{
-				position.x += static_cast<int>(moveSpeed * zoom);
-			}
-		}
-		else
-		{
-			position.x += static_cast<int>(moveSpeed * zoom);
-			lastKeyPressed = SDL_SCANCODE_D;
-		}
-	}
-	else if (InputManager::isKeyPressed(SDL_SCANCODE_A))
-	{
-		position.x -= static_cast<int>(moveSpeed * zoom);
-		lastKeyPressed = SDL_SCANCODE_A;
-	}
-}
-
-void Camera::zoomUpdate()
-{
-	if (!m_ground) return;
-
-	const float zoomStep = 0.1f;
-	const float minZoom = 0.25f;
-	const float maxZoom = 4.0f;
-
-	if (InputManager::isKeyPressed(SDL_SCANCODE_Q))
-	{
-		zoom = std::min(maxZoom, zoom + zoomStep);
-	}
-	else if (InputManager::isKeyPressed(SDL_SCANCODE_E))
-	{
-		zoom = std::max(minZoom, zoom - zoomStep);
-	}
-
-	// Ensure ground tile size is updated when zoom changes
-	int tileSize = std::max(1, static_cast<int>(32 * zoom));
-	m_ground->m_groundTile.rect.w = tileSize;
-	m_ground->m_groundTile.rect.h = tileSize;
-}
-
-int2 Camera::getPosition()
-{
-	return position;
-}
-

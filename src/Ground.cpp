@@ -1,5 +1,6 @@
 #include "ground.h"
 #include "Presenter.h"
+#include "InputManager.h"
 
 Ground::Ground()
 {
@@ -27,16 +28,13 @@ void Ground::init()
 	stream.close();
 }
 
-//void Ground::draw() // how to do this better?
-//{
-//	for(int i = 0; i < 1920; i += m_groundTile.rect.w)
-//	{
-//		m_groundTile.rect.x = i;
-//		drawObject(m_groundTile);
-//	}
-//}
-
 void Ground::destroy()
 {
 	SDL_DestroyTexture(m_groundTile.texture);
+}
+
+void Ground::updateZoom()
+{
+	m_groundTile.rect.w = m_groundTile.srcRect.w * InputManager::getZoom();
+	m_groundTile.rect.h = m_groundTile.srcRect.h * InputManager::getZoom();
 }

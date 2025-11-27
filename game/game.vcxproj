@@ -33,7 +33,6 @@
     <ClInclude Include="..\include\State.h" />
     <ClInclude Include="..\include\StateManager.h" />
     <ClInclude Include="..\include\TextField.h" />
-    <ClInclude Include="..\include\Tile.h" />
     <ClInclude Include="..\include\TitleScreen.h" />
     <ClInclude Include="..\include\WinScreen.h" />
     <ClInclude Include="..\include\World.h" />
@@ -54,7 +53,6 @@
     <ClCompile Include="..\src\State.cpp" />
     <ClCompile Include="..\src\StateManager.cpp" />
     <ClCompile Include="..\src\TextField.cpp" />
-    <ClCompile Include="..\src\Tile.cpp" />
     <ClCompile Include="..\src\TitleScreen.cpp" />
     <ClCompile Include="..\src\WinScreen.cpp" />
     <ClCompile Include="..\src\World.cpp" />

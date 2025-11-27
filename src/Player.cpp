@@ -26,6 +26,7 @@ void Player::init()
 	stream >> tmp >> rect.x >> rect.y >> rect.w >> rect.h;
 	stream >> tmp >> hitBox.x >> hitBox.y >> hitBox.w >> hitBox.h;
 	stream >> tmp >> playerRenderMultiplier;
+	stream >> tmp >> moveSpeed;
 	stream >> tmp >> jumpStrength;
 	stream >> tmp >> Gravity;
 	stream >> tmp >> hitBoxOffsetX >> hitBoxOffsetY;
@@ -68,7 +69,9 @@ void Player::jump()
 
 void Player::move()
 {
-	if (InputManager::isKeyPressed(SDL_SCANCODE_W) && isOnGround)
+	moveVertical();
+
+	if ((InputManager::isKeyPressed(SDL_SCANCODE_W) || InputManager::isKeyPressed(SDL_SCANCODE_SPACE)) && isOnGround)
 	{
 		jump();
 	}
@@ -81,13 +84,40 @@ void Player::move()
 	moveSprite();
 }
 
-
+void Player::moveVertical()
+{
+	if (InputManager::isKeyPressed(SDL_SCANCODE_D))
+	{
+		if (InputManager::isKeyPressed(SDL_SCANCODE_A))
+		{
+			if (lastKeyPressed == SDL_SCANCODE_D)
+			{
+				mapCoords.x -= moveSpeed;
+				srcRect.x = srcRect.w;
+			}
+			else
+			{
+				mapCoords.x += moveSpeed;
+				srcRect.x = 0;
+			}
+		}
+		else
+		{
+			mapCoords.x += moveSpeed;
+			srcRect.x = 0;
+			lastKeyPressed = SDL_SCANCODE_D;
+		}
+	}
+	else if (InputManager::isKeyPressed(SDL_SCANCODE_A))
+	{
+		mapCoords.x -= moveSpeed;
+		srcRect.x = srcRect.w;
+		lastKeyPressed = SDL_SCANCODE_A;
+	}
+}
 
 void Player::moveSprite()
 {
-	rect.x += VelocityX;
-	rect.y += VelocityY;
-
 	hitBox.x = rect.x + hitBoxOffsetX;
 	hitBox.y = rect.y + hitBoxOffsetY;
 }
@@ -100,7 +130,7 @@ void Player::gravityEffect()
 bool Player::checkIfWillHitGround() // how to collide better with ground?
 {
 	SDL_Rect FuturePlayerHitBox = { hitBox.x + VelocityX, hitBox.y + VelocityY, hitBox.w, hitBox.h };
-
+	
 	return collRectRect(FuturePlayerHitBox, tmpGroundHitBox);
 }
 

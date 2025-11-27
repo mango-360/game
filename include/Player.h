@@ -10,23 +10,26 @@ public:
 	void init();
 	void update();
 
-	int2 mapCoords;
+	float2 mapCoords;
 private:
 	void move();
 	void jump();
+	void moveVertical();
 	void moveSprite();
 
 	void gravityEffect();
 	bool checkIfWillHitGround();
 	void landOnGround(SDL_Rect ground);
 
-	
+	int lastKeyPressed = -1;
 	int jumpStrength;
 	int VelocityX = 0;
 	int VelocityY = 0;
 	int Gravity;
 	int hitBoxOffsetX;
 	int hitBoxOffsetY;
+
+	float moveSpeed;
 
 	bool isOnGround = false;
 

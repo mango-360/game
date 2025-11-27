@@ -37,7 +37,7 @@ void Board::init()
 
 	initMap();
 
-	m_camera.init(&m_ground);
+	m_camera.init(&m_player, &m_ground);
 }
 
 void Board::initMap()
@@ -57,9 +57,9 @@ void Board::initMap()
 	for (int i = 0; i < 32; ++i)
 	{
 		float noiseF =
-			amplitudeMultiplier * sizeMultiplier * std::sin(x * 0.02f / sizeMultiplier) * 10.0f +
-			amplitudeMultiplier * sizeMultiplier * std::sin(x * 0.05f / sizeMultiplier) * 5.0f +
-			amplitudeMultiplier * sizeMultiplier * std::sin(x * 0.1f / sizeMultiplier) * 3.0f;
+			amplitudeMultiplier * sizeMultiplier * sin(x * 0.02f / sizeMultiplier) * 10.0f +
+			amplitudeMultiplier * sizeMultiplier * sin(x * 0.05f / sizeMultiplier) * 5.0f +
+			amplitudeMultiplier * sizeMultiplier * sin(x * 0.1f / sizeMultiplier) * 3.0f;
 
 		int noise = static_cast<int>(round(noiseF));
 

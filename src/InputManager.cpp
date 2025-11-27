@@ -3,6 +3,7 @@
 bool InputManager::m_mousePressed = false;
 int2 InputManager::m_mouseCoor = {0, 0};
 const Uint8* InputManager::m_keyboardState = nullptr;
+float InputManager::m_zoom = 3;
 
 InputManager::InputManager()
 {
@@ -28,6 +29,18 @@ void InputManager::handleInput()
 		case SDL_MOUSEBUTTONDOWN:
 			if (m_event.button.button == SDL_BUTTON_LEFT)
 				m_mousePressed = true;
+			break;
+		case SDL_MOUSEWHEEL:
+			if (m_event.wheel.y > 0) // Toward Screen
+			{
+				m_zoom += zoomStep; // Zoom in
+				if (m_zoom > maxZoom) m_zoom = maxZoom;
+			}
+			else if(m_event.wheel.y < 0) // Toward me
+			{
+				m_zoom -= zoomStep; // Zoom out
+				if (m_zoom < minZoom) m_zoom = minZoom;
+			}
 			break;
 		default:
 			break;
