@@ -35,17 +35,23 @@ void Camera::init(Player* player, Ground* ground)
 
 	m_player = player;
 	m_ground = ground;
+
+	prevZoom = InputManager::getZoom();
+	prevTileSize = static_cast<int>(TILE_SIZE * prevZoom);
 }
 
 void Camera::update()
 {
 	move();
+
+	if (InputManager::getZoom() != prevZoom) zoom(); //if zoom changed
+
+	updateTileSize();
 }
 
 void Camera::draw()
 {
-	
-	
+	drawMap();
 }
 
 void Camera::move()
@@ -53,35 +59,33 @@ void Camera::move()
 
 }
 
-void Camera::updateMap()
+void Camera::zoom()
 {
-	m_ground->updateZoom();
-	int tileSize = static_cast<int>(TILE_SIZE * InputManager::getZoom());
+	float halfWidth = static_cast<float>(Presenter::m_SCREEN_WIDTH) / 2.0f;
+	 
+	position.x += halfWidth / prevTileSize * (InputManager::getZoom() - prevZoom);
+	position.y += halfWidth / prevTileSize * (InputManager::getZoom() - prevZoom);
 
-	int firstTileX = static_cast<int>(floor(position.x / static_cast<double>(tileSize)));
-	int firstTileY = static_cast<int>(floor(position.y / static_cast<double>(tileSize)));
+	prevZoom = InputManager::getZoom();
+}
 
-	// How many tiles are needed to fill the screen (add 2 for margin)
-	int tilesX = (1920 / tileSize) + 1;
-	int tilesY = (1080 / tileSize) + 1;
+void Camera::updateTileSize()
+{
+	prevTileSize = static_cast<int>(TILE_SIZE * InputManager::getZoom());
 }
 
 void Camera::drawMap()
 {
-	
+	int startingX = -1 * (fmod(position.x, 1.0) * prevTileSize); // starting pixel x position
+	int startingY = -1 * (fmod(position.y, 1.0) * prevTileSize); // starting pixel y position
 
-	for (int tx = firstTileX; tx <= firstTileX + tilesX; ++tx)
+	for(int i = startingY; i <= Presenter::m_SCREEN_HEIGHT; i += prevTileSize)
 	{
-		for (int ty = firstTileY; ty <= firstTileY + tilesY; ++ty)
+		for(int j = startingX; j <= Presenter::m_SCREEN_WIDTH; j += prevTileSize)
 		{
-			if (world.m_stateManager.m_game->m_board.m_map[ty][tx] == Tile::AIR) continue;
-
-			int destX = tx * tileSize - position.x;
-			int destY = ty * tileSize - position.y;
-
-			m_ground->m_groundTile.rect.x = destX;
-			m_ground->m_groundTile.rect.y = destY;
-
+			m_ground->m_groundTile.rect.y = i;
+			m_ground->m_groundTile.rect.x = j;
+			
 			drawObject(m_ground->m_groundTile);
 		}
 	}

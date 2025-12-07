@@ -65,7 +65,7 @@ void Board::initMap()
 
 		int y = surfaceLevel - noise;
 		if (y >= 0 && y < 24) // guard array bounds
-			m_map[y][i] = Tile::GRASSBLOCK;
+			m_map[y][i] = TILE_TYPE::GRASSBLOCK;
 
 		cout << noise << " ";
 
@@ -82,13 +82,13 @@ void Board::initMap()
 void Board::update()
 {
 	m_player.update();
+	m_ground.update();
 	m_camera.update();
 }
 
 void Board::draw()
 {
 	drawObject(m_background);
-	//m_ground.draw();
 	drawObject(m_player);
 	m_camera.draw();
 }

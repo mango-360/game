@@ -2,16 +2,23 @@
 
 #include "defines.h"
 
-class Ground
+class Tile
 {
-	public:
-	Ground();
-	~Ground();
+public:
+
+	Tile();
+	~Tile();
 	void init();
 	void update();
+	void draw();
 	void destroy();
 
-	DrawableWithSrc m_groundTile;
+protected:
+	Drawable m_tile;
+
+	TILE_TYPE m_type;
+
+	int m_hp;
 private:
 
 	void updateZoom();

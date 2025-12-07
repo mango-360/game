@@ -28,6 +28,11 @@ void Ground::init()
 	stream.close();
 }
 
+void Ground::update()
+{
+	updateZoom();
+}	
+
 void Ground::destroy()
 {
 	SDL_DestroyTexture(m_groundTile.texture);

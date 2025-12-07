@@ -98,8 +98,9 @@ enum COLOR
 	ORANGE = 4,
 };
 
-enum Tile
+enum TILE_TYPE
 {
-	AIR = 0,
-	GRASSBLOCK = 1,
+	NONE = 0,
+	AIR = 1,
+	GRASSBLOCK = 2,
 };

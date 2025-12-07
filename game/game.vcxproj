@@ -33,17 +33,20 @@
     <ClInclude Include="..\include\State.h" />
     <ClInclude Include="..\include\StateManager.h" />
     <ClInclude Include="..\include\TextField.h" />
+    <ClInclude Include="..\include\Tile.h" />
     <ClInclude Include="..\include\TitleScreen.h" />
     <ClInclude Include="..\include\WinScreen.h" />
     <ClInclude Include="..\include\World.h" />
     <ClInclude Include="..\include\Writer.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\include\ImgManager.h" />
     <ClCompile Include="..\src\Board.cpp" />
     <ClCompile Include="..\src\Camera.cpp" />
     <ClCompile Include="..\src\Engine.cpp" />
     <ClCompile Include="..\src\Game.cpp" />
     <ClCompile Include="..\src\Ground.cpp" />
+    <ClCompile Include="..\src\ImgManager.cpp" />
     <ClCompile Include="..\src\InputManager.cpp" />
     <ClCompile Include="..\src\main.cpp" />
     <ClCompile Include="..\src\Entity.cpp" />
@@ -53,6 +56,7 @@
     <ClCompile Include="..\src\State.cpp" />
     <ClCompile Include="..\src\StateManager.cpp" />
     <ClCompile Include="..\src\TextField.cpp" />
+    <ClCompile Include="..\src\Tile.cpp" />
     <ClCompile Include="..\src\TitleScreen.cpp" />
     <ClCompile Include="..\src\WinScreen.cpp" />
     <ClCompile Include="..\src\World.cpp" />

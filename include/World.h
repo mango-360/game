@@ -4,6 +4,7 @@
 #include "InputManager.h"
 #include "StateManager.h"
 #include "SoundManager.h"
+#include "ImgManager.h"
 
 class World
 {
@@ -15,6 +16,7 @@ public:
 	SoundManager m_soundManager;
 	InputManager m_inputManager;
 	StateManager m_stateManager;
+	ImgManager m_imgManager;
 
 	void init();
 	void run();

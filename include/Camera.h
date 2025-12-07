@@ -10,18 +10,22 @@ class Camera
 	void init(Player* player, Ground* ground);
 	void update();
 	void draw();
-	int2 getPosition() { return position; };
+	float2 getPosition() { return position; };
 
 private:
 	void move();
-	void updateMap();
+	void zoom();
+	void updateTileSize();
 	void drawMap();
 
-	int2 position;
+	float2 position;
 	
 	float moveSpeed;
 
 	Player* m_player;
 
 	Ground* m_ground;
+
+	float prevZoom = 1.0f;
+	float prevTileSize;
 };

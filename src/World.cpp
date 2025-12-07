@@ -15,6 +15,7 @@ void World::init()
 	m_presenter.init();
 	m_stateManager.init(GAME_STATE::TITLE_SCREEN);
 	m_soundManager.init();
+	m_imgManager.loadAllTextures();
 }
 
 void World::run()
@@ -31,6 +32,7 @@ void World::destroy()
 	SDL_DestroyRenderer(Presenter::m_mainRenderer);
 	SDL_DestroyWindow(Presenter::m_mainWindow);
 	m_soundManager.destroy();
+	m_imgManager.destroyAllTextures();
 }
 
 bool World::isRunning()
