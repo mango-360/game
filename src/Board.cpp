@@ -64,7 +64,7 @@ void Board::initMap()
 		{
 			GrassBlock grassBlock;
 
-			grassBlock.init();
+			grassBlock.init({i, y});
 
 			grassBlock.setPosition({ i * TILE_SIZE, y * TILE_SIZE });
 
@@ -74,7 +74,7 @@ void Board::initMap()
 		{
 			Tile tile;
 
-			tile.init();
+			tile.init({i, y});
 
 			tile.setPosition({ i * TILE_SIZE, y * TILE_SIZE });
 

@@ -8,7 +8,7 @@ public:
 
 	Tile();
 	~Tile();
-	virtual void init();
+	virtual void init(int2 coords);
 	void update();
 	void draw();
 	void destroy();
@@ -20,6 +20,8 @@ protected:
 	TILE_TYPE m_type;
 
 	int m_hp;
+
+	int2 m_gridCoords;
 private:
 
 	void updateZoom();

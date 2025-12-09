@@ -10,12 +10,13 @@ Tile::~Tile()
 {
 }
 
-void Tile::init()
+void Tile::init(int2 coords)
 {
 	m_tile.texture = nullptr;
 	m_tile.rect = { 0, 0, TILE_SIZE, TILE_SIZE };
 	m_hp = 0;
 	m_type = TILE_TYPE::NONE_TYPE;
+	m_gridCoords = coords;
 }
 
 void Tile::update()
@@ -39,4 +40,7 @@ void Tile::updateZoom()
 {
 	m_tile.rect.w = TILE_SIZE * InputManager::getZoom();
 	m_tile.rect.h = TILE_SIZE * InputManager::getZoom();
+
+	m_tile.rect.x = m_gridCoords.x * m_tile.rect.w;
+	m_tile.rect.y = m_gridCoords.y * m_tile.rect.h;
 }
