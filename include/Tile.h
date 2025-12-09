@@ -8,10 +8,11 @@ public:
 
 	Tile();
 	~Tile();
-	void init();
+	virtual void init();
 	void update();
 	void draw();
 	void destroy();
+	void setPosition(int2 coords);
 
 protected:
 	Drawable m_tile;

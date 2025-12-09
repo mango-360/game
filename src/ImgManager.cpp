@@ -21,7 +21,7 @@ void ImgManager::loadAllTextures()
 
 	stream.close();
 
-	m_grassBlockTexture = loadTexture(grassBlockImg);
+	m_grassBlockTexture = loadTexture(TILES_FOLDER + grassBlockImg);
 
 	if (m_grassBlockTexture) {
 		SDL_SetTextureScaleMode(m_grassBlockTexture, SDL_ScaleModeNearest); // prevents linear filtering for this texture

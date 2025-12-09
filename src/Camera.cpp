@@ -13,7 +13,7 @@ Camera::~Camera()
 {
 }
 
-void Camera::init(Player* player, Ground* ground)
+void Camera::init(Player* player)
 {
 	string tmp, cameraFile = "camera.txt";
 
@@ -34,7 +34,6 @@ void Camera::init(Player* player, Ground* ground)
 	}*/
 
 	m_player = player;
-	m_ground = ground;
 
 	prevZoom = InputManager::getZoom();
 	prevTileSize = static_cast<int>(TILE_SIZE * prevZoom);
@@ -79,7 +78,7 @@ void Camera::drawMap()
 	int startingX = -1 * (fmod(position.x, 1.0) * prevTileSize); // starting pixel x position
 	int startingY = -1 * (fmod(position.y, 1.0) * prevTileSize); // starting pixel y position
 
-	for(int i = startingY; i <= Presenter::m_SCREEN_HEIGHT; i += prevTileSize)
+	/*for(int i = startingY; i <= Presenter::m_SCREEN_HEIGHT; i += prevTileSize)
 	{
 		for(int j = startingX; j <= Presenter::m_SCREEN_WIDTH; j += prevTileSize)
 		{
@@ -88,5 +87,5 @@ void Camera::drawMap()
 			
 			drawObject(m_ground->m_groundTile);
 		}
-	}
+	}*/
 }

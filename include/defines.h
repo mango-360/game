@@ -13,6 +13,7 @@ static const string CONFIG_FOLDER = "config\\";
 static const string SOUND_FOLDER = "sound\\";
 static const string FONT_FOLDER = "font\\";
 static const string TEXT_FIELD_FOLDER = "textField\\";
+static const string TILES_FOLDER = "tiles\\";
 
 static const int TILE_SIZE = 32;
 
@@ -66,6 +67,8 @@ struct int2
 
 struct Drawable
 {
+	string img;
+
 	SDL_Texture* texture;
 	SDL_Rect rect; //dst rect
 };
@@ -100,7 +103,37 @@ enum COLOR
 
 enum TILE_TYPE
 {
-	NONE = 0,
+	NONE_TYPE = 0,
 	AIR = 1,
 	GRASSBLOCK = 2,
 };
+
+inline istream& operator>>(istream& is, SDL_Rect& rect)
+{
+	is >> rect.x >> rect.y >> rect.w >> rect.h;
+	return is;
+}
+
+inline ostream& operator<<(ostream& os, SDL_Rect& rect)
+{
+	os << rect.x << " " << rect.y << " " << rect.w << " " << rect.h;
+	return os;
+}
+
+inline istream& operator>>(istream& is, int2& vec)
+{
+	is >> vec.x >> vec.y;
+	return is;
+}
+
+inline istream& operator>>(istream& is, Drawable& dr)
+{
+	is >> dr.img >> dr.rect;
+	return is;
+}
+
+inline ostream& operator<<(ostream& os, int2& vec)
+{
+	os << vec.x << " " << vec.y;
+	return os;
+}
