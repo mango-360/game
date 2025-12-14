@@ -102,8 +102,7 @@ void Board::update()
 void Board::draw()
 {
 	drawObject(m_background);
-	drawObject(m_player);
-	m_camera.draw();
+	m_player.draw();
 	drawMap();
 }
 
@@ -145,7 +144,6 @@ SDL_Rect Board::getStartEndTiles()
 	// Determine visible tile range and update only those tiles
 	const float zoom = InputManager::getZoom();
 	const float tilePx = TILE_SIZE * zoom;
-	cout << "Zoom: " << zoom << ", TilePx: " << tilePx << endl;
 
 	// Defensive: if zoom or TILE_SIZE are invalid for any reason, return full map bounds
 	if (tilePx <= 0.0f)
@@ -153,18 +151,22 @@ SDL_Rect Board::getStartEndTiles()
 		return { 0, 0, MAP_WIDTH - 1, MAP_HEIGHT - 1 };
 	}
 
-	float2 camPos = m_camera.getPosition(); // camera position is in tile units (center)
+	// Camera now provides a pixel rect (top-left in world pixels, width/height = screen px).
+	SDL_Rect camRect = m_camera.getCameraRect();
 
-	// how many tiles fit half-screen in each direction (from center)
-	const float halfTilesX = (float)Presenter::m_SCREEN_WIDTH / (2.0f * tilePx);
-	const float halfTilesY = (float)Presenter::m_SCREEN_HEIGHT / (2.0f * tilePx);
+	// Convert camera pixel bounds to tile indices.
+	// Use floor for left/top and floor((right-1)/tilePx) for right/bottom so edges map to correct tiles.
+	const float camLeftPx = static_cast<float>(camRect.x);
+	const float camTopPx = static_cast<float>(camRect.y);
+	const float camRightPx = camLeftPx + static_cast<float>(camRect.w);
+	const float camBottomPx = camTopPx + static_cast<float>(camRect.h);
 
 	// compute integer tile indices and add padding to avoid popping
 	const int padding = 2;
-	int startX = static_cast<int>(floor(camPos.x - halfTilesX)) - padding;
-	int endX = static_cast<int>(floor(camPos.x + halfTilesX)) + padding;
-	int startY = static_cast<int>(floor(camPos.y - halfTilesY)) - padding;
-	int endY = static_cast<int>(floor(camPos.y + halfTilesY)) + padding;
+	int startX = static_cast<int>(floor(camLeftPx / tilePx)) - padding;
+	int endX = static_cast<int>(floor((camRightPx - 1.0f) / tilePx)) + padding;
+	int startY = static_cast<int>(floor(camTopPx / tilePx)) - padding;
+	int endY = static_cast<int>(floor((camBottomPx - 1.0f) / tilePx)) + padding;
 
 	// clamp to map bounds
 	startX = max(startX, 0);

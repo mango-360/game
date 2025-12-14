@@ -3,7 +3,7 @@
 bool InputManager::m_mousePressed = false;
 int2 InputManager::m_mouseCoor = {0, 0};
 const Uint8* InputManager::m_keyboardState = nullptr;
-float InputManager::m_zoom = 1;
+float InputManager::m_zoom = 3;
 
 InputManager::InputManager()
 {

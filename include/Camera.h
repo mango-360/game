@@ -1,6 +1,7 @@
 #pragma once
 
 #include "defines.h"
+#include "Player.h"
 
 class Camera
 {
@@ -9,21 +10,10 @@ class Camera
 	~Camera();
 	void init(Player* player);
 	void update();
-	void draw();
-	float2 getPosition() { return position; };
+	SDL_Rect getCameraRect() const { return cameraRect; };
 
 private:
-	void move();
-	void zoom();
-	void updateTileSize();
-	void drawMap();
-
-	float2 position;
-	
-	float moveSpeed;
+	SDL_Rect cameraRect;
 
 	Player* m_player;
-
-	float prevZoom = 1.0f;
-	float prevTileSize;
 };

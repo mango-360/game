@@ -28,9 +28,9 @@ void Player::init()
 	stream >> tmp >> playerRenderMultiplier;
 	stream >> tmp >> moveSpeed;
 	stream >> tmp >> jumpStrength;
-	stream >> tmp >> Gravity;
-	stream >> tmp >> hitBoxOffsetX >> hitBoxOffsetY;
-	
+	stream >> tmp >> gravity;
+	stream >> tmp >> hitBoxOffset.x >> hitBoxOffset.y;
+
 	texture = loadTexture(playerImg);
 	if (texture) {
 	    SDL_SetTextureScaleMode(texture, SDL_ScaleModeNearest); // prevents linear filtering for this texture
@@ -45,12 +45,12 @@ void Player::init()
 
 	hitBox.w *= playerRenderMultiplier;
 	hitBox.h *= playerRenderMultiplier;
-	hitBoxOffsetX *= playerRenderMultiplier;
-	hitBoxOffsetY *= playerRenderMultiplier;
+	hitBoxOffset.x *= playerRenderMultiplier;
+	hitBoxOffset.y *= playerRenderMultiplier;
 
 	std::cout << "Player dimention: " << rect.w << std::endl;
 
-	mapCoords = { 16, 12 };
+	mapCoords = { 16.0f, 12.0f };
 }
 
 void Player::update()
@@ -60,9 +60,22 @@ void Player::update()
 	gravityEffect();
 }
 
+void Player::draw()
+{
+	rect.x = getRealCoords().x;
+	rect.y = getRealCoords().y;
+
+	drawObject(*this);
+}
+
+int2 Player::getRealCoords()
+{
+	return { static_cast<int>(mapCoords.x * TILE_SIZE * InputManager::getZoom()), static_cast<int>(mapCoords.y * TILE_SIZE * InputManager::getZoom()) };
+}
+
 void Player::jump()
 {
-	VelocityY = -jumpStrength;
+	velocity.y = -jumpStrength;
 
 	isOnGround = false;
 }
@@ -118,18 +131,18 @@ void Player::moveVertical()
 
 void Player::moveSprite()
 {
-	hitBox.x = rect.x + hitBoxOffsetX;
-	hitBox.y = rect.y + hitBoxOffsetY;
+	hitBox.x = rect.x + hitBoxOffset.x;
+	hitBox.y = rect.y + hitBoxOffset.y;
 }
 
 void Player::gravityEffect()
 {
-	VelocityY += Gravity;
+	velocity.y += gravity;
 }
 
 bool Player::checkIfWillHitGround() // how to collide better with ground?
 {
-	SDL_Rect FuturePlayerHitBox = { hitBox.x + VelocityX, hitBox.y + VelocityY, hitBox.w, hitBox.h };
+	SDL_Rect FuturePlayerHitBox = { hitBox.x + velocity.x, hitBox.y + velocity.y, hitBox.w, hitBox.h };
 	
 	return collRectRect(FuturePlayerHitBox, tmpGroundHitBox);
 }
@@ -138,7 +151,7 @@ void Player::landOnGround(SDL_Rect ground)
 {
 	isOnGround = true;
 	
-	VelocityY = 0;
-	rect.y = ground.y - hitBoxOffsetY - hitBox.h;
-	hitBox.y = rect.y + hitBoxOffsetY;
+	velocity.y = 0;
+	rect.y = ground.y - hitBoxOffset.y - hitBox.h;
+	hitBox.y = rect.y + hitBoxOffset.y;
 }

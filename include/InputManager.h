@@ -28,7 +28,7 @@ private:
 	static bool m_mousePressed;
 
 	const float zoomStep = 0.1f;
-	const float minZoom = 0.50f;
+	const float minZoom = 1.5f;
 	const float maxZoom = 4.0f;
 	
 	static float m_zoom;

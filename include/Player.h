@@ -9,8 +9,9 @@ public:
 	~Player();
 	void init();
 	void update();
+	void draw();
+	int2 getRealCoords();
 
-	float2 mapCoords;
 private:
 	void move();
 	void jump();
@@ -23,11 +24,9 @@ private:
 
 	int lastKeyPressed = -1;
 	int jumpStrength;
-	int VelocityX = 0;
-	int VelocityY = 0;
-	int Gravity;
-	int hitBoxOffsetX;
-	int hitBoxOffsetY;
+	int2 velocity = { 0, 0 };
+	int gravity;
+	int2 hitBoxOffset;
 
 	float moveSpeed;
 
@@ -35,4 +34,5 @@ private:
 
 	SDL_Rect hitBox;
 	SDL_Rect tmpGroundHitBox; // temporary, for Ground hitbox
+	float2 mapCoords;
 };

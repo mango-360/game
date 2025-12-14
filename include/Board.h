@@ -24,7 +24,7 @@ public:
 	void draw();
 	void destroy();
 
-	Tile m_map[32][24];
+	Tile m_map[320][240];
 
 	Player m_player;
 private:
@@ -37,6 +37,6 @@ private:
 
 	Camera m_camera;
 
-	const int MAP_WIDTH = 32;
-	const int MAP_HEIGHT = 24;
+	const int MAP_WIDTH = 320;
+	const int MAP_HEIGHT = 240;
 };
