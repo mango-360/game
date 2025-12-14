@@ -9,11 +9,11 @@ public:
 	~Player();
 	void init();
 	void update();
-	//void draw();                      // legacy, draws without camera (kept)
 	void draw(int2 camOffset); // camera-aware draw
-	int2 getRealCoords();
+	float2 getRealCoords();
 
 private:
+	void zoomUpdate();
 	void move();
 	void jump();
 	void moveVertical();

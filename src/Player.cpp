@@ -58,31 +58,22 @@ void Player::update()
 	move();
 
 	gravityEffect();
+
+	zoomUpdate();
 }
 
-// Legacy draw — keep for cases that expect world coords
-/*void Player::draw()
-{
-	// draw at world coords (no camera)
-	int2 world = getRealCoords();
-	rect.x = world.x;
-	rect.y = world.y;
-	drawObject(*this);
-}*/
-
-// Camera-aware draw: convert world -> screen by subtracting camera offset
 void Player::draw(int2 camOffset)
 {
-	int2 world = getRealCoords();
+	float2 world = getRealCoords();
 	rect.x = world.x - camOffset.x;
 	rect.y = world.y - camOffset.y;
 
 	drawObject(*this);
 }
 
-int2 Player::getRealCoords()
+float2 Player::getRealCoords()
 {
-	return { static_cast<int>(mapCoords.x * TILE_SIZE * InputManager::getZoom()), static_cast<int>(mapCoords.y * TILE_SIZE * InputManager::getZoom()) };
+	return { static_cast<float>(mapCoords.x * TILE_SIZE * InputManager::getZoom()), static_cast<float>(mapCoords.y * TILE_SIZE * InputManager::getZoom()) };
 }
 
 void Player::jump()
@@ -90,6 +81,12 @@ void Player::jump()
 	velocity.y = -jumpStrength;
 
 	isOnGround = false;
+}
+
+void Player::zoomUpdate()
+{
+	rect.w = srcRect.w * InputManager::getZoom();
+	rect.h = srcRect.h * InputManager::getZoom();
 }
 
 void Player::move()
