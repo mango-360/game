@@ -24,9 +24,19 @@ void Tile::update()
 	updateZoom();
 }
 
-void Tile::draw()
+/*void Tile::draw()
 {
+	// legacy: draw using the tile rect as-is (world coords). Useful if camera not applied.
 	drawObject(m_tile);
+}*/
+
+void Tile::draw(int2 camOffset)
+{
+	Drawable tmp = m_tile;
+	tmp.rect.x = m_tile.rect.x - camOffset.x;
+	tmp.rect.y = m_tile.rect.y - camOffset.y;
+
+	drawObject(tmp);
 }
 
 void Tile::destroy()

@@ -10,7 +10,8 @@ public:
 	~Tile();
 	virtual void init(int2 coords);
 	void update();
-	void draw();
+	//void draw();                 // legacy draw (no camera) - kept for compatibility
+	void draw(int2 camOffset); // draw with camera offset
 	void destroy();
 	void setPosition(int2 coords);
 

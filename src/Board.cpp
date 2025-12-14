@@ -101,8 +101,15 @@ void Board::update()
 
 void Board::draw()
 {
+	// draw background (full-screen)
 	drawObject(m_background);
-	m_player.draw();
+
+	// get camera rect to transform world -> screen
+	SDL_Rect camRect = m_camera.getCameraRect();
+
+	m_player.draw({ camRect.x, camRect.y });
+
+	// draw visible tiles with camera offset
 	drawMap();
 }
 
@@ -128,13 +135,14 @@ void Board::updateMap()
 void Board::drawMap()
 {
 	SDL_Rect visibleTiles = getStartEndTiles();
+	SDL_Rect camRect = m_camera.getCameraRect();
 
 	// Use the proper fields: x/y = startX/startY, w/h = endX/endY
 	for (int y = visibleTiles.y; y <= visibleTiles.h; ++y)
 	{
 		for (int x = visibleTiles.x; x <= visibleTiles.w; ++x)
 		{
-			m_map[y][x].draw();
+			m_map[y][x].draw({ camRect.x, camRect.y });
 		}
 	}
 }

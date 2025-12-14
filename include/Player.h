@@ -9,7 +9,8 @@ public:
 	~Player();
 	void init();
 	void update();
-	void draw();
+	//void draw();                      // legacy, draws without camera (kept)
+	void draw(int2 camOffset); // camera-aware draw
 	int2 getRealCoords();
 
 private:
@@ -30,7 +31,7 @@ private:
 
 	float moveSpeed;
 
-	bool isOnGround = false;
+	bool isOnGround = true;
 
 	SDL_Rect hitBox;
 	SDL_Rect tmpGroundHitBox; // temporary, for Ground hitbox

@@ -60,10 +60,22 @@ void Player::update()
 	gravityEffect();
 }
 
-void Player::draw()
+// Legacy draw — keep for cases that expect world coords
+/*void Player::draw()
 {
-	rect.x = getRealCoords().x;
-	rect.y = getRealCoords().y;
+	// draw at world coords (no camera)
+	int2 world = getRealCoords();
+	rect.x = world.x;
+	rect.y = world.y;
+	drawObject(*this);
+}*/
+
+// Camera-aware draw: convert world -> screen by subtracting camera offset
+void Player::draw(int2 camOffset)
+{
+	int2 world = getRealCoords();
+	rect.x = world.x - camOffset.x;
+	rect.y = world.y - camOffset.y;
 
 	drawObject(*this);
 }
@@ -86,6 +98,7 @@ void Player::move()
 
 	if ((InputManager::isKeyPressed(SDL_SCANCODE_W) || InputManager::isKeyPressed(SDL_SCANCODE_SPACE)) && isOnGround)
 	{
+		cout << " HWERE " << std::endl;
 		jump();
 	}
 
