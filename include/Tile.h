@@ -23,7 +23,7 @@ protected:
 	int m_hp;
 
 	int2 m_gridCoords;
-private:
 
 	void updateZoom();
+private:
 };

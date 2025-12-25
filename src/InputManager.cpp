@@ -1,6 +1,7 @@
 #include "InputManager.h"
 
 bool InputManager::m_mousePressed = false;
+bool InputManager::hasZoomChanged = false;
 int2 InputManager::m_mouseCoor = {0, 0};
 const Uint8* InputManager::m_keyboardState = nullptr;
 float InputManager::m_zoom = 3;
@@ -16,6 +17,7 @@ InputManager::~InputManager()
 void InputManager::handleInput()
 {
 	m_mousePressed = false;
+	hasZoomChanged = false;
 
 	while (SDL_PollEvent(&m_event))
 	{
@@ -35,11 +37,13 @@ void InputManager::handleInput()
 			{
 				m_zoom += zoomStep; // Zoom in
 				if (m_zoom > maxZoom) m_zoom = maxZoom;
+				else hasZoomChanged = true;
 			}
 			else if(m_event.wheel.y < 0) // Toward me
 			{
 				m_zoom -= zoomStep; // Zoom out
 				if (m_zoom < minZoom) m_zoom = minZoom;
+				else hasZoomChanged = true;
 			}
 			break;
 		default:

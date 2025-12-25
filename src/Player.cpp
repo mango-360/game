@@ -64,9 +64,8 @@ void Player::update()
 
 void Player::draw(int2 camOffset)
 {
-	float2 world = getRealCoords();
-	rect.x = world.x - camOffset.x;
-	rect.y = world.y - camOffset.y;
+	rect.x = getRealCoords().x - camOffset.x;
+	rect.y = getRealCoords().y - camOffset.y;
 
 	drawObject(*this);
 }
@@ -95,7 +94,6 @@ void Player::move()
 
 	if ((InputManager::isKeyPressed(SDL_SCANCODE_W) || InputManager::isKeyPressed(SDL_SCANCODE_SPACE)) && isOnGround)
 	{
-		cout << " HWERE " << std::endl;
 		jump();
 	}
 

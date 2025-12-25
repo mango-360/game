@@ -17,6 +17,7 @@ void Tile::init(int2 coords)
 	m_hp = 0;
 	m_type = TILE_TYPE::NONE_TYPE;
 	m_gridCoords = coords;
+	updateZoom();
 }
 
 void Tile::update()
@@ -35,6 +36,8 @@ void Tile::draw(int2 camOffset)
 	Drawable tmp = m_tile;
 	tmp.rect.x = m_tile.rect.x - camOffset.x;
 	tmp.rect.y = m_tile.rect.y - camOffset.y;
+
+	//cout << tmp.rect.x << ", " << tmp.rect.y << std::endl;
 
 	drawObject(tmp);
 }

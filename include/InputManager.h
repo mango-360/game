@@ -18,7 +18,9 @@ public:
 	static bool isMousePressed();
 	static bool isAnyKeyPressed();
 	static bool isKeyPressed(SDL_Scancode code);
+	static bool isZoomChanged() { return hasZoomChanged; };
 	static float getZoom() { return m_zoom; };
+
 
 private:
 	SDL_Event m_event;
@@ -26,6 +28,7 @@ private:
 	float2 m_mouseMultiplier;
 
 	static bool m_mousePressed;
+	static bool hasZoomChanged;
 
 	const float zoomStep = 0.125f;
 	const float minZoom = 1.0f;

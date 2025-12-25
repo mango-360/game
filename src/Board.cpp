@@ -66,8 +66,6 @@ void Board::initMap()
 
 			grassBlock.init({i, y});
 
-			grassBlock.setPosition({ i * TILE_SIZE, y * TILE_SIZE });
-
 			m_map[y][i] = grassBlock;
 		}
 		else
@@ -75,8 +73,6 @@ void Board::initMap()
 			Tile tile;
 
 			tile.init({i, y});
-
-			tile.setPosition({ i * TILE_SIZE, y * TILE_SIZE });
 
 			m_map[y][i] = tile;
 		}
@@ -101,15 +97,10 @@ void Board::update()
 
 void Board::draw()
 {
-	// draw background (full-screen)
 	drawObject(m_background);
 
-	// get camera rect to transform world -> screen
-	SDL_Rect camRect = m_camera.getCameraRect();
+	m_player.draw( { m_camera.getCameraRect().x, m_camera.getCameraRect().y} ); // draw player based on cammera position
 
-	m_player.draw({ camRect.x, camRect.y });
-
-	// draw visible tiles with camera offset
 	drawMap();
 }
 
@@ -120,14 +111,14 @@ void Board::destroy()
 
 void Board::updateMap()
 {
-	SDL_Rect visibleTiles = getStartEndTiles();
-
-	// Use the proper fields: x/y = startX/startY, w/h = endX/endY
-	for (int y = visibleTiles.y; y <= visibleTiles.h; ++y)
+	if (InputManager::isZoomChanged())
 	{
-		for (int x = visibleTiles.x; x <= visibleTiles.w; ++x)
+		for (int i = 0; i < MAP_HEIGHT; ++i)
 		{
-			m_map[y][x].update();
+			for (int j = 0; j < MAP_WIDTH; ++j)
+			{
+				m_map[i][j].update();
+			}
 		}
 	}
 }
