@@ -13,7 +13,7 @@ Player::~Player()
 
 void Player::init()
 {
-	string playerfile = "player.txt", tmp, playerImg;
+	string playerfile = "player.txt", tmp, playerImg, hitboxImg;
 
 	float playerRenderMultiplier;
 
@@ -24,7 +24,7 @@ void Player::init()
 	stream >> tmp >> playerImg;
 	stream >> tmp >> srcRect.x >> srcRect.y >> srcRect.w >> srcRect.h;
 	stream >> tmp >> rect.x >> rect.y >> rect.w >> rect.h;
-	stream >> tmp >> hitBox.x >> hitBox.y >> hitBox.w >> hitBox.h;
+	stream >> hitboxImg >> hitBox.x >> hitBox.y >> hitBox.w >> hitBox.h; //UNIFINISHED
 	stream >> tmp >> playerRenderMultiplier;
 	stream >> tmp >> moveSpeed;
 	stream >> tmp >> jumpStrength;
@@ -32,6 +32,7 @@ void Player::init()
 	stream >> tmp >> hitBoxOffset.x >> hitBoxOffset.y;
 
 	texture = loadTexture(playerImg);
+
 	if (texture) {
 	    SDL_SetTextureScaleMode(texture, SDL_ScaleModeNearest); // prevents linear filtering for this texture
 	}

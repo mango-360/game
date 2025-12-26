@@ -13,7 +13,11 @@ class Camera
 	SDL_Rect getCameraRect() const { return cameraRect; };
 
 private:
+	void updateZoom();
+
 	SDL_Rect cameraRect;
 
 	Player* m_player;
+
+	float prevZoom;
 };

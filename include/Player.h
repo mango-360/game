@@ -33,7 +33,7 @@ private:
 
 	bool isOnGround = true;
 
-	SDL_Rect hitBox;
+	Drawable hitBox;
 	SDL_Rect tmpGroundHitBox; // temporary, for Ground hitbox
 	float2 mapCoords;
 };
