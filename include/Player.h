@@ -18,6 +18,7 @@ private:
 	void jump();
 	void moveVertical();
 	void moveSprite();
+	void drawHitBox(); // for debugging
 
 	void gravityEffect();
 	bool checkIfWillHitGround();
@@ -27,13 +28,14 @@ private:
 	int jumpStrength;
 	int2 velocity = { 0, 0 };
 	int gravity;
-	int2 hitBoxOffset;
+	int2 hitboxOffsetSrc;
+	int2 hitboxOffset;
 
 	float moveSpeed;
 
 	bool isOnGround = true;
 
-	Drawable hitBox;
+	DrawableWithSrc hitBox;
 	SDL_Rect tmpGroundHitBox; // temporary, for Ground hitbox
 	float2 mapCoords;
 };

@@ -22,16 +22,18 @@ void Player::init()
 	stream.open(CONFIG_FOLDER + playerfile);
 
 	stream >> tmp >> playerImg;
-	stream >> tmp >> srcRect.x >> srcRect.y >> srcRect.w >> srcRect.h;
-	stream >> tmp >> rect.x >> rect.y >> rect.w >> rect.h;
-	stream >> hitboxImg >> hitBox.x >> hitBox.y >> hitBox.w >> hitBox.h; //UNIFINISHED
+	stream >> tmp >> srcRect;
+	stream >> tmp >> rect;
+	stream >> tmp >> hitboxImg >> hitBox.rect;
+	stream >> tmp >> hitBox.srcRect;
 	stream >> tmp >> playerRenderMultiplier;
 	stream >> tmp >> moveSpeed;
 	stream >> tmp >> jumpStrength;
 	stream >> tmp >> gravity;
-	stream >> tmp >> hitBoxOffset.x >> hitBoxOffset.y;
+	stream >> tmp >> hitboxOffsetSrc;
 
 	texture = loadTexture(playerImg);
+	hitBox.texture = loadTexture(hitboxImg);
 
 	if (texture) {
 	    SDL_SetTextureScaleMode(texture, SDL_ScaleModeNearest); // prevents linear filtering for this texture
@@ -41,13 +43,13 @@ void Player::init()
 
 	tmpGroundHitBox = { 0, 800, 1920, 100 }; // temporary, for Ground hitbox
 
-	rect.w *= playerRenderMultiplier;
+	/*rect.w *= playerRenderMultiplier;
 	rect.h *= playerRenderMultiplier;
 
-	hitBox.w *= playerRenderMultiplier;
-	hitBox.h *= playerRenderMultiplier;
+	hitBox.rect.w *= playerRenderMultiplier;
+	hitBox.rect.h *= playerRenderMultiplier;
 	hitBoxOffset.x *= playerRenderMultiplier;
-	hitBoxOffset.y *= playerRenderMultiplier;
+	hitBoxOffset.y *= playerRenderMultiplier;*/
 
 	std::cout << "Player dimention: " << rect.w << std::endl;
 
@@ -56,11 +58,11 @@ void Player::init()
 
 void Player::update()
 {
+	zoomUpdate();
+
 	move();
 
 	gravityEffect();
-
-	zoomUpdate();
 }
 
 void Player::draw(int2 camOffset)
@@ -69,6 +71,7 @@ void Player::draw(int2 camOffset)
 	rect.y = getRealCoords().y - camOffset.y;
 
 	drawObject(*this);
+	//drawObject(hitBox); Hitbox is a bit shaky, might be due to some camera offset float shenanigans
 }
 
 float2 Player::getRealCoords()
@@ -87,6 +90,12 @@ void Player::zoomUpdate()
 {
 	rect.w = srcRect.w * InputManager::getZoom();
 	rect.h = srcRect.h * InputManager::getZoom();
+
+	
+	hitBox.rect.w = hitBox.srcRect.w * InputManager::getZoom();
+	hitBox.rect.h = hitBox.srcRect.h * InputManager::getZoom();
+	hitboxOffset.x = hitboxOffsetSrc.x * InputManager::getZoom();
+	hitboxOffset.y = hitboxOffsetSrc.y * InputManager::getZoom();
 }
 
 void Player::move()
@@ -140,8 +149,13 @@ void Player::moveVertical()
 
 void Player::moveSprite()
 {
-	hitBox.x = rect.x + hitBoxOffset.x;
-	hitBox.y = rect.y + hitBoxOffset.y;
+	hitBox.rect.x = rect.x + hitboxOffset.x;
+	hitBox.rect.y = rect.y + hitboxOffset.y;
+}
+
+void Player::drawHitBox() //for debugging
+{
+	drawObject(hitBox);
 }
 
 void Player::gravityEffect()
@@ -151,7 +165,7 @@ void Player::gravityEffect()
 
 bool Player::checkIfWillHitGround() // how to collide better with ground?
 {
-	SDL_Rect FuturePlayerHitBox = { hitBox.x + velocity.x, hitBox.y + velocity.y, hitBox.w, hitBox.h };
+	SDL_Rect FuturePlayerHitBox = { hitBox.rect.x + velocity.x, hitBox.rect.y + velocity.y, hitBox.rect.w, hitBox.rect.h };
 	
 	return collRectRect(FuturePlayerHitBox, tmpGroundHitBox);
 }
@@ -161,6 +175,6 @@ void Player::landOnGround(SDL_Rect ground)
 	isOnGround = true;
 	
 	velocity.y = 0;
-	rect.y = ground.y - hitBoxOffset.y - hitBox.h;
-	hitBox.y = rect.y + hitBoxOffset.y;
+	//rect.y = ground.y - hitboxOffset.y - hitBox.rect.h;
+	//hitbox.rect.y = rect.y + hitBoxOffset.y;
 }
