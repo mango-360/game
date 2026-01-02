@@ -28,14 +28,12 @@ private:
 	int jumpStrength;
 	int2 velocity = { 0, 0 };
 	int gravity;
-	int2 hitboxOffsetSrc;
-	int2 hitboxOffset;
 
 	float moveSpeed;
 
 	bool isOnGround = true;
 
-	DrawableWithSrc hitBox;
+	DrawableWithSrc hitbox;
 	SDL_Rect tmpGroundHitBox; // temporary, for Ground hitbox
 	float2 mapCoords;
 };

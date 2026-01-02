@@ -42,13 +42,6 @@ void Camera::updateZoom()
 {
 	const float newZoom = InputManager::getZoom();
 
-	// guard against invalid previous zoom (avoid div by zero / nonsense)
-	if (prevZoom <= 0.0f)
-	{
-		prevZoom = newZoom;
-		return;
-	}
-
 	if (prevZoom != newZoom)
 	{
 		// Scale factor between new and old zoom

@@ -24,16 +24,15 @@ void Player::init()
 	stream >> tmp >> playerImg;
 	stream >> tmp >> srcRect;
 	stream >> tmp >> rect;
-	stream >> tmp >> hitboxImg >> hitBox.rect;
-	stream >> tmp >> hitBox.srcRect;
+	stream >> tmp >> hitboxImg >> hitbox.rect;
+	stream >> tmp >> hitbox.srcRect;
 	stream >> tmp >> playerRenderMultiplier;
 	stream >> tmp >> moveSpeed;
 	stream >> tmp >> jumpStrength;
 	stream >> tmp >> gravity;
-	stream >> tmp >> hitboxOffsetSrc;
 
 	texture = loadTexture(playerImg);
-	hitBox.texture = loadTexture(hitboxImg);
+	hitbox.texture = loadTexture(hitboxImg);
 
 	if (texture) {
 	    SDL_SetTextureScaleMode(texture, SDL_ScaleModeNearest); // prevents linear filtering for this texture
@@ -71,7 +70,7 @@ void Player::draw(int2 camOffset)
 	rect.y = getRealCoords().y - camOffset.y;
 
 	drawObject(*this);
-	//drawObject(hitBox); Hitbox is a bit shaky, might be due to some camera offset float shenanigans
+	drawObject(hitbox);
 }
 
 float2 Player::getRealCoords()
@@ -92,10 +91,8 @@ void Player::zoomUpdate()
 	rect.h = srcRect.h * InputManager::getZoom();
 
 	
-	hitBox.rect.w = hitBox.srcRect.w * InputManager::getZoom();
-	hitBox.rect.h = hitBox.srcRect.h * InputManager::getZoom();
-	hitboxOffset.x = hitboxOffsetSrc.x * InputManager::getZoom();
-	hitboxOffset.y = hitboxOffsetSrc.y * InputManager::getZoom();
+	hitbox.rect.w = hitbox.srcRect.w * InputManager::getZoom();
+	hitbox.rect.h = hitbox.srcRect.h * InputManager::getZoom();
 }
 
 void Player::move()
@@ -149,13 +146,13 @@ void Player::moveVertical()
 
 void Player::moveSprite()
 {
-	hitBox.rect.x = rect.x + hitboxOffset.x;
-	hitBox.rect.y = rect.y + hitboxOffset.y;
+	hitbox.rect.x = rect.x + rect.w / 2 - hitbox.rect.w / 2;
+	hitbox.rect.y = rect.y + rect.h / 2 - hitbox.rect.h / 2;
 }
 
 void Player::drawHitBox() //for debugging
 {
-	drawObject(hitBox);
+	drawObject(hitbox);
 }
 
 void Player::gravityEffect()
@@ -165,7 +162,7 @@ void Player::gravityEffect()
 
 bool Player::checkIfWillHitGround() // how to collide better with ground?
 {
-	SDL_Rect FuturePlayerHitBox = { hitBox.rect.x + velocity.x, hitBox.rect.y + velocity.y, hitBox.rect.w, hitBox.rect.h };
+	SDL_Rect FuturePlayerHitBox = { hitbox.rect.x + velocity.x, hitbox.rect.y + velocity.y, hitbox.rect.w, hitbox.rect.h };
 	
 	return collRectRect(FuturePlayerHitBox, tmpGroundHitBox);
 }

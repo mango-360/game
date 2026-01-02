@@ -141,8 +141,7 @@ void Board::drawMap()
 SDL_Rect Board::getStartEndTiles()
 {
 	// Determine visible tile range and update only those tiles
-	const float zoom = InputManager::getZoom();
-	const float tilePx = TILE_SIZE * zoom;
+	const int tilePx = TILE_SIZE * InputManager::getZoom();
 
 	// Defensive: if zoom or TILE_SIZE are invalid for any reason, return full map bounds
 	if (tilePx <= 0.0f)
@@ -150,33 +149,16 @@ SDL_Rect Board::getStartEndTiles()
 		return { 0, 0, MAP_WIDTH - 1, MAP_HEIGHT - 1 };
 	}
 
-	// Camera now provides a pixel rect (top-left in world pixels, width/height = screen px).
-	SDL_Rect camRect = m_camera.getCameraRect();
-
-	// Convert camera pixel bounds to tile indices.
-	// Use floor for left/top and floor((right-1)/tilePx) for right/bottom so edges map to correct tiles.
-	const float camLeftPx = static_cast<float>(camRect.x);
-	const float camTopPx = static_cast<float>(camRect.y);
-	const float camRightPx = camLeftPx + static_cast<float>(camRect.w);
-	const float camBottomPx = camTopPx + static_cast<float>(camRect.h);
-
 	// compute integer tile indices and add padding to avoid popping
-	const int padding = 2;
-	int startX = static_cast<int>(floor(camLeftPx / tilePx)) - padding;
-	int endX = static_cast<int>(floor((camRightPx - 1.0f) / tilePx)) + padding;
-	int startY = static_cast<int>(floor(camTopPx / tilePx)) - padding;
-	int endY = static_cast<int>(floor((camBottomPx - 1.0f) / tilePx)) + padding;
+	const int padding = 1;
+	int2 startBlock = { static_cast<int>(floor(m_camera.getCameraRect().x / tilePx)) - padding,
+						static_cast<int>(floor(m_camera.getCameraRect().y / tilePx)) - padding };
+	int2 endBlock = { static_cast<int>(floor((m_camera.getCameraRect().x + m_camera.getCameraRect().w - 1.0f) / tilePx)) + padding,
+					  static_cast<int>(floor((m_camera.getCameraRect().y + m_camera.getCameraRect().h - 1.0f) / tilePx)) + padding };
 
 	// clamp to map bounds
-	startX = max(startX, 0);
-	startY = max(startY, 0);
-	endX = min(endX, MAP_WIDTH - 1);
-	endY = min(endY, MAP_HEIGHT - 1);
+	startBlock = { max(startBlock.x, 0), max(startBlock.y, 0) };
+	endBlock = { min(endBlock.x, MAP_WIDTH - 1), min(endBlock.y, MAP_HEIGHT - 1) };
 
-	// defensive: if rounding/positioning made start > end, fix by clamping to full bounds
-	if (startX > endX) { startX = 0; endX = MAP_WIDTH - 1; }
-	if (startY > endY) { startY = 0; endY = MAP_HEIGHT - 1; }
-
-	// return in SDL_Rect: x=startX, y=startY, w=endX, h=endY
-	return { startX, startY, endX, endY };
+	return { startBlock.x, startBlock.y, endBlock.x, endBlock.y };
 }
