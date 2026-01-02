@@ -10,12 +10,13 @@ class Camera
 	~Camera();
 	void init(Player* player);
 	void update();
-	SDL_Rect getCameraRect() const { return cameraRect; };
+	Camera_Rect getCameraRect() const { return rect; };
 
 private:
 	void updateZoom();
+	void smoothFollow();
 
-	SDL_Rect cameraRect;
+	Camera_Rect rect;
 
 	Player* m_player;
 

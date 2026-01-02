@@ -78,6 +78,11 @@ struct DrawableWithSrc : public Drawable
 	SDL_Rect srcRect;
 };
 
+struct Camera_Rect
+{
+	float x, y, w, h;
+};
+
 enum SOUND
 {
 	BACKGROUND_MUSIC,

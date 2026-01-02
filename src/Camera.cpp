@@ -14,54 +14,43 @@ void Camera::init(Player* player)
 {
 	m_player = player;
 
-	cameraRect = 
-	{ static_cast<int>(m_player->getRealCoords().x + m_player->rect.w / 2 - Presenter::m_SCREEN_WIDTH / 2),		// x
-		static_cast<int>(m_player->getRealCoords().y + m_player->rect.h / 2 - Presenter::m_SCREEN_HEIGHT / 2),	// y
-		Presenter::m_SCREEN_WIDTH, Presenter::m_SCREEN_HEIGHT };												// w, h
+	const float width = Presenter::m_SCREEN_WIDTH / (TILE_SIZE * InputManager::getZoom());
+	const float height = Presenter::m_SCREEN_HEIGHT / (TILE_SIZE * InputManager::getZoom());
 
-	prevZoom = InputManager::getZoom();
+	rect = { m_player->getMapCoords().x - width / 2, m_player->getMapCoords().y - height / 2, width, height};
 }
 
 void Camera::update()
 {
 	updateZoom();
 
-	int2 playerCenteredPos = //cameraPos where player is centered
-	  { static_cast<int>(m_player->getRealCoords().x + m_player->rect.w / 2 - Presenter::m_SCREEN_WIDTH / 2),
-		static_cast<int>(m_player->getRealCoords().y + m_player->rect.h / 2 - Presenter::m_SCREEN_HEIGHT / 2) };  
+	smoothFollow();
 
-	int n = 5; //temporary follow speed factor
-
-	cameraRect.x += (playerCenteredPos.x - cameraRect.x) / n; //smooth camera follow
-	cameraRect.y += (playerCenteredPos.y - cameraRect.y) / n;
-
-	//cout << "Camera coords: " << cameraRect.x << ", " << cameraRect.y << std::endl;
+	//cout << "Camera coords: " << rect.x << ", " << rect.y << ", " << rect.w << ", " << rect.h << endl;
 }
 
 void Camera::updateZoom()
 {
-	const float newZoom = InputManager::getZoom();
-
-	if (prevZoom != newZoom)
+	if (InputManager::isZoomChanged())
 	{
-		// Scale factor between new and old zoom
-		const float scale = newZoom / prevZoom;
+		const float width = Presenter::m_SCREEN_WIDTH / (TILE_SIZE * InputManager::getZoom());
+		const float height = Presenter::m_SCREEN_HEIGHT / (TILE_SIZE * InputManager::getZoom());
 
-		// Camera center in pixels (world space)
-		const float camCenterX = static_cast<float>(cameraRect.x) + Presenter::m_SCREEN_WIDTH * 0.5f;
-		const float camCenterY = static_cast<float>(cameraRect.y) + Presenter::m_SCREEN_HEIGHT * 0.5f;
-
-		// Scale camera center so relative offsets (including the small smooth-follow offset)
-		// remain proportional when zoom changes. This avoids snapping the camera to the player
-		// while preventing the "overshoot" caused by incrementally modifying cameraRect using
-		// values that were already mutated.
-		const float newCamCenterX = camCenterX * scale;
-		const float newCamCenterY = camCenterY * scale;
-
-		// Convert back to top-left camera rect
-		cameraRect.x = static_cast<int>(std::round(newCamCenterX - Presenter::m_SCREEN_WIDTH * 0.5f));
-		cameraRect.y = static_cast<int>(std::round(newCamCenterY - Presenter::m_SCREEN_HEIGHT * 0.5f));
-
-		prevZoom = newZoom;
+		rect.x += (rect.w - width) / 2; 
+		rect.y += (rect.h - height) / 2;
+		rect.w = width;
+		rect.h = height;
 	}
+}
+
+void Camera::smoothFollow()
+{
+	float2 playerCenteredPos = //cameraPos where player is centered
+	{ m_player->getMapCoords().x + 0.5f - rect.w / 2,
+	  m_player->getMapCoords().y + 0.5f - rect.h / 2 };
+
+	int n = 5; //temporary follow speed factor
+
+	rect.x += (playerCenteredPos.x - rect.x) / n; //smooth camera follow
+	rect.y += (playerCenteredPos.y - rect.y) / n;
 }

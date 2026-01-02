@@ -31,8 +31,6 @@ private:
 	void updateMap();
 	void drawMap();
 
-	SDL_Rect getStartEndTiles();
-
 	SDL_Texture* m_background;
 
 	Camera m_camera;

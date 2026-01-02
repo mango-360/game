@@ -9,8 +9,9 @@ public:
 	~Player();
 	void init();
 	void update();
-	void draw(int2 camOffset); // camera-aware draw
-	float2 getRealCoords();
+	void draw(float2 camCoords); // camera-aware draw
+	int2 getRealCoords();
+	float2 getMapCoords() const { return mapCoords; };
 
 private:
 	void zoomUpdate();

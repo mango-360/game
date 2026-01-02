@@ -11,9 +11,8 @@ public:
 	virtual void init(int2 coords);
 	void update();
 	//void draw();                 // legacy draw (no camera) - kept for compatibility
-	void draw(int2 camOffset); // draw with camera offset
+	void draw(float2 camCoords); // draw with camera offset
 	void destroy();
-	void setPosition(int2 coords);
 
 protected:
 	Drawable m_tile;

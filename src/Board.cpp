@@ -125,40 +125,14 @@ void Board::updateMap()
 
 void Board::drawMap()
 {
-	SDL_Rect visibleTiles = getStartEndTiles();
-	SDL_Rect camRect = m_camera.getCameraRect();
+	Camera_Rect camRect = m_camera.getCameraRect();
 
-	// Use the proper fields: x/y = startX/startY, w/h = endX/endY
-	for (int y = visibleTiles.y; y <= visibleTiles.h; ++y)
+	for (int y = floor(camRect.y); y <= floor(camRect.y + camRect.h); ++y)
 	{
-		for (int x = visibleTiles.x; x <= visibleTiles.w; ++x)
+		for (int x = floor(camRect.x); x <= floor(camRect.x + camRect.w); ++x)
 		{
+			if(y < 0 || y >= MAP_HEIGHT || x < 0 || x >= MAP_WIDTH) continue; // skip out-of-bounds tiles
 			m_map[y][x].draw({ camRect.x, camRect.y });
 		}
 	}
-}
-
-SDL_Rect Board::getStartEndTiles()
-{
-	// Determine visible tile range and update only those tiles
-	const int tilePx = TILE_SIZE * InputManager::getZoom();
-
-	// Defensive: if zoom or TILE_SIZE are invalid for any reason, return full map bounds
-	if (tilePx <= 0.0f)
-	{
-		return { 0, 0, MAP_WIDTH - 1, MAP_HEIGHT - 1 };
-	}
-
-	// compute integer tile indices and add padding to avoid popping
-	const int padding = 1;
-	int2 startBlock = { static_cast<int>(floor(m_camera.getCameraRect().x / tilePx)) - padding,
-						static_cast<int>(floor(m_camera.getCameraRect().y / tilePx)) - padding };
-	int2 endBlock = { static_cast<int>(floor((m_camera.getCameraRect().x + m_camera.getCameraRect().w - 1.0f) / tilePx)) + padding,
-					  static_cast<int>(floor((m_camera.getCameraRect().y + m_camera.getCameraRect().h - 1.0f) / tilePx)) + padding };
-
-	// clamp to map bounds
-	startBlock = { max(startBlock.x, 0), max(startBlock.y, 0) };
-	endBlock = { min(endBlock.x, MAP_WIDTH - 1), min(endBlock.y, MAP_HEIGHT - 1) };
-
-	return { startBlock.x, startBlock.y, endBlock.x, endBlock.y };
 }

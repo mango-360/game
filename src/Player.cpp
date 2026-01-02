@@ -64,18 +64,18 @@ void Player::update()
 	gravityEffect();
 }
 
-void Player::draw(int2 camOffset)
+void Player::draw(float2 camCoords)
 {
-	rect.x = getRealCoords().x - camOffset.x;
-	rect.y = getRealCoords().y - camOffset.y;
+	rect.x = (mapCoords.x - camCoords.x) * (TILE_SIZE * InputManager::getZoom());
+	rect.y = (mapCoords.y - camCoords.y) * (TILE_SIZE * InputManager::getZoom());
 
 	drawObject(*this);
 	drawObject(hitbox);
 }
 
-float2 Player::getRealCoords()
+int2 Player::getRealCoords()
 {
-	return { static_cast<float>(mapCoords.x * TILE_SIZE * InputManager::getZoom()), static_cast<float>(mapCoords.y * TILE_SIZE * InputManager::getZoom()) };
+	return { static_cast<int>(mapCoords.x * TILE_SIZE * InputManager::getZoom()), static_cast<int>(mapCoords.y * TILE_SIZE * InputManager::getZoom()) };
 }
 
 void Player::jump()
