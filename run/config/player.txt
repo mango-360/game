@@ -4,6 +4,7 @@ DestinationRect: 900 700 32 32
 hitBox: hitbox.bmp 905 710 24 15
 hitBoxSrc: 0 0 24 15
 PlayerRenderMultiplier(float): 6
-MoveSpeed: 0.08
+MoveSpeed: 0.01
+MaxSpeedVelocity: 0.08 0.08
 JumpStrength: 20
-Gravity: 1
+Gravity: 0.01

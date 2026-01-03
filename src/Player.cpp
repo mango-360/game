@@ -1,6 +1,7 @@
 #include "Player.h"
 #include <Presenter.h>
 #include "InputManager.h"
+#include <algorithm>
 
 
 Player::Player()
@@ -11,7 +12,7 @@ Player::~Player()
 {
 }
 
-void Player::init()
+void Player::init(Tile* map[MAP_HEIGHT][MAP_WIDTH])
 {
 	string playerfile = "player.txt", tmp, playerImg, hitboxImg;
 
@@ -28,6 +29,7 @@ void Player::init()
 	stream >> tmp >> hitbox.srcRect;
 	stream >> tmp >> playerRenderMultiplier;
 	stream >> tmp >> moveSpeed;
+	stream >> tmp >> maxInputVelocity;
 	stream >> tmp >> jumpStrength;
 	stream >> tmp >> gravity;
 
@@ -42,17 +44,15 @@ void Player::init()
 
 	tmpGroundHitBox = { 0, 800, 1920, 100 }; // temporary, for Ground hitbox
 
-	/*rect.w *= playerRenderMultiplier;
-	rect.h *= playerRenderMultiplier;
-
-	hitBox.rect.w *= playerRenderMultiplier;
-	hitBox.rect.h *= playerRenderMultiplier;
-	hitBoxOffset.x *= playerRenderMultiplier;
-	hitBoxOffset.y *= playerRenderMultiplier;*/
-
-	std::cout << "Player dimention: " << rect.w << std::endl;
-
 	mapCoords = { 16.0f, 12.0f };
+
+	for (int y = 0; y < MAP_HEIGHT; ++y)
+	{
+		for (int x = 0; x < MAP_WIDTH; ++x)
+		{
+			m_map[y][x] = map[y][x];
+		}
+	}  
 }
 
 void Player::update()
@@ -62,6 +62,9 @@ void Player::update()
 	move();
 
 	gravityEffect();
+
+	calculateVelocity();
+	applyVelocity();
 }
 
 void Player::draw(float2 camCoords)
@@ -104,9 +107,9 @@ void Player::move()
 		jump();
 	}
 
-	if (checkIfWillHitGround())
+	//if (checkForGround())
 	{
-		landOnGround(tmpGroundHitBox);
+		//landOnGround(tmpGroundHitBox);
 	}
 
 	moveSprite();
@@ -120,25 +123,29 @@ void Player::moveVertical()
 		{
 			if (lastKeyPressed == SDL_SCANCODE_D)
 			{
-				mapCoords.x -= moveSpeed;
+				//mapCoords.x -= moveSpeed;
+				inputVelocity.x -= moveSpeed;
 				srcRect.x = srcRect.w;
 			}
 			else
 			{
-				mapCoords.x += moveSpeed;
+				//mapCoords.x += moveSpeed;
+				inputVelocity.x += moveSpeed;
 				srcRect.x = 0;
 			}
 		}
 		else
 		{
-			mapCoords.x += moveSpeed;
+			//mapCoords.x += moveSpeed;
+			inputVelocity.x += moveSpeed;
 			srcRect.x = 0;
 			lastKeyPressed = SDL_SCANCODE_D;
 		}
 	}
 	else if (InputManager::isKeyPressed(SDL_SCANCODE_A))
 	{
-		mapCoords.x -= moveSpeed;
+		//mapCoords.x -= moveSpeed;
+		inputVelocity.x -= moveSpeed;
 		srcRect.x = srcRect.w;
 		lastKeyPressed = SDL_SCANCODE_A;
 	}
@@ -157,21 +164,54 @@ void Player::drawHitBox() //for debugging
 
 void Player::gravityEffect()
 {
-	velocity.y += gravity;
+	gameVelocity.y += gravity;
 }
 
-bool Player::checkIfWillHitGround() // how to collide better with ground?
+void Player::checkForGround() // how to collide better with ground?
 {
-	SDL_Rect FuturePlayerHitBox = { hitbox.rect.x + velocity.x, hitbox.rect.y + velocity.y, hitbox.rect.w, hitbox.rect.h };
+	SDL_Rect FuturePlayerHitbox = { hitbox.rect.x + velocity.x, hitbox.rect.y + velocity.y, hitbox.rect.w, hitbox.rect.h };
 	
-	return collRectRect(FuturePlayerHitBox, tmpGroundHitBox);
+	if (velocity.x < 0.0f)
+	{
+		for(int y = floor(mapCoords.y); y < floor(mapCoords.y) + 1; ++y)
+		{
+			if (collRectRect(FuturePlayerHitbox, m_map[y][static_cast<int>(floor(mapCoords.x)) - 1]->getTileRect()))
+			{
+
+			}
+		}
+	}
+	else if (velocity.x > 0.0f)
+	{
+		for(int y = floor(mapCoords.y); y < floor(mapCoords.y) + 1; ++y)
+		{
+			if (collRectRect(FuturePlayerHitbox, m_map[y][static_cast<int>(floor(mapCoords.x)) + 1]->getTileRect()))
+			{
+			}
+		}
+	}
+
 }
 
 void Player::landOnGround(SDL_Rect ground)
 {
 	isOnGround = true;
-	
-	velocity.y = 0;
-	//rect.y = ground.y - hitboxOffset.y - hitBox.rect.h;
-	//hitbox.rect.y = rect.y + hitBoxOffset.y;
+}
+
+void Player::calculateVelocity()
+{
+	inputVelocity.x = clamp(inputVelocity.x, -maxInputVelocity.x, maxInputVelocity.x); // clamps input velocity
+	inputVelocity.y = clamp(inputVelocity.y, -maxInputVelocity.y, maxInputVelocity.y);
+
+	velocity = gameVelocity + inputVelocity;
+
+	if (isOnGround) // prevents downward velocity when on ground
+	{
+		velocity.y = max(0.0f, velocity.y); 
+	}
+}
+
+void Player::applyVelocity()
+{
+	mapCoords += velocity;
 }

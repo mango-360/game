@@ -16,6 +16,8 @@ static const string TEXT_FIELD_FOLDER = "textField\\";
 static const string TILES_FOLDER = "tiles\\";
 
 static const int TILE_SIZE = 32;
+static const int MAP_WIDTH = 320;
+static const int MAP_HEIGHT = 240;
 
 struct float2
 {
@@ -126,6 +128,12 @@ inline ostream& operator<<(ostream& os, SDL_Rect& rect)
 }
 
 inline istream& operator>>(istream& is, int2& vec)
+{
+	is >> vec.x >> vec.y;
+	return is;
+}
+
+inline istream& operator>>(istream& is, float2& vec)
 {
 	is >> vec.x >> vec.y;
 	return is;

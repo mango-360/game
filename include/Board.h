@@ -24,7 +24,7 @@ public:
 	void draw();
 	void destroy();
 
-	Tile m_map[320][240];
+	Tile m_map[MAP_HEIGHT][MAP_WIDTH];
 
 	Player m_player;
 private:
@@ -34,7 +34,4 @@ private:
 	SDL_Texture* m_background;
 
 	Camera m_camera;
-
-	const int MAP_WIDTH = 320;
-	const int MAP_HEIGHT = 240;
 };

@@ -13,6 +13,7 @@ public:
 	//void draw();                 // legacy draw (no camera) - kept for compatibility
 	void draw(float2 camCoords); // draw with camera offset
 	void destroy();
+	SDL_Rect getTileRect() { return m_tile.rect; };
 
 protected:
 	Drawable m_tile;

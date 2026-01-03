@@ -132,6 +132,7 @@ void Board::drawMap()
 		for (int x = floor(camRect.x); x <= floor(camRect.x + camRect.w); ++x)
 		{
 			if(y < 0 || y >= MAP_HEIGHT || x < 0 || x >= MAP_WIDTH) continue; // skip out-of-bounds tiles
+
 			m_map[y][x].draw({ camRect.x, camRect.y });
 		}
 	}
