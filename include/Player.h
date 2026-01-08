@@ -8,7 +8,7 @@ class Player : public Entity
 public:
 	Player();
 	~Player();
-	void init(Tile* map[MAP_HEIGHT][MAP_WIDTH]);
+	void init(Tile(*map)[MAP_WIDTH]);
 	void update();
 	void draw(float2 camCoords); // camera-aware draw
 	int2 getRealCoords();
@@ -24,7 +24,8 @@ private:
 
 	void gravityEffect();
 	void checkForGround();
-	void landOnGround(SDL_Rect ground);
+	void landOnGround(int2 ground);
+	void landOnWall(int2 wall, bool isLeftWall);
 	void calculateVelocity();
 	void applyVelocity();
 
@@ -37,7 +38,9 @@ private:
 	float2 inputVelocity = { 0, 0 };
 	float2 maxInputVelocity;
 	
-	bool isOnGround = true;
+	bool isOnGround = false;
+	bool isLeftWall = false;
+	bool isOnWall = false;
 
 	DrawableWithSrc hitbox;
 	SDL_Rect tmpGroundHitBox; // temporary, for Ground hitbox

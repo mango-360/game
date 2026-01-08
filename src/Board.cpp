@@ -31,7 +31,7 @@ void Board::init()
 
 	m_background = loadTexture(backgroundImg);
 
-	m_player.init();
+	m_player.init(m_map);
 
 	initMap();
 

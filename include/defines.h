@@ -150,3 +150,8 @@ inline ostream& operator<<(ostream& os, int2& vec)
 	os << vec.x << " " << vec.y;
 	return os;
 }
+
+inline ostream& operator<<(ostream& os, const SDL_Rect& v) {
+	os << "(" << v.x << ", " << v.y << ", " << v.w << ", " << v.h << ")";
+	return os;
+}
