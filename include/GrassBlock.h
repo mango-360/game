@@ -8,5 +8,5 @@ class GrassBlock : public Tile
 public:
 	GrassBlock();
 	~GrassBlock();
-	void init(int2 coords);
+	void init(float2 coords);
 };

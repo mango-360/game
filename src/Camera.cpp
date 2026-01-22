@@ -17,7 +17,7 @@ void Camera::init(Player* player)
 	const float width = Presenter::m_SCREEN_WIDTH / (TILE_SIZE * InputManager::getZoom());
 	const float height = Presenter::m_SCREEN_HEIGHT / (TILE_SIZE * InputManager::getZoom());
 
-	rect = { m_player->getMapCoords().x - width / 2, m_player->getMapCoords().y - height / 2, width, height};
+	rect = { m_player->getMapRect().x - width / 2, m_player->getMapRect().y - height / 2, width, height};
 }
 
 void Camera::update()
@@ -26,7 +26,7 @@ void Camera::update()
 
 	smoothFollow();
 
-	//cout << "Camera coords: " << rect.x << ", " << rect.y << ", " << rect.w << ", " << rect.h << endl;
+	cout << "Camera coords: " << rect.x << ", " << rect.y << ", " << rect.w << ", " << rect.h << endl;
 }
 
 void Camera::updateZoom()
@@ -46,8 +46,8 @@ void Camera::updateZoom()
 void Camera::smoothFollow()
 {
 	float2 playerCenteredPos = //cameraPos where player is centered
-	{ m_player->getMapCoords().x + 0.5f - rect.w / 2,
-	  m_player->getMapCoords().y + 0.5f - rect.h / 2 };
+	{ m_player->getMapRect().x + 0.5f - rect.w / 2,
+	  m_player->getMapRect().y + 0.5f - rect.h / 2 };
 
 	int n = 5; //temporary follow speed factor
 

@@ -39,3 +39,12 @@ bool collRectRect(SDL_Rect rect1, SDL_Rect rect2)
 
     return true;
 }
+
+bool FcollRectRect(SDL_FRect rect1, SDL_FRect rect2)
+{
+    if (rect1.x + rect1.w < rect2.x || rect1.y + rect1.h < rect2.y || 
+        rect2.x + rect2.w < rect1.x || rect2.y + rect2.h < rect1.y) 
+        return false;
+
+    return true;
+}

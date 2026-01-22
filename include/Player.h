@@ -12,7 +12,7 @@ public:
 	void update();
 	void draw(float2 camCoords); // camera-aware draw
 	int2 getRealCoords();
-	float2 getMapCoords() const { return mapCoords; };
+	SDL_FRect getMapRect() const { return hitbox.rect; };
 
 private:
 	void zoomUpdate();
@@ -20,7 +20,7 @@ private:
 	void jump();
 	void moveVertical();
 	void moveSprite();
-	void drawHitBox(); // for debugging
+	void drawHitBox(float2 camCoords); // for debugging
 
 	void gravityEffect();
 	void checkForGround();
@@ -42,9 +42,6 @@ private:
 	bool isLeftWall = false;
 	bool isOnWall = false;
 
-	DrawableWithSrc hitbox;
-	SDL_Rect tmpGroundHitBox; // temporary, for Ground hitbox
-	float2 mapCoords;
-
+	FDrawable hitbox;
 	Tile* m_map[MAP_HEIGHT][MAP_WIDTH];
 };

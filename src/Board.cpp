@@ -64,7 +64,7 @@ void Board::initMap()
 		{
 			GrassBlock grassBlock;
 
-			grassBlock.init({i, y});
+			grassBlock.init({ static_cast<float>(i),static_cast<float>(y) });
 
 			m_map[y][i] = grassBlock;
 		}
@@ -72,7 +72,7 @@ void Board::initMap()
 		{
 			Tile tile;
 
-			tile.init({i, y});
+			tile.init({static_cast<float>(i),static_cast<float>(y)});
 
 			m_map[y][i] = tile;
 		}

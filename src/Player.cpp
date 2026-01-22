@@ -2,6 +2,7 @@
 #include <Presenter.h>
 #include "InputManager.h"
 #include <algorithm>
+#include <iostream>
 
 
 Player::Player()
@@ -16,8 +17,6 @@ void Player::init(Tile(*map)[MAP_WIDTH])
 {
 	string playerfile = "player.txt", tmp, playerImg, hitboxImg;
 
-	float playerRenderMultiplier;
-
 	fstream stream;
 
 	stream.open(CONFIG_FOLDER + playerfile);
@@ -26,8 +25,6 @@ void Player::init(Tile(*map)[MAP_WIDTH])
 	stream >> tmp >> srcRect;
 	stream >> tmp >> rect;
 	stream >> tmp >> hitboxImg >> hitbox.rect;
-	stream >> tmp >> hitbox.srcRect;
-	stream >> tmp >> playerRenderMultiplier;
 	stream >> tmp >> moveSpeed;
 	stream >> tmp >> maxInputVelocity;
 	stream >> tmp >> jumpStrength;
@@ -42,17 +39,13 @@ void Player::init(Tile(*map)[MAP_WIDTH])
 
 	stream.close();
 
-	tmpGroundHitBox = { 0, 800, 1920, 100 }; // temporary, for Ground hitbox
-
-	mapCoords = { 16.0f, 5.0f };
-
 	for (int y = 0; y < MAP_HEIGHT; ++y)
 	{
 		for (int x = 0; x < MAP_WIDTH; ++x)
 		{
 			m_map[y][x] = &map[y][x];
 		}
-	}  
+	} 
 }
 
 void Player::update()
@@ -66,21 +59,38 @@ void Player::update()
 	calculateVelocity();
 	applyVelocity();
 
-	//cout << "Player map coords: " << mapCoords.x << ", " << mapCoords.y << endl;
+	//cout << "Player map coords: " << hitbox.rect.x << ", " << hitbox.rect.y << endl;
 }
 
 void Player::draw(float2 camCoords)
 {
-	rect.x = (mapCoords.x - camCoords.x) * (TILE_SIZE * InputManager::getZoom());
-	rect.y = (mapCoords.y - camCoords.y) * (TILE_SIZE * InputManager::getZoom());
+	SDL_Rect tmpHitboxRect = 
+	{
+		round((hitbox.rect.x - camCoords.x) * (TILE_SIZE * InputManager::getZoom())),
+		round((hitbox.rect.y - camCoords.y) * (TILE_SIZE * InputManager::getZoom())),
+		round(hitbox.rect.w * (TILE_SIZE * InputManager::getZoom())),
+		round(hitbox.rect.h * (TILE_SIZE * InputManager::getZoom()))
+	};
 
-	drawObject(*this);
-	drawObject(hitbox);
+
+	Drawable tmp = { hitbox.img, hitbox.texture, tmpHitboxRect };
+	Drawable tmpPlayer = tmp;
+	tmpPlayer.rect = 
+	{
+		tmp.rect.x - (rect.w / 2 - tmp.rect.w / 2),
+		tmp.rect.y - (rect.h / 2 - tmp.rect.h / 2),
+		rect.w,
+		rect.h
+	};
+	tmpPlayer.texture = texture;
+
+	drawObject(tmpPlayer);
+	drawObject(tmp);
 }
 
 int2 Player::getRealCoords()
 {
-	return { static_cast<int>(mapCoords.x * TILE_SIZE * InputManager::getZoom()), static_cast<int>(mapCoords.y * TILE_SIZE * InputManager::getZoom()) };
+	return { static_cast<int>(hitbox.rect.x * TILE_SIZE * InputManager::getZoom()), static_cast<int>(hitbox.rect.y * TILE_SIZE * InputManager::getZoom()) };
 }
 
 void Player::jump()
@@ -94,10 +104,6 @@ void Player::zoomUpdate()
 {
 	rect.w = srcRect.w * InputManager::getZoom();
 	rect.h = srcRect.h * InputManager::getZoom();
-
-	
-	hitbox.rect.w = hitbox.srcRect.w * InputManager::getZoom();
-	hitbox.rect.h = hitbox.srcRect.h * InputManager::getZoom();
 }
 
 void Player::move()
@@ -109,9 +115,9 @@ void Player::move()
 		jump();
 	}
 
-	checkForGround();
+	//checkForGround();
 
-	moveSprite();
+	//moveSprite();
 }
 
 void Player::moveVertical()
@@ -152,9 +158,20 @@ void Player::moveSprite()
 	hitbox.rect.y = rect.y + rect.h / 2 - hitbox.rect.h / 2;
 }
 
-void Player::drawHitBox() //for debugging
+void Player::drawHitBox(float2 camCoords) //for debugging
 {
-	drawObject(hitbox);
+	SDL_Rect tmpHitboxRect =
+	{
+		round((hitbox.rect.x - camCoords.x) * (TILE_SIZE * InputManager::getZoom())),
+		round((hitbox.rect.y - camCoords.y) * (TILE_SIZE * InputManager::getZoom())),
+		round(hitbox.rect.w * (TILE_SIZE * InputManager::getZoom())),
+		round(hitbox.rect.h * (TILE_SIZE * InputManager::getZoom()))
+	};
+
+
+	Drawable tmp = { hitbox.img, hitbox.texture, tmpHitboxRect };
+
+	drawObject(tmp);
 }
 
 void Player::gravityEffect()
@@ -164,15 +181,15 @@ void Player::gravityEffect()
 
 void Player::checkForGround() // how to collide better with ground?
 {
-	SDL_Rect FuturePlayerHitbox = { hitbox.rect.x + velocity.x, hitbox.rect.y + velocity.y, hitbox.rect.w, hitbox.rect.h };
+	SDL_FRect FuturePlayerHitbox = { hitbox.rect.x + velocity.x, hitbox.rect.y + velocity.y, hitbox.rect.w, hitbox.rect.h };
 	
-	const int x = static_cast<int>(floor(mapCoords.x));
+	const int x = static_cast<int>(floor(hitbox.rect.x));
 
 	if (velocity.x < 0.0f)
 	{
-		for (int y = floor(mapCoords.y); y <= floor(mapCoords.y) + 1; ++y)
+		for (int y = floor(hitbox.rect.y); y <= floor(hitbox.rect.y) + 1; ++y)
 		{
-			if (collRectRect(FuturePlayerHitbox, m_map[y][x - 1]->getTileRect()))
+			if (FcollRectRect(FuturePlayerHitbox, m_map[y][x - 1]->getTileGridRect()))
 			{
 				cout << "COLLIDED LEFT" << endl;
 
@@ -192,9 +209,9 @@ void Player::checkForGround() // how to collide better with ground?
 	}
 	else if (velocity.x > 0.0f)
 	{
-		for(int y = floor(mapCoords.y); y <= floor(mapCoords.y) + 1; ++y)
+		for(int y = floor(hitbox.rect.y); y <= floor(hitbox.rect.y) + 1; ++y)
 		{
-			if (collRectRect(FuturePlayerHitbox, m_map[y][x + 1]->getTileRect()))
+			if (FcollRectRect(FuturePlayerHitbox, m_map[y][x + 1]->getTileGridRect()))
 			{
 				cout << "COLLIDED RIGHT" << endl;
 
@@ -221,9 +238,9 @@ void Player::checkForGround() // how to collide better with ground?
 	if (velocity.x == 0.0f)
 	{
 
-		if(collRectRect(FuturePlayerHitbox, m_map[static_cast<int>(floor(mapCoords.y) + 1)][x]->getTileRect()))
+		if(FcollRectRect(FuturePlayerHitbox, m_map[static_cast<int>(floor(hitbox.rect.y) + 1)][x]->getTileGridRect()))
 		{
-			landOnGround({ x, static_cast<int>(floor(mapCoords.y) + 1) });
+			landOnGround({ x, static_cast<int>(floor(hitbox.rect.y) + 1) });
 		}
 	}
 
@@ -231,7 +248,7 @@ void Player::checkForGround() // how to collide better with ground?
 
 void Player::landOnGround(int2 ground)
 {
-	mapCoords.y = ground.y - ((static_cast<float>((rect.h - hitbox.rect.h)) / 2.0f + hitbox.rect.h) / (TILE_SIZE * InputManager::getZoom())); // align player on top of ground
+	hitbox.rect.y = ground.y - ((static_cast<float>((rect.h - hitbox.rect.h)) / 2.0f + hitbox.rect.h) / (TILE_SIZE * InputManager::getZoom())); // align player on top of ground
 
 	isOnGround = true;
 }
@@ -240,11 +257,11 @@ void Player::landOnWall(int2 wall, bool isLeftWall)
 {
 	if (isLeftWall)
 	{
-		mapCoords.x = wall.x + 1 - static_cast<float>((rect.w - hitbox.rect.w)) / 2.0f; // align player to the right of the wall
+		hitbox.rect.x = wall.x + 1 - static_cast<float>((rect.w - hitbox.rect.w)) / 2.0f; // align player to the right of the wall
 	}
 	else
 	{
-		mapCoords.x = wall.x - ((static_cast<float>((rect.w - hitbox.rect.w)) / 2.0f + hitbox.rect.w) / (TILE_SIZE * InputManager::getZoom())); // align player to the left of the wall
+		hitbox.rect.x = wall.x - ((static_cast<float>((rect.w - hitbox.rect.w)) / 2.0f + hitbox.rect.w) / (TILE_SIZE * InputManager::getZoom())); // align player to the left of the wall
 	}
 }
 
@@ -281,5 +298,7 @@ void Player::calculateVelocity()
 
 void Player::applyVelocity()
 {
-	mapCoords += velocity;
+	//cout << "Velocity: " << velocity.x << ", " << velocity.y << endl;
+	hitbox.rect.x += velocity.x;
+	hitbox.rect.y += velocity.y;
 }

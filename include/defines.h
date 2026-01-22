@@ -70,14 +70,25 @@ struct int2
 struct Drawable
 {
 	string img;
-
 	SDL_Texture* texture;
 	SDL_Rect rect; //dst rect
+};
+
+struct FDrawable
+{
+	string img;
+	SDL_Texture* texture;
+	SDL_FRect rect; //dst rect
 };
 
 struct DrawableWithSrc : public Drawable
 {
 	SDL_Rect srcRect;
+};
+
+struct FDrawableWithSrc : public FDrawable
+{
+	SDL_FRect srcRect;
 };
 
 struct Camera_Rect
@@ -126,6 +137,18 @@ inline ostream& operator<<(ostream& os, SDL_Rect& rect)
 	os << rect.x << " " << rect.y << " " << rect.w << " " << rect.h;
 	return os;
 }
+
+inline istream& operator>>(istream& is, SDL_FRect& rect)
+{
+	is >> rect.x >> rect.y >> rect.w >> rect.h;
+	return is;
+}
+
+inline ostream& operator>>(ostream& is, SDL_FRect& rect)
+{
+	is << rect.x << rect.y << rect.w << rect.h;
+	return is;
+} 
 
 inline istream& operator>>(istream& is, int2& vec)
 {
