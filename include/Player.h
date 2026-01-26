@@ -19,13 +19,11 @@ private:
 	void move();
 	void jump();
 	void moveVertical();
-	void moveSprite();
 	void drawHitBox(float2 camCoords); // for debugging
 
-	void gravityEffect();
 	void checkForGround();
-	void landOnGround(int2 ground);
-	void landOnWall(int2 wall, bool isLeftWall);
+	void landOnGround(float groundY);
+	void landOnWall(SDL_FRect wall, bool isOnLeftWall);
 	void calculateVelocity();
 	void applyVelocity();
 
@@ -41,6 +39,7 @@ private:
 	bool isOnGround = false;
 	bool isLeftWall = false;
 	bool isOnWall = false;
+	bool onCeiling = false;
 
 	FDrawable hitbox;
 	Tile* m_map[MAP_HEIGHT][MAP_WIDTH];

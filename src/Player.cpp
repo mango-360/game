@@ -54,8 +54,6 @@ void Player::update()
 
 	move();
 
-	gravityEffect();
-
 	calculateVelocity();
 	applyVelocity();
 
@@ -74,7 +72,7 @@ void Player::draw(float2 camCoords)
 
 
 	Drawable tmp = { hitbox.img, hitbox.texture, tmpHitboxRect };
-	Drawable tmpPlayer = tmp;
+	DrawableWithSrc tmpPlayer = { tmp, srcRect };
 	tmpPlayer.rect = 
 	{
 		tmp.rect.x - (rect.w / 2 - tmp.rect.w / 2),
@@ -95,9 +93,11 @@ int2 Player::getRealCoords()
 
 void Player::jump()
 {
-	velocity.y = -jumpStrength;
+	inputVelocity.y = -jumpStrength;
 
 	isOnGround = false;
+
+	cout << "JUMP!" << endl;
 }
 
 void Player::zoomUpdate()
@@ -108,6 +108,7 @@ void Player::zoomUpdate()
 
 void Player::move()
 {
+
 	moveVertical();
 
 	if ((InputManager::isKeyPressed(SDL_SCANCODE_W) || InputManager::isKeyPressed(SDL_SCANCODE_SPACE)) && isOnGround)
@@ -115,9 +116,9 @@ void Player::move()
 		jump();
 	}
 
-	//checkForGround();
+	checkForGround();
 
-	//moveSprite();
+	//cout << "Player map coords: " << hitbox.rect.x << ", " << hitbox.rect.y << endl;
 }
 
 void Player::moveVertical()
@@ -152,12 +153,6 @@ void Player::moveVertical()
 	}
 }
 
-void Player::moveSprite()
-{
-	hitbox.rect.x = rect.x + rect.w / 2 - hitbox.rect.w / 2;
-	hitbox.rect.y = rect.y + rect.h / 2 - hitbox.rect.h / 2;
-}
-
 void Player::drawHitBox(float2 camCoords) //for debugging
 {
 	SDL_Rect tmpHitboxRect =
@@ -174,95 +169,97 @@ void Player::drawHitBox(float2 camCoords) //for debugging
 	drawObject(tmp);
 }
 
-void Player::gravityEffect()
-{
-	gameVelocity.y += gravity;
-}
-
 void Player::checkForGround() // how to collide better with ground?
 {
 	SDL_FRect FuturePlayerHitbox = { hitbox.rect.x + velocity.x, hitbox.rect.y + velocity.y, hitbox.rect.w, hitbox.rect.h };
 	
-	const int x = static_cast<int>(floor(hitbox.rect.x));
+	bool hitsLeftWall = false;
+	bool hitsWall = false;
+	bool hitsGround = false;
 
-	if (velocity.x < 0.0f)
+
+	for (int i = floor(hitbox.rect.y) - 1; i <= ceil(hitbox.rect.y + hitbox.rect.h); ++i)
 	{
-		for (int y = floor(hitbox.rect.y); y <= floor(hitbox.rect.y) + 1; ++y)
+		for (int j = floor(hitbox.rect.x) - 1; j <= ceil(hitbox.rect.x + hitbox.rect.w); ++j)
 		{
-			if (FcollRectRect(FuturePlayerHitbox, m_map[y][x - 1]->getTileGridRect()))
+			if (FcollRectRect(FuturePlayerHitbox, m_map[i][j]->getTileGridRect()))
 			{
-				cout << "COLLIDED LEFT" << endl;
+				float deltaX = abs(FuturePlayerHitbox.x + FuturePlayerHitbox.w / 2 - m_map[i][j]->getTileGridRect().x - m_map[i][j]->getTileGridRect().w / 2);
+				float deltaY = abs(FuturePlayerHitbox.y + FuturePlayerHitbox.h / 2 - m_map[i][j]->getTileGridRect().y - m_map[i][j]->getTileGridRect().h / 2);
 
-				if (FuturePlayerHitbox.y + FuturePlayerHitbox.h - m_map[y][x - 1]->getTileRect().y >  // y diff
-					m_map[y][x - 1]->getTileRect().x + m_map[y][x - 1]->getTileRect().w - FuturePlayerHitbox.x) // x diff - THIS IS CORRECT
+				if (deltaX > deltaY)
 				{
-					isOnWall = true;
-					isLeftWall = true;
-					landOnWall({ x - 1, y }, isLeftWall);
+					if(FuturePlayerHitbox.x > m_map[i][j]->getTileGridRect().x) // left wall
+					{
+						//cout << "ON LEFT WALL" << endl;
+
+						landOnWall(m_map[i][j]->getTileGridRect(), true);
+
+						hitsLeftWall = true;
+					}
+					else // right wall
+					{
+						//cout << "ON RIGHT WALL" << endl;
+
+						landOnWall(m_map[i][j]->getTileGridRect(), false);
+
+						hitsWall = true;
+					}
 				}
 				else
 				{
-					landOnGround({ x - 1, y });
+					if(FuturePlayerHitbox.y > m_map[i][j]->getTileGridRect().y) // ceiling
+					{
+						//cout << "ON CEILING" << endl;
+
+						onCeiling = true;
+
+						//hitbox.rect.y = i + m_map[i][j]->getTileGridRect().h; // align player below ceiling
+					}
+					else // ground
+					{
+						//cout << "ON GROUND" << endl;
+
+						landOnGround(m_map[i][j]->getTileGridRect().y);
+
+						hitsGround = true;
+					}
 				}
 			}
 		}
 	}
-	else if (velocity.x > 0.0f)
+
+	if (!hitsWall)
 	{
-		for(int y = floor(hitbox.rect.y); y <= floor(hitbox.rect.y) + 1; ++y)
-		{
-			if (FcollRectRect(FuturePlayerHitbox, m_map[y][x + 1]->getTileGridRect()))
-			{
-				cout << "COLLIDED RIGHT" << endl;
-
-				if (FuturePlayerHitbox.y + FuturePlayerHitbox.h - m_map[y][x + 1]->getTileRect().y >			// y diff
-					FuturePlayerHitbox.x + FuturePlayerHitbox.w - m_map[y][x + 1]->getTileRect().x)				// x diff
-				{
-					isOnWall = true;
-					isLeftWall = false;
-
-					landOnWall({ x + 1, y }, isLeftWall);
-
-					cout << "LAND ON WALL RIGHT" << endl;
-				}
-				else
-				{
-					landOnGround({ x + 1, y });
-
-					cout << "LAND ON GROUND MOVING RIGHT" << endl;
-				}
-			}
-		}
+		isOnWall = false;
+		isLeftWall = false;
 	}
 
-	if (velocity.x == 0.0f)
-	{
+	if (!hitsLeftWall)	isLeftWall = false;
 
-		if(FcollRectRect(FuturePlayerHitbox, m_map[static_cast<int>(floor(hitbox.rect.y) + 1)][x]->getTileGridRect()))
-		{
-			landOnGround({ x, static_cast<int>(floor(hitbox.rect.y) + 1) });
-		}
-	}
-
+	if (!hitsGround) isOnGround = false;
+	
 }
 
-void Player::landOnGround(int2 ground)
+void Player::landOnGround(float groundY)
 {
-	hitbox.rect.y = ground.y - ((static_cast<float>((rect.h - hitbox.rect.h)) / 2.0f + hitbox.rect.h) / (TILE_SIZE * InputManager::getZoom())); // align player on top of ground
+	hitbox.rect.y = groundY - hitbox.rect.h; // align player on top of the ground
 
 	isOnGround = true;
 }
 
-void Player::landOnWall(int2 wall, bool isLeftWall)
+void Player::landOnWall(SDL_FRect wall, bool isOnLeftWall)
 {
-	if (isLeftWall)
+	if (isOnLeftWall)
 	{
-		hitbox.rect.x = wall.x + 1 - static_cast<float>((rect.w - hitbox.rect.w)) / 2.0f; // align player to the right of the wall
+		hitbox.rect.x = wall.x + wall.w; // align player to the right of the wall
 	}
 	else
 	{
-		hitbox.rect.x = wall.x - ((static_cast<float>((rect.w - hitbox.rect.w)) / 2.0f + hitbox.rect.w) / (TILE_SIZE * InputManager::getZoom())); // align player to the left of the wall
+		hitbox.rect.x = wall.x - hitbox.rect.w; // align player to the left of the wall
 	}
+
+	isLeftWall = isOnLeftWall;
 }
 
 void Player::calculateVelocity()
@@ -270,13 +267,22 @@ void Player::calculateVelocity()
 	inputVelocity.x = clamp(inputVelocity.x, -maxInputVelocity.x, maxInputVelocity.x); // clamps input velocity
 	inputVelocity.y = clamp(inputVelocity.y, -maxInputVelocity.y, maxInputVelocity.y);
 
-	velocity = gameVelocity + inputVelocity;
+	gameVelocity.y += inputVelocity.y; // adds input velocity to game velocity
+	gameVelocity.y += gravity; // applies gravity to game velocity
+
+	velocity = gameVelocity;
+	velocity.x += inputVelocity.x;
 
 	if (!(InputManager::isKeyPressed(SDL_SCANCODE_W) || InputManager::isKeyPressed(SDL_SCANCODE_SPACE))) inputVelocity.y = 0.0f; // resets jump input velocity when not jumping
 
 	if (isOnGround) // prevents downward velocity when on ground
 	{
 		velocity.y = min(0.0f, velocity.y);
+		gameVelocity.y = 0.0f;
+	}
+	else
+	{
+		inputVelocity.y = 0.0f; // resets jump input velocity when not on ground
 	}
 
 	if (isOnWall)

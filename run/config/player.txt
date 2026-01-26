@@ -1,8 +1,8 @@
 PlayerImage: bob.bmp
 SourceRect: 0 0 32 32
 DestinationRect: 900 700 32 32
-hitBox: hitbox.bmp 10.0 5.0 0.8 0.8
+hitBox: hitbox.bmp 10.0 5.0 0.7 0.5
 MoveSpeed: 0.01
-MaxInputVelocity: 0.08 0.08
+MaxInputVelocity: 0.08 10
 JumpStrength: 0.1
 Gravity: 0.005

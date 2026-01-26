@@ -26,7 +26,7 @@ void Camera::update()
 
 	smoothFollow();
 
-	cout << "Camera coords: " << rect.x << ", " << rect.y << ", " << rect.w << ", " << rect.h << endl;
+	//cout << "Camera coords: " << rect.x << ", " << rect.y << ", " << rect.w << ", " << rect.h << endl;
 }
 
 void Camera::updateZoom()
