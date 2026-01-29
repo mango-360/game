@@ -22,9 +22,6 @@ private:
 	void drawHitBox(float2 camCoords); // for debugging
 
 	void collision();
-	void checkForGround();
-	void landOnGround(float groundY);
-	void landOnWall(SDL_FRect wall, bool isOnLeftWall);
 	void calculateVelocity();
 	void applyVelocity();
 

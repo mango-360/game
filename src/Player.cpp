@@ -208,99 +208,6 @@ void Player::collision()
 	isOnGround = hitsGround;
 }
 
-void Player::checkForGround() // how to collide better with ground?
-{
-	SDL_FRect FuturePlayerHitbox = { hitbox.rect.x + velocity.x, hitbox.rect.y + velocity.y, hitbox.rect.w, hitbox.rect.h };
-	
-	bool hitsLeftWall = false;
-	bool hitsWall = false;
-	bool hitsGround = false;
-
-
-	for (int i = floor(hitbox.rect.y) - 1; i <= ceil(hitbox.rect.y + hitbox.rect.h); ++i)
-	{
-		for (int j = floor(hitbox.rect.x) - 1; j <= ceil(hitbox.rect.x + hitbox.rect.w); ++j)
-		{
-			if (FcollRectRect(FuturePlayerHitbox, m_map[i][j]->getTileGridRect()))
-			{
-				float deltaX = abs(FuturePlayerHitbox.x + FuturePlayerHitbox.w / 2 - m_map[i][j]->getTileGridRect().x - m_map[i][j]->getTileGridRect().w / 2);
-				float deltaY = abs(FuturePlayerHitbox.y + FuturePlayerHitbox.h / 2 - m_map[i][j]->getTileGridRect().y - m_map[i][j]->getTileGridRect().h / 2);
-
-				if (deltaX > deltaY)
-				{
-					if(FuturePlayerHitbox.x > m_map[i][j]->getTileGridRect().x) // left wall
-					{
-						//cout << "ON LEFT WALL" << endl;
-
-						landOnWall(m_map[i][j]->getTileGridRect(), true);
-
-						hitsLeftWall = true;
-					}
-					else // right wall
-					{
-						//cout << "ON RIGHT WALL" << endl;
-
-						landOnWall(m_map[i][j]->getTileGridRect(), false);
-
-						hitsWall = true;
-					}
-				}
-				else
-				{
-					if(FuturePlayerHitbox.y > m_map[i][j]->getTileGridRect().y) // ceiling
-					{
-						//cout << "ON CEILING" << endl;
-
-						onCeiling = true;
-
-						//hitbox.rect.y = i + m_map[i][j]->getTileGridRect().h; // align player below ceiling
-					}
-					else // ground
-					{
-						//cout << "ON GROUND" << endl;
-
-						landOnGround(m_map[i][j]->getTileGridRect().y);
-
-						hitsGround = true;
-					}
-				}
-			}
-		}
-	}
-
-	if (!hitsWall)
-	{
-		isOnWall = false;
-		isLeftWall = false;
-	}
-
-	if (!hitsLeftWall)	isLeftWall = false;
-
-	if (!hitsGround) isOnGround = false;
-	
-}
-
-void Player::landOnGround(float groundY)
-{
-	hitbox.rect.y = groundY - hitbox.rect.h; // align player on top of the ground
-
-	isOnGround = true;
-}
-
-void Player::landOnWall(SDL_FRect wall, bool isOnLeftWall)
-{
-	if (isOnLeftWall)
-	{
-		hitbox.rect.x = wall.x + wall.w; // align player to the right of the wall
-	}
-	else
-	{
-		hitbox.rect.x = wall.x - hitbox.rect.w; // align player to the left of the wall
-	}
-
-	isLeftWall = isOnLeftWall;
-}
-
 void Player::calculateVelocity()
 {
 	inputVelocity.x = clamp(inputVelocity.x, -maxInputVelocity.x, maxInputVelocity.x); // clamps input velocity
@@ -316,7 +223,6 @@ void Player::calculateVelocity()
 
 	if (isOnGround) // prevents downward velocity when on ground
 	{
-		//velocity.y = min(0.0f, velocity.y);
 		gameVelocity.y = 0.0f;
 	}
 	else
@@ -324,21 +230,21 @@ void Player::calculateVelocity()
 		inputVelocity.y = 0.0f; // resets jump input velocity when not on ground
 	}
 
-	if (isOnWall)
-	{
-		if (isLeftWall)
-		{
-			velocity.x = max(0.0f, velocity.x); // prevents leftward velocity when on left wall
+	//if (isOnWall)
+	//{
+	//	if (isLeftWall)
+	//	{
+	//		velocity.x = max(0.0f, velocity.x); // prevents leftward velocity when on left wall
 
-			//cout << "IS ON LEFT WALL" << endl;
-		}
-		else
-		{
-			velocity.x = min(0.0f, velocity.x); // prevents rightward velocity when on right wall
+	//		//cout << "IS ON LEFT WALL" << endl;
+	//	}
+	//	else
+	//	{
+	//		velocity.x = min(0.0f, velocity.x); // prevents rightward velocity when on right wall
 
-			//cout << "IS ON RIGHT WALL" << endl;
-		}
-	}
+	//		//cout << "IS ON RIGHT WALL" << endl;
+	//	}
+	//}
 }
 
 void Player::applyVelocity()
