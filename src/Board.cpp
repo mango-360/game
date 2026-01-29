@@ -99,9 +99,9 @@ void Board::draw()
 {
 	drawObject(m_background);
 
-	m_player.draw( { m_camera.getCameraRect().x, m_camera.getCameraRect().y} ); // draw player based on cammera position
-
 	drawMap();
+
+	m_player.draw( { m_camera.getCameraRect().x, m_camera.getCameraRect().y} ); // draw player based on cammera position
 }
 
 void Board::destroy()

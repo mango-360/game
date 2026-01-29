@@ -41,6 +41,11 @@ struct float2
 	float2 operator*(float2 a) const { return { x * a.x, y * a.y }; }
 	float2 operator/(float2 a) const { return { x / a.x, y / a.y }; }
 
+	void operator+=(float a) { x += a; y += a; }
+	void operator-=(float a) { x -= a; y -= a; }
+	void operator*=(float a) { x *= a; y *= a; }
+	void operator/=(float a) { x /= a; y /= a; }
+
 	void operator+=(float2 a) { x += a.x; y += a.y; }
 	void operator-=(float2 a) { x -= a.x; y -= a.y; }
 	void operator*=(float2 a) { x *= a.x; y *= a.y; }

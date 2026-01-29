@@ -5,7 +5,6 @@ SDL_Texture* LoadTexture(string imgPath, SDL_Renderer* renderer)
 	string fullPath = IMG_FOLDER + imgPath;
 
 	SDL_Surface* tempSurface = SDL_LoadBMP(fullPath.c_str());
-
 	SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, tempSurface);
 
     if (texture == nullptr)
@@ -97,11 +96,11 @@ bool FcollRayRect(float2 rayOrigin, float2 rayDir, SDL_FRect* rect, float2& cont
 	return true;
 }
 
-bool DynamicRectVsRect(const SDL_FRect* r_dynamic, const float2 velocity, const SDL_FRect& r_static,
+bool DynamicRectVsRect(const SDL_FRect* r_dynamic, const float2& velocity, const SDL_FRect& r_static,
 	float2& contact_point, float2& contact_normal, float& contact_time)
 {
 	// Check if dynamic rectangle is actually moving - we assume rectangles are NOT in collision to start
-	if (velocity == 0.0f) return false;
+	if (velocity == 0) return false;
 
 	// Expand target rectangle by source dimensions
 	SDL_FRect expanded_target;
@@ -116,28 +115,22 @@ bool DynamicRectVsRect(const SDL_FRect* r_dynamic, const float2 velocity, const 
 	{
 		cout << "returned true from DynamicRectVsRect" << endl;
 		return (contact_time >= 0.0f && contact_time < 1.0f);
-
 	}
 	else
 		return false;
 }
 
-bool ResolveDynamicRectVsRect(SDL_FRect* r_dynamic, float2 velocity, SDL_FRect* r_static)
+bool ResolveDynamicRectVsRect(SDL_FRect* r_dynamic, float2& velocity, SDL_FRect* r_static)
 {
 	float2 contact_point, contact_normal;
 	float contact_time = 0.0f;
 	if (DynamicRectVsRect(r_dynamic, velocity, *r_static, contact_point, contact_normal, contact_time))
 	{
-		/*if (contact_normal.y > 0) r_dynamic->contact[0] = r_static; else nullptr;
-		if (contact_normal.x < 0) r_dynamic->contact[1] = r_static; else nullptr;
-		if (contact_normal.y < 0) r_dynamic->contact[2] = r_static; else nullptr;
-		if (contact_normal.x > 0) r_dynamic->contact[3] = r_static; else nullptr;*/
+		// resolve contacts...
 
-		r_dynamic = r_static;
-
-		velocity += contact_normal * float2({ abs(velocity.x), abs(velocity.y) }) * (1 - contact_time);
-
-		cout << "Resolved collision at time: " << contact_time << endl;
+		// Example: modify velocity in-place so caller sees the change
+		velocity += contact_normal * float2({ fabsf(velocity.x), fabsf(velocity.y) }) * (1.0f - contact_time);
+		
 		return true;
 	}
 
