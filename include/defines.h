@@ -31,10 +31,15 @@ struct float2
 	bool operator==(float2 a) { return (x == a.x && y == a.y); }
 	bool operator!=(float2 a) { return (x != a.x || y != a.y); }
 
-	float2 operator+(float2 a) { return { x + a.x, y + a.y }; }
-	float2 operator-(float2 a) { return { x - a.x, y - a.y }; }
-	float2 operator*(float2 a) { return { x * a.x, y * a.y }; }
-	float2 operator/(float2 a) { return { x / a.x, y / a.y }; }
+	float2 operator+(float a) { return { a + x, a + y }; }
+	float2 operator-(float a) { return { a - x, a - y }; }
+	float2 operator*(float a) { return { a * x, a * y }; }
+	float2 operator/(float a) { return { a / x, a / y }; }
+
+	float2 operator+(float2 a) const { return { x + a.x, y + a.y }; }
+	float2 operator-(float2 a) const { return { x - a.x, y - a.y }; }
+	float2 operator*(float2 a) const { return { x * a.x, y * a.y }; }
+	float2 operator/(float2 a) const { return { x / a.x, y / a.y }; }
 
 	void operator+=(float2 a) { x += a.x; y += a.y; }
 	void operator-=(float2 a) { x -= a.x; y -= a.y; }
@@ -177,4 +182,24 @@ inline ostream& operator<<(ostream& os, int2& vec)
 inline ostream& operator<<(ostream& os, const SDL_Rect& v) {
 	os << "(" << v.x << ", " << v.y << ", " << v.w << ", " << v.h << ")";
 	return os;
+}
+
+inline float2 operator+(float a, const float2& v) {
+	return { a + v.x, a + v.y };
+}
+inline float2 operator-(float a, const float2& v) {
+	return { a - v.x, a - v.y };
+}
+inline float2 operator*(float a, const float2& v) {
+	return { a * v.x, a * v.y };
+}
+inline float2 operator/(float a, const float2& v) {
+	return { a / v.x, a / v.y };
+}
+
+inline bool operator==(const float2& v, float value) {
+	return v.x == value && v.y == value;
+}
+inline bool operator==(float value, const float2& v) {
+	return v == value && v == value;
 }

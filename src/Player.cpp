@@ -116,7 +116,8 @@ void Player::move()
 		jump();
 	}
 
-	checkForGround();
+	collision();
+	//checkForGround();
 
 	//cout << "Player map coords: " << hitbox.rect.x << ", " << hitbox.rect.y << endl;
 }
@@ -167,6 +168,39 @@ void Player::drawHitBox(float2 camCoords) //for debugging
 	Drawable tmp = { hitbox.img, hitbox.texture, tmpHitboxRect };
 
 	drawObject(tmp);
+}
+
+void Player::collision()
+{
+	float2 cp, cn;
+	float t = 0, min_t = INFINITY;
+	vector<pair<int2, float>> collsList;
+
+	// Work out collision point, add it to vector along with rect ID
+	for (int i = floor(hitbox.rect.y) - 1; i <= ceil(hitbox.rect.y + hitbox.rect.h); ++i)
+	{
+		for (int j = floor(hitbox.rect.x) - 1; j <= ceil(hitbox.rect.x + hitbox.rect.w); ++j)
+		{
+			if (DynamicRectVsRect(&hitbox.rect, velocity, m_map[i][j]->getTileGridRect(), cp, cn, t))
+			{
+				collsList.push_back({ {i, j}, t });
+			}
+		}
+	}
+
+	// Do the sort
+	sort(collsList.begin(), collsList.end(), [](const pair<int2, float>& a, const pair<int2, float>& b)
+		{
+			return a.second < b.second;
+		});
+
+	// Now resolve the collision in correct order 
+	for (auto j : collsList) 
+	{
+		// Avoid taking the address of a temporary returned by getTileGridRect():
+		SDL_FRect tileRect = m_map[j.first.x][j.first.y]->getTileGridRect();
+		ResolveDynamicRectVsRect(&hitbox.rect, velocity, &tileRect);
+	}
 }
 
 void Player::checkForGround() // how to collide better with ground?
@@ -273,33 +307,33 @@ void Player::calculateVelocity()
 	velocity = gameVelocity;
 	velocity.x += inputVelocity.x;
 
-	if (!(InputManager::isKeyPressed(SDL_SCANCODE_W) || InputManager::isKeyPressed(SDL_SCANCODE_SPACE))) inputVelocity.y = 0.0f; // resets jump input velocity when not jumping
+	//if (!(InputManager::isKeyPressed(SDL_SCANCODE_W) || InputManager::isKeyPressed(SDL_SCANCODE_SPACE))) inputVelocity.y = 0.0f; // resets jump input velocity when not jumping
 
-	if (isOnGround) // prevents downward velocity when on ground
-	{
-		velocity.y = min(0.0f, velocity.y);
-		gameVelocity.y = 0.0f;
-	}
-	else
-	{
-		inputVelocity.y = 0.0f; // resets jump input velocity when not on ground
-	}
+	//if (isOnGround) // prevents downward velocity when on ground
+	//{
+	//	velocity.y = min(0.0f, velocity.y);
+	//	gameVelocity.y = 0.0f;
+	//}
+	//else
+	//{
+	//	inputVelocity.y = 0.0f; // resets jump input velocity when not on ground
+	//}
 
-	if (isOnWall)
-	{
-		if (isLeftWall)
-		{
-			velocity.x = max(0.0f, velocity.x); // prevents leftward velocity when on left wall
+	//if (isOnWall)
+	//{
+	//	if (isLeftWall)
+	//	{
+	//		velocity.x = max(0.0f, velocity.x); // prevents leftward velocity when on left wall
 
-			//cout << "IS ON LEFT WALL" << endl;
-		}
-		else
-		{
-			velocity.x = min(0.0f, velocity.x); // prevents rightward velocity when on right wall
+	//		//cout << "IS ON LEFT WALL" << endl;
+	//	}
+	//	else
+	//	{
+	//		velocity.x = min(0.0f, velocity.x); // prevents rightward velocity when on right wall
 
-			//cout << "IS ON RIGHT WALL" << endl;
-		}
-	}
+	//		//cout << "IS ON RIGHT WALL" << endl;
+	//	}
+	//}
 }
 
 void Player::applyVelocity()
