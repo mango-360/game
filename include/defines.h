@@ -172,6 +172,12 @@ inline istream& operator>>(istream& is, float2& vec)
 	return is;
 }
 
+inline ostream& operator<<(ostream& os, float2& vec)
+{
+	os << vec.x << " " << vec.y;
+	return os;
+}
+
 inline istream& operator>>(istream& is, Drawable& dr)
 {
 	is >> dr.img >> dr.rect;

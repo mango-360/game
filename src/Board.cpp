@@ -50,6 +50,15 @@ void Board::initMap()
 	std::uniform_int_distribution<int> startDist(0, 120);
 	int x = startDist(rng);
 
+	for(int j = 0; j < MAP_HEIGHT; ++j)
+	{
+		for(int i = 0; i < MAP_WIDTH; ++i)
+		{
+			Tile tile;
+			tile.init({ static_cast<float>(i),static_cast<float>(j) });
+			m_map[j][i] = tile;
+		}
+	}
 	for (int i = 0; i < MAP_WIDTH; ++i)
 	{
 		float noiseF =
@@ -60,6 +69,7 @@ void Board::initMap()
 		int noise = static_cast<int>(round(noiseF));
 
 		int y = surfaceLevel - noise;
+
 		if (y >= 0 && y < MAP_HEIGHT) // guard array bounds
 		{
 			GrassBlock grassBlock;
@@ -68,23 +78,9 @@ void Board::initMap()
 
 			m_map[y][i] = grassBlock;
 		}
-		else
-		{
-			Tile tile;
-
-			tile.init({static_cast<float>(i),static_cast<float>(y)});
-
-			m_map[y][i] = tile;
-		}
 
 		x ++;
 	}
-
-	/*for (int i = 0; i < MAP_HEIGHT; i++)   COUT MAP
-	{
-		for (int j = 0; j < MAP_WIDTH; j++) cout << static_cast<int>(m_map[i][j]) << " ";
-		cout << endl;
-	}*/
 }
 
 void Board::update()

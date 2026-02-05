@@ -50,6 +50,8 @@ void Player::init(Tile(*map)[MAP_WIDTH])
 
 void Player::update()
 {
+	addGravity();
+
 	zoomUpdate();
 
 	calculateVelocity();
@@ -183,9 +185,22 @@ void Player::collision()
 	{
 		for (int j = floor(hitbox.rect.x) - 1; j <= ceil(hitbox.rect.x + hitbox.rect.w); ++j)
 		{
+			if (m_map[i][j]->getTileType() == TILE_TYPE::NONE_TYPE) continue;
+
 			if (DynamicRectVsRect(&hitbox.rect, velocity, m_map[i][j]->getTileGridRect(), cp, cn, t))
 			{
+				/*cout << "Player at: " << floor(hitbox.rect.x) << ", " << floor(hitbox.rect.y) << endl;
+				cout << "Checking block at: " << j << ", " << i << endl;
+				cout << "Contact normal: " << cn << endl;*/
+
 				collsList.push_back({ {i, j}, t });
+
+				if (cn.y == -1)
+				{
+					hitsGround = true;
+
+					applyFriction({ i, j });
+				}
 			}
 		}
 	}
@@ -201,50 +216,58 @@ void Player::collision()
 	{
 		// Avoid taking the address of a temporary returned by getTileGridRect():
 		SDL_FRect tileRect = m_map[j.first.x][j.first.y]->getTileGridRect();
-		if (ResolveDynamicRectVsRect(&hitbox.rect, velocity, &tileRect)) hitsGround = true;
-		cout << "velocity after resolve: " << velocity.x << ", " << velocity.y << endl;
+		ResolveDynamicRectVsRect(&hitbox.rect, velocity, &tileRect);
 	}
 
 	isOnGround = hitsGround;
 }
 
+void Player::addGravity()
+{
+	velocity.y += gravity;
+}
+
+void Player::applyFriction(int2 coords)
+{
+	if (velocity.x != 0)
+	{
+		if (velocity.x > 0)
+		{
+			friction = max(-velocity.x, -(velocity.y * m_map[coords.x][coords.y]->getFriction()));
+
+			cout << "Subtracting friction: " << velocity.y * m_map[coords.x][coords.y]->getFriction() << endl;
+		}
+		else
+		{
+
+			friction = min(-velocity.x, (velocity.y * m_map[coords.x][coords.y]->getFriction()));
+
+			cout << "Adding friction: " << velocity.y * m_map[coords.x][coords.y]->getFriction() << endl;
+		}
+	}
+}
+
 void Player::calculateVelocity()
 {
+	inputVelocity.x += friction; // applies friction to input velocity
+	friction = 0.0f; // resets friction for next frame
 	inputVelocity.x = clamp(inputVelocity.x, -maxInputVelocity.x, maxInputVelocity.x); // clamps input velocity
 	inputVelocity.y = clamp(inputVelocity.y, -maxInputVelocity.y, maxInputVelocity.y);
 
-	gameVelocity.y += inputVelocity.y; // adds input velocity to game velocity
-	gameVelocity.y += gravity; // applies gravity to game velocity
+	velocity.y += inputVelocity.y; // adds input velocity to game velocity
 
-	velocity = gameVelocity;
-	velocity.x += inputVelocity.x;
-
-	//if (!(InputManager::isKeyPressed(SDL_SCANCODE_W) || InputManager::isKeyPressed(SDL_SCANCODE_SPACE))) inputVelocity.y = 0.0f; // resets jump input velocity when not jumping
+	velocity.x = inputVelocity.x;
 
 	if (isOnGround) // prevents downward velocity when on ground
 	{
-		gameVelocity.y = 0.0f;
+		velocity.y = 0.0f;
+		cout << "isOnGround" << endl;
 	}
 	else
 	{
 		inputVelocity.y = 0.0f; // resets jump input velocity when not on ground
+		cout << "isNotOnGround" << endl;
 	}
-
-	//if (isOnWall)
-	//{
-	//	if (isLeftWall)
-	//	{
-	//		velocity.x = max(0.0f, velocity.x); // prevents leftward velocity when on left wall
-
-	//		//cout << "IS ON LEFT WALL" << endl;
-	//	}
-	//	else
-	//	{
-	//		velocity.x = min(0.0f, velocity.x); // prevents rightward velocity when on right wall
-
-	//		//cout << "IS ON RIGHT WALL" << endl;
-	//	}
-	//}
 }
 
 void Player::applyVelocity()

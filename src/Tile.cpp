@@ -17,6 +17,7 @@ void Tile::init(float2 coords)
 	m_hp = 0;
 	m_type = TILE_TYPE::NONE_TYPE;
 	m_gridRect = { coords.x, coords.y, 1, 1 };
+	m_friction = 0;
 	updateZoom();
 }
 

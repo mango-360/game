@@ -92,7 +92,6 @@ bool FcollRayRect(float2 rayOrigin, float2 rayDir, SDL_FRect* rect, float2& cont
 	// so pointless to resolve. By returning a CN={0,0} even though its
 	// considered a hit, the resolver wont change anything.
 
-	cout << "returned true from FcollRayRect" << endl;
 	return true;
 }
 
@@ -113,7 +112,6 @@ bool DynamicRectVsRect(const SDL_FRect* r_dynamic, const float2& velocity, const
 
 	if (FcollRayRect(r_dynamic_center, velocity, &expanded_target, contact_point, contact_normal, contact_time))
 	{
-		cout << "returned true from DynamicRectVsRect" << endl;
 		return (contact_time >= 0.0f && contact_time < 1.0f);
 	}
 	else
@@ -126,10 +124,7 @@ bool ResolveDynamicRectVsRect(SDL_FRect* r_dynamic, float2& velocity, SDL_FRect*
 	float contact_time = 0.0f;
 	if (DynamicRectVsRect(r_dynamic, velocity, *r_static, contact_point, contact_normal, contact_time))
 	{
-		// resolve contacts...
-
-		// Example: modify velocity in-place so caller sees the change
-		velocity += contact_normal * float2({ fabsf(velocity.x), fabsf(velocity.y) }) * (1.0f - contact_time);
+		velocity += (contact_normal * float2({ fabsf(velocity.x), fabsf(velocity.y) })) * (1.0f - contact_time);
 		
 		return true;
 	}

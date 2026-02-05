@@ -4,5 +4,5 @@ DestinationRect: 900 700 32 32
 hitBox: hitbox.bmp 10.0 5.0 0.7 0.5
 MoveSpeed: 0.01
 MaxInputVelocity: 0.08 10
-JumpStrength: 0.1
+JumpStrength: 0.15
 Gravity: 0.005
