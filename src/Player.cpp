@@ -84,8 +84,8 @@ void Player::draw(float2 camCoords)
 	};
 	tmpPlayer.texture = texture;
 
-	drawObject(tmp);
 	drawObject(tmpPlayer);
+	drawObject(tmp);
 }
 
 int2 Player::getRealCoords()
