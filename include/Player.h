@@ -22,19 +22,21 @@ private:
 	void drawHitBox(float2 camCoords); // for debugging
 
 	void collision();
-	void addGravity();
-	void applyFriction(int2 coords);
+	void calculateFriction(int2 coords);
 	void calculateVelocity();
+	void calculateNetForce();
+	void addFriction();
 	void applyVelocity();
 
 	int lastKeyPressed = -1;
 	float jumpStrength;
-	float gravity;
-	float friction;
 	float moveSpeed;
+	float2 friction;
+	float2 gravity;
 	float2 velocity = { 0, 0 };
 	float2 inputVelocity = { 0, 0 };
 	float2 maxInputVelocity;
+	float2 netForce;
 	
 	bool isOnGround = false;
 	bool isLeftWall = false;

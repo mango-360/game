@@ -50,13 +50,16 @@ void Player::init(Tile(*map)[MAP_WIDTH])
 
 void Player::update()
 {
-	addGravity();
-
 	zoomUpdate();
+
+	move();
 
 	calculateVelocity();
 
-	move();
+	collision();
+	
+	addFriction();
+
 	applyVelocity();
 
 	//cout << "Player map coords: " << hitbox.rect.x << ", " << hitbox.rect.y << endl;
@@ -117,8 +120,6 @@ void Player::move()
 	{
 		jump();
 	}
-
-	collision();
 	//checkForGround();
 
 	//cout << "Player map coords: " << hitbox.rect.x << ", " << hitbox.rect.y << endl;
@@ -175,9 +176,10 @@ void Player::drawHitBox(float2 camCoords) //for debugging
 void Player::collision()
 {
 	bool hitsGround = false;
+	friction = { 0, 0 };
 
 	float2 cp, cn;
-	float t = 0, min_t = INFINITY;
+	float t = 0, min_t = INFINITY, prevFriction = 0;
 	vector<pair<int2, float>> collsList;
 
 	// Work out collision point, add it to vector along with rect ID
@@ -199,7 +201,9 @@ void Player::collision()
 				{
 					hitsGround = true;
 
-					applyFriction({ i, j });
+					if(m_map[i][j]->getFriction() > prevFriction) calculateFriction({ i, j });
+
+					prevFriction = m_map[i][j]->getFriction();
 				}
 			}
 		}
@@ -222,45 +226,33 @@ void Player::collision()
 	isOnGround = hitsGround;
 }
 
-void Player::addGravity()
+void Player::calculateFriction(int2 coords)
 {
-	velocity.y += gravity;
-}
+	friction.x = min(abs(velocity.x), abs(gravity.y * m_map[coords.x][coords.y]->getFriction()));
 
-void Player::applyFriction(int2 coords)
-{
-	if (velocity.x != 0)
+	if (velocity.x > 0)
 	{
-		if (velocity.x > 0)
-		{
-			friction = max(-velocity.x, -(velocity.y * m_map[coords.x][coords.y]->getFriction()));
-
-			cout << "Subtracting friction: " << velocity.y * m_map[coords.x][coords.y]->getFriction() << endl;
-		}
-		else
-		{
-
-			friction = min(-velocity.x, (velocity.y * m_map[coords.x][coords.y]->getFriction()));
-
-			cout << "Adding friction: " << velocity.y * m_map[coords.x][coords.y]->getFriction() << endl;
-		}
+		friction.x = -friction.x;
+	}
+	if (velocity.y > 0)
+	{
+		friction.y = -friction.y;
 	}
 }
 
 void Player::calculateVelocity()
 {
-	inputVelocity.x += friction; // applies friction to input velocity
-	friction = 0.0f; // resets friction for next frame
 	inputVelocity.x = clamp(inputVelocity.x, -maxInputVelocity.x, maxInputVelocity.x); // clamps input velocity
 	inputVelocity.y = clamp(inputVelocity.y, -maxInputVelocity.y, maxInputVelocity.y);
-
-	velocity.y += inputVelocity.y; // adds input velocity to game velocity
-
 	velocity.x = inputVelocity.x;
+
+	velocity.y += inputVelocity.y;
+
+	calculateNetForce();
+	velocity += netForce; 
 
 	if (isOnGround) // prevents downward velocity when on ground
 	{
-		velocity.y = 0.0f;
 		cout << "isOnGround" << endl;
 	}
 	else
@@ -268,6 +260,17 @@ void Player::calculateVelocity()
 		inputVelocity.y = 0.0f; // resets jump input velocity when not on ground
 		cout << "isNotOnGround" << endl;
 	}
+}
+
+void Player::calculateNetForce()
+{
+	netForce = gravity;
+}
+
+void Player::addFriction()
+{
+	velocity += friction;
+	cout << "Friction: " << friction << endl;
 }
 
 void Player::applyVelocity()
