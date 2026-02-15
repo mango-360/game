@@ -143,5 +143,5 @@ void Board::drawMap()
 
 void Board::toggleStatistics()
 {
-	if(InputManager::isKeyPressed(SDL_SCANCODE_F3)) drawStatistics = !drawStatistics;
+	if(InputManager::isKeyJustPressed(SDL_SCANCODE_F3)) drawStatistics = !drawStatistics;
 }

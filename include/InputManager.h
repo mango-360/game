@@ -11,6 +11,8 @@ public:
 	static int2 m_mouseCoor;
 
 	static const Uint8* m_keyboardState;
+	static const Uint8* m_prevKeyboardState;  // ADD THIS
+
 
 	void handleInput();
 	void setMouseMultiply(float2 multiplier);
@@ -18,6 +20,7 @@ public:
 	static bool isMousePressed();
 	static bool isAnyKeyPressed();
 	static bool isKeyPressed(SDL_Scancode code);
+	static bool isKeyJustPressed(SDL_Scancode code);  // ADD THIS
 	static bool isZoomChanged() { return hasZoomChanged; };
 	static float getZoom() { return m_zoom; };
 
@@ -35,4 +38,5 @@ private:
 	const float maxZoom = 5.0f;
 	
 	static float m_zoom;
+	static Uint8 m_keyboardStateCopy[SDL_NUM_SCANCODES];  // ADD THIS
 }; 
