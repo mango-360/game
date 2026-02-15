@@ -14,6 +14,7 @@ static const string SOUND_FOLDER = "sound\\";
 static const string FONT_FOLDER = "font\\";
 static const string TEXT_FIELD_FOLDER = "textField\\";
 static const string TILES_FOLDER = "tiles\\";
+static const string STATISTICS_FOLDER = "statistics\\";
 
 static const int TILE_SIZE = 32;
 static const int MAP_WIDTH = 320;

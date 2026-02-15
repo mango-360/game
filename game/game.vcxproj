@@ -33,6 +33,7 @@
     <ClInclude Include="..\include\SoundManager.h" />
     <ClInclude Include="..\include\State.h" />
     <ClInclude Include="..\include\StateManager.h" />
+    <ClInclude Include="..\include\Statistics.h" />
     <ClInclude Include="..\include\TextField.h" />
     <ClInclude Include="..\include\Tile.h" />
     <ClInclude Include="..\include\TitleScreen.h" />
@@ -53,6 +54,7 @@
     <ClCompile Include="..\src\Player.cpp" />
     <ClCompile Include="..\src\Presenter.cpp" />
     <ClCompile Include="..\src\SoundManager.cpp" />
+    <ClCompile Include="..\src\Statistics.cpp" />
     <ClCompile Include="..\src\State.cpp" />
     <ClCompile Include="..\src\StateManager.cpp" />
     <ClCompile Include="..\src\TextField.cpp" />

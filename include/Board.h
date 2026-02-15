@@ -11,6 +11,7 @@
 #include "Tile.h"
 #include "Camera.h"
 #include "GrassBlock.h"
+#include "Statistics.h"
 
 class Board
 {
@@ -30,8 +31,13 @@ public:
 private:
 	void updateMap();
 	void drawMap();
+	void toggleStatistics();
+
+	bool drawStatistics = false;
 
 	SDL_Texture* m_background;
 
 	Camera m_camera;
+
+	Statistics m_statistics;
 };

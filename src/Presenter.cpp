@@ -31,6 +31,7 @@ void Presenter::init()
 	m_mainRenderer = SDL_CreateRenderer(m_mainWindow, -1, SDL_RENDERER_PRESENTVSYNC);
 	
 	improveRederer();
+	m_writer->init();
 }
 
 void Presenter::draw()

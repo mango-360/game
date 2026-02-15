@@ -15,7 +15,7 @@ void TextField::init(string configFile)
 
 	fstream stream;
 
-	stream.open(CONFIG_FOLDER + TEXT_FIELD_FOLDER + configFile);
+	stream.open(CONFIG_FOLDER + configFile);
 
 	stream >> tmp >> m_fontSize;
 	stream >> tmp >> m_background.rect.x >> m_background.rect.y >> m_background.rect.w >> m_background.rect.h;
@@ -24,7 +24,7 @@ void TextField::init(string configFile)
 
 	stream.close();
 
-	m_background.texture = loadTexture(TEXT_FIELD_FOLDER + background);
+	m_background.texture = loadTexture(background);
 
 	m_needToDrawBackground = true;
 }

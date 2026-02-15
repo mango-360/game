@@ -242,15 +242,6 @@ void Player::calculateVelocity()
 	//inputVelocity.y = clamp(inputVelocity.y, -maxInputVelocity.y, maxInputVelocity.y); // clamps y input velocity
 
 	velocity += inputVelocity;
-
-	if (isOnGround)
-	{
-		cout << "isOnGround" << endl;
-	}
-	else
-	{
-		cout << "isNotOnGround" << endl;
-	}
 }
 
 float2 Player::calculateNetForce()
@@ -260,16 +251,11 @@ float2 Player::calculateNetForce()
 
 void Player::addFriction()
 {
-	cout << "Velocity before friction: " << velocity.x << ", " << velocity.y << endl;
 	velocity += friction;
-	cout << "Velocity after friction: " << velocity.x << ", " << velocity.y << endl;
-	cout << "Friction: " << friction << endl;
 }
 
 void Player::applyVelocity()
 {
-	cout << "Velocity: " << velocity.x << ", " << velocity.y << endl;
-
 	hitbox.rect.x += velocity.x;
 	hitbox.rect.y += velocity.y;
 }

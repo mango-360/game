@@ -36,6 +36,8 @@ void Board::init()
 	initMap();
 
 	m_camera.init(&m_player);
+
+	m_statistics.init();
 }
 
 void Board::initMap()
@@ -89,6 +91,9 @@ void Board::update()
 	m_camera.update();
 
 	updateMap();
+
+	toggleStatistics();
+	if(drawStatistics) m_statistics.update();
 }
 
 void Board::draw()
@@ -98,6 +103,8 @@ void Board::draw()
 	drawMap();
 
 	m_player.draw( { m_camera.getCameraRect().x, m_camera.getCameraRect().y} ); // draw player based on cammera position
+
+	if (drawStatistics) m_statistics.draw();
 }
 
 void Board::destroy()
@@ -132,4 +139,9 @@ void Board::drawMap()
 			m_map[y][x].draw({ camRect.x, camRect.y });
 		}
 	}
+}
+
+void Board::toggleStatistics()
+{
+	if(InputManager::isKeyPressed(SDL_SCANCODE_F3)) drawStatistics = !drawStatistics;
 }

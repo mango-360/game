@@ -1,0 +1,4 @@
+fontsize: 20
+bgrect: 0 70 405 30
+color: 1
+background: rectangle.bmp
