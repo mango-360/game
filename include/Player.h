@@ -24,7 +24,7 @@ private:
 	void collision();
 	void calculateFriction(int2 coords);
 	void calculateVelocity();
-	void calculateNetForce();
+	float2 calculateNetForce();
 	void addFriction();
 	void applyVelocity();
 

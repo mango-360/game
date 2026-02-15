@@ -98,11 +98,9 @@ int2 Player::getRealCoords()
 
 void Player::jump()
 {
-	inputVelocity.y = -jumpStrength;
+	if(isOnGround) velocity.y = -jumpStrength;
 
 	isOnGround = false;
-
-	cout << "JUMP!" << endl;
 }
 
 void Player::zoomUpdate()
@@ -120,9 +118,6 @@ void Player::move()
 	{
 		jump();
 	}
-	//checkForGround();
-
-	//cout << "Player map coords: " << hitbox.rect.x << ", " << hitbox.rect.y << endl;
 }
 
 void Player::moveVertical()
@@ -149,11 +144,15 @@ void Player::moveVertical()
 			lastKeyPressed = SDL_SCANCODE_D;
 		}
 	}
-	else if (InputManager::isKeyPressed(SDL_SCANCODE_A))
+	else 
 	{
-		inputVelocity.x -= moveSpeed;
-		srcRect.x = srcRect.w;
-		lastKeyPressed = SDL_SCANCODE_A;
+		if (InputManager::isKeyPressed(SDL_SCANCODE_A))
+		{
+			inputVelocity.x -= moveSpeed;
+			srcRect.x = srcRect.w;
+			lastKeyPressed = SDL_SCANCODE_A;
+		}
+		else inputVelocity.x = 0;
 	}
 }
 
@@ -230,52 +229,46 @@ void Player::calculateFriction(int2 coords)
 {
 	friction.x = min(abs(velocity.x), abs(gravity.y * m_map[coords.x][coords.y]->getFriction()));
 
-	if (velocity.x > 0)
-	{
-		friction.x = -friction.x;
-	}
-	if (velocity.y > 0)
-	{
-		friction.y = -friction.y;
-	}
+	if (velocity.x > 0) friction.x *= -1;
+	if (velocity.y > 0) friction.y *= -1;
 }
 
 void Player::calculateVelocity()
 {
-	inputVelocity.x = clamp(inputVelocity.x, -maxInputVelocity.x, maxInputVelocity.x); // clamps input velocity
-	inputVelocity.y = clamp(inputVelocity.y, -maxInputVelocity.y, maxInputVelocity.y);
-	velocity.x = inputVelocity.x;
+	velocity += calculateNetForce();
 
-	velocity.y += inputVelocity.y;
+	if(velocity.x > 0) inputVelocity.x = clamp(inputVelocity.x, -maxInputVelocity.x, max(0.0f, maxInputVelocity.x - velocity.x)); // clamps x input velocity
+	else	inputVelocity.x = clamp(inputVelocity.x, min(0.0f, -maxInputVelocity.x - velocity.x), maxInputVelocity.x); 
+	//inputVelocity.y = clamp(inputVelocity.y, -maxInputVelocity.y, maxInputVelocity.y); // clamps y input velocity
 
-	calculateNetForce();
-	velocity += netForce; 
+	velocity += inputVelocity;
 
-	if (isOnGround) // prevents downward velocity when on ground
+	if (isOnGround)
 	{
 		cout << "isOnGround" << endl;
 	}
 	else
 	{
-		inputVelocity.y = 0.0f; // resets jump input velocity when not on ground
 		cout << "isNotOnGround" << endl;
 	}
 }
 
-void Player::calculateNetForce()
+float2 Player::calculateNetForce()
 {
-	netForce = gravity;
+	return gravity;
 }
 
 void Player::addFriction()
 {
+	cout << "Velocity before friction: " << velocity.x << ", " << velocity.y << endl;
 	velocity += friction;
+	cout << "Velocity after friction: " << velocity.x << ", " << velocity.y << endl;
 	cout << "Friction: " << friction << endl;
 }
 
 void Player::applyVelocity()
 {
-	//cout << "Velocity: " << velocity.x << ", " << velocity.y << endl;
+	cout << "Velocity: " << velocity.x << ", " << velocity.y << endl;
 
 	hitbox.rect.x += velocity.x;
 	hitbox.rect.y += velocity.y;
