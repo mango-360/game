@@ -11,7 +11,7 @@ Writer::~Writer()
 
 void Writer::init()
 {
-	m_fontLocation = FONT_FOLDER + "Roboto-Regular.ttf";
+	m_fontLocation = FONT_FOLDER + "JellyDonuts-Aja7.ttf";
 
 	for (int i = 8; i <= 300; i ++) // Font sizes from 8 to 300
 	{
