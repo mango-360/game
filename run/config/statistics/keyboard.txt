@@ -1,0 +1,6 @@
+srcRectUnpressed: 0 0 32 32
+srcRectPressed: 32 0 32 32
+W.bmp 64 100 64 64
+A.bmp 0 164																																			  	 64 64
+S.bmp 64 164 64 64
+D.bmp 128 164 64 64

@@ -22,6 +22,7 @@ void World::run()
 {
 	m_inputManager.handleInput();
 
+	if (InputManager::isKeyPressed(SDL_SCANCODE_ESCAPE)) m_running = false;
 	m_stateManager.run();
 
 	m_presenter.draw();

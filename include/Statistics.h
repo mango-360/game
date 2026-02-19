@@ -14,4 +14,7 @@ public:
 	void destroy();
 private:
 	TextField m_position;
+
+	SDL_Rect m_keyboardRect;
+	DrawableWithSrc m_keyboard[4];
 };

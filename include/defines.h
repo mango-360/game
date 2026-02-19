@@ -155,11 +155,11 @@ inline istream& operator>>(istream& is, SDL_FRect& rect)
 	return is;
 }
 
-inline ostream& operator>>(ostream& is, SDL_FRect& rect)
+inline ostream& operator<<(ostream& os, SDL_FRect& rect)
 {
-	is << rect.x << rect.y << rect.w << rect.h;
-	return is;
-} 
+	os << rect.x << ", " << rect.y << ", " << rect.w << ", " << rect.h;
+	return os;
+}
 
 inline istream& operator>>(istream& is, int2& vec)
 {
@@ -194,6 +194,12 @@ inline ostream& operator<<(ostream& os, int2& vec)
 inline ostream& operator<<(ostream& os, const SDL_Rect& v) {
 	os << "(" << v.x << ", " << v.y << ", " << v.w << ", " << v.h << ")";
 	return os;
+}
+
+inline istream& operator>>(istream& is, DrawableWithSrc& dr)
+{
+	is >> dr.img >> dr.rect >> dr.srcRect;
+	return is;
 }
 
 inline float2 operator+(float a, const float2& v) {

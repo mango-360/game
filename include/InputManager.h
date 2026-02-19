@@ -11,7 +11,7 @@ public:
 	static int2 m_mouseCoor;
 
 	static const Uint8* m_keyboardState;
-	static const Uint8* m_prevKeyboardState;  // ADD THIS
+	static const Uint8* m_prevKeyboardState;  
 
 
 	void handleInput();
@@ -20,7 +20,8 @@ public:
 	static bool isMousePressed();
 	static bool isAnyKeyPressed();
 	static bool isKeyPressed(SDL_Scancode code);
-	static bool isKeyJustPressed(SDL_Scancode code);  // ADD THIS
+	static bool isKeyClicked(SDL_Scancode code); 
+	static bool isKeyUnclicked(SDL_Scancode code); 
 	static bool isZoomChanged() { return hasZoomChanged; };
 	static float getZoom() { return m_zoom; };
 

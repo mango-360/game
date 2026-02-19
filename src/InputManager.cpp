@@ -6,8 +6,8 @@ int2 InputManager::m_mouseCoor = {0, 0};
 const Uint8* InputManager::m_keyboardState = nullptr;
 float InputManager::m_zoom = 3;
 
-const Uint8* InputManager::m_prevKeyboardState = nullptr;  // ADD THIS
-Uint8 InputManager::m_keyboardStateCopy[SDL_NUM_SCANCODES] = { 0 };  // ADD THIS
+const Uint8* InputManager::m_prevKeyboardState = nullptr;  
+Uint8 InputManager::m_keyboardStateCopy[SDL_NUM_SCANCODES] = { 0 }; 
 
 InputManager::InputManager()
 {
@@ -19,7 +19,7 @@ InputManager::~InputManager()
 
 void InputManager::handleInput()
 {
-	// NEW CODE: copy the current keyboard state to the previous keyboard state before polling new events
+	//copy the current keyboard state to the previous keyboard state before polling new events
 	if (m_keyboardState != nullptr)
 	{
 		memcpy(m_keyboardStateCopy, m_keyboardState, SDL_NUM_SCANCODES);
@@ -92,7 +92,12 @@ bool InputManager::isKeyPressed(SDL_Scancode code)
 	return m_keyboardState[code];
 }
 
-bool InputManager::isKeyJustPressed(SDL_Scancode code)
+bool InputManager::isKeyClicked(SDL_Scancode code)
 {
 	return m_keyboardState[code] && !m_prevKeyboardState[code];
+}
+
+bool InputManager::isKeyUnclicked(SDL_Scancode code)
+{
+	return !m_keyboardState[code] && m_prevKeyboardState[code];
 }

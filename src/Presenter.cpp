@@ -74,7 +74,7 @@ void Presenter::improveRederer()
 	world.m_inputManager.setMouseMultiply(mouseMultiplier);
 
 	SDL_RenderSetLogicalSize(m_mainRenderer, m_SCREEN_WIDTH, m_SCREEN_HEIGHT);
-	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
+	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0"); // nearest for all scaling, to avoid blurring
 }
 
 SDL_Texture* loadTexture(string imgPath)

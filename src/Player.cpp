@@ -33,10 +33,6 @@ void Player::init(Tile(*map)[MAP_WIDTH])
 	texture = loadTexture(playerImg);
 	hitbox.texture = loadTexture(hitboxImg);
 
-	if (texture) {
-	    SDL_SetTextureScaleMode(texture, SDL_ScaleModeNearest); // prevents linear filtering for this texture
-	}
-
 	stream.close();
 
 	for (int y = 0; y < MAP_HEIGHT; ++y)
@@ -61,8 +57,6 @@ void Player::update()
 	addFriction();
 
 	applyVelocity();
-
-	//cout << "Player map coords: " << hitbox.rect.x << ", " << hitbox.rect.y << endl;
 }
 
 void Player::draw(float2 camCoords)
@@ -88,7 +82,7 @@ void Player::draw(float2 camCoords)
 	tmpPlayer.texture = texture;
 
 	drawObject(tmpPlayer);
-	drawObject(tmp);
+	//drawObject(tmp); //hitbox
 }
 
 int2 Player::getRealCoords()
@@ -242,6 +236,17 @@ void Player::calculateVelocity()
 	//inputVelocity.y = clamp(inputVelocity.y, -maxInputVelocity.y, maxInputVelocity.y); // clamps y input velocity
 
 	velocity += inputVelocity;
+
+	if(velocity.x != 0 && abs(velocity.x) < 0.001f) //????????????????????????
+	{
+		velocity.x = 0;
+		cout << "Player velocity x reset at " << velocity.x << endl;
+	}
+	if(velocity.y != 0 && abs(velocity.y) < 0.001f)
+	{
+		velocity.y = 0;
+		cout << "Player velocity y reset at " << velocity.y << endl;
+	}
 }
 
 float2 Player::calculateNetForce()
@@ -258,4 +263,5 @@ void Player::applyVelocity()
 {
 	hitbox.rect.x += velocity.x;
 	hitbox.rect.y += velocity.y;
+	cout << "Player velocity: " << velocity.x << ", " << velocity.y << endl;
 }
