@@ -99,6 +99,9 @@
     <ClCompile Include="..\src\DirtBlock.cpp">
       <Filter>Source Files\Tiles</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\Mob.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\defines.h">
@@ -166,6 +169,9 @@
     </ClInclude>
     <ClInclude Include="..\include\DirtBlock.h">
       <Filter>Header Files\Tiles</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Mob.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -9,7 +9,7 @@ class Entity : public DrawableWithSrc
 public:
 	Entity();
 	~Entity();
-	virtual void init(Tile(*map)[MAP_WIDTH]);
+	virtual void init(Tile(*map)[MAP_WIDTH] , string configFile);
 	virtual void update();
 	virtual void draw(float2 camCoords); // camera-aware draw
 	int2 getRealCoords();
@@ -17,7 +17,7 @@ public:
 
 protected:
 	void zoomUpdate();
-	virtual void move();
+	virtual void move() = 0;
 	void jump();
 	virtual void moveVertical() = 0;
 	void drawHitBox(float2 camCoords); // for debugging
@@ -40,5 +40,8 @@ protected:
 	bool onCeiling = false;
 
 	FDrawable hitbox;
+
+	vector<float2> normalDirs;
+
 	static Tile* m_map[MAP_HEIGHT][MAP_WIDTH];
 };

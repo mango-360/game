@@ -29,6 +29,7 @@
     <ClInclude Include="..\include\ImgManager.h" />
     <ClInclude Include="..\include\InputManager.h" />
     <ClInclude Include="..\include\Entity.h" />
+    <ClInclude Include="..\include\Mob.h" />
     <ClInclude Include="..\include\Player.h" />
     <ClInclude Include="..\include\Presenter.h" />
     <ClInclude Include="..\include\SoundManager.h" />
@@ -53,6 +54,7 @@
     <ClCompile Include="..\src\InputManager.cpp" />
     <ClCompile Include="..\src\main.cpp" />
     <ClCompile Include="..\src\Entity.cpp" />
+    <ClCompile Include="..\src\Mob.cpp" />
     <ClCompile Include="..\src\Player.cpp" />
     <ClCompile Include="..\src\Presenter.cpp" />
     <ClCompile Include="..\src\SoundManager.cpp" />

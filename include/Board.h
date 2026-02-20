@@ -9,9 +9,11 @@
 #include "Presenter.h"
 #include "TextField.h"
 
-#include "Player.h"
 #include "Camera.h"
 #include "Statistics.h"
+
+#include "Player.h"
+#include "Mob.h"
 
 #include "Tile.h"
 #include "GrassBlock.h"
@@ -32,6 +34,9 @@ public:
 	Tile m_map[MAP_HEIGHT][MAP_WIDTH];
 
 	Player m_player;
+	
+	Mob m_mob;
+
 private:
 	void updateMap();
 	void drawMap();

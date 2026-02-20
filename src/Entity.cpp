@@ -12,13 +12,13 @@ Entity::~Entity()
 {
 }
 
-void Entity::init(Tile(*map)[MAP_WIDTH])
+void Entity::init(Tile(*map)[MAP_WIDTH], string configFile)
 {
-	string Entityfile = "Entity.txt", tmp, EntityImg, hitboxImg;
+	string tmp, EntityImg, hitboxImg;
 
 	fstream stream;
 
-	stream.open(CONFIG_FOLDER + Entityfile);
+	stream.open(CONFIG_FOLDER + configFile);
 
 	stream >> tmp >> EntityImg;
 	stream >> tmp >> srcRect;
@@ -158,6 +158,8 @@ void Entity::collision()
 				{
 					hitsGround = true;
 				}
+
+				normalDirs.push_back(cn);
 			}
 		}
 	}

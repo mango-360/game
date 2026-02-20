@@ -32,6 +32,8 @@ void Board::init()
 
 	m_player.init(m_map);
 
+	m_mob.init(m_map, "player.txt");
+
 	initMap();
 
 	m_camera.init(&m_player);
@@ -96,6 +98,8 @@ void Board::initMap()
 void Board::update()
 {
 	m_player.update();
+	m_mob.update();
+
 	m_camera.update();
 
 	updateMap();
@@ -110,7 +114,8 @@ void Board::draw()
 
 	drawMap();
 
-	m_player.draw( { m_camera.getCameraRect().x, m_camera.getCameraRect().y} ); // draw player based on cammera position
+	m_player.draw( { m_camera.getCameraRect().x, m_camera.getCameraRect().y} ); // draw player based on camera position
+	m_mob.draw({ m_camera.getCameraRect().x, m_camera.getCameraRect().y });
 
 	if (drawStatistics) m_statistics.draw();
 }
