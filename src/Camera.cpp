@@ -26,6 +26,8 @@ void Camera::update()
 
 	smoothFollow();
 
+	stopOutOfBounds();
+
 	//cout << "Camera coords: " << rect.x << ", " << rect.y << ", " << rect.w << ", " << rect.h << endl;
 }
 
@@ -53,4 +55,12 @@ void Camera::smoothFollow()
 
 	rect.x += (playerCenteredPos.x - rect.x) / n; //smooth camera follow
 	rect.y += (playerCenteredPos.y - rect.y) / n;
+}
+
+void Camera::stopOutOfBounds()
+{
+	if (rect.x < 0) rect.x = 0;
+	else if (rect.x + rect.w > MAP_WIDTH) rect.x = MAP_WIDTH - rect.w;
+	if (rect.y < 0) rect.y = 0;
+	else if (rect.y + rect.h > MAP_HEIGHT) rect.y = MAP_HEIGHT - rect.h;
 }

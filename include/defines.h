@@ -135,6 +135,7 @@ enum TILE_TYPE
 	NONE_TYPE = 0,
 	AIR = 1,
 	GRASSBLOCK = 2,
+	DIRTBLOCK = 3,
 };
 
 inline istream& operator>>(istream& is, SDL_Rect& rect)

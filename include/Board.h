@@ -3,15 +3,19 @@
 #include <string>
 #include <algorithm>
 #include <random>
+#include <cmath>
 
 #include "Engine.h"
 #include "Presenter.h"
 #include "TextField.h"
+
 #include "Player.h"
-#include "Tile.h"
 #include "Camera.h"
-#include "GrassBlock.h"
 #include "Statistics.h"
+
+#include "Tile.h"
+#include "GrassBlock.h"
+#include "DirtBlock.h"
 
 class Board
 {

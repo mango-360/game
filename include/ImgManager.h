@@ -10,6 +10,7 @@ public:
 	~ImgManager();
 
 	static SDL_Texture* m_grassBlockTexture;
+	static SDL_Texture* m_dirtBlockTexture;
 
 	void loadAllTextures();
 	void destroyAllTextures();

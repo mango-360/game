@@ -96,6 +96,9 @@
     <ClCompile Include="..\src\Statistics.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\DirtBlock.cpp">
+      <Filter>Source Files\Tiles</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\defines.h">
@@ -160,6 +163,9 @@
     </ClInclude>
     <ClInclude Include="..\include\Statistics.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\DirtBlock.h">
+      <Filter>Header Files\Tiles</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

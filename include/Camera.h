@@ -15,6 +15,7 @@ class Camera
 private:
 	void updateZoom();
 	void smoothFollow();
+	void stopOutOfBounds();
 
 	Camera_Rect rect;
 

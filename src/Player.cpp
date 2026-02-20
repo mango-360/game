@@ -1,8 +1,6 @@
 #include "Player.h"
 #include <Presenter.h>
 #include "InputManager.h"
-#include <algorithm>
-#include <iostream>
 
 
 Player::Player()
@@ -28,7 +26,6 @@ void Player::init(Tile(*map)[MAP_WIDTH])
 	stream >> tmp >> moveSpeed;
 	stream >> tmp >> maxInputVelocity;
 	stream >> tmp >> jumpStrength;
-	stream >> tmp >> gravity;
 
 	texture = loadTexture(playerImg);
 	hitbox.texture = loadTexture(hitboxImg);
@@ -57,50 +54,8 @@ void Player::update()
 	addFriction();
 
 	applyVelocity();
-}
 
-void Player::draw(float2 camCoords)
-{
-	SDL_Rect tmpHitboxRect = 
-	{
-		round((hitbox.rect.x - camCoords.x) * (TILE_SIZE * InputManager::getZoom())),
-		round((hitbox.rect.y - camCoords.y) * (TILE_SIZE * InputManager::getZoom())),
-		round(hitbox.rect.w * (TILE_SIZE * InputManager::getZoom())),
-		round(hitbox.rect.h * (TILE_SIZE * InputManager::getZoom()))
-	};
-
-
-	Drawable tmp = { hitbox.img, hitbox.texture, tmpHitboxRect };
-	DrawableWithSrc tmpPlayer = { tmp, srcRect };
-	tmpPlayer.rect = 
-	{
-		tmp.rect.x - (rect.w / 2 - tmp.rect.w / 2),
-		tmp.rect.y - (rect.h / 2 - tmp.rect.h / 2),
-		rect.w,
-		rect.h
-	};
-	tmpPlayer.texture = texture;
-
-	drawObject(tmpPlayer);
-	//drawObject(tmp); //hitbox
-}
-
-int2 Player::getRealCoords()
-{
-	return { static_cast<int>(hitbox.rect.x * TILE_SIZE * InputManager::getZoom()), static_cast<int>(hitbox.rect.y * TILE_SIZE * InputManager::getZoom()) };
-}
-
-void Player::jump()
-{
-	if(isOnGround) velocity.y = -jumpStrength;
-
-	isOnGround = false;
-}
-
-void Player::zoomUpdate()
-{
-	rect.w = srcRect.w * InputManager::getZoom();
-	rect.h = srcRect.h * InputManager::getZoom();
+	stopOutOfBounds();
 }
 
 void Player::move()
@@ -148,22 +103,6 @@ void Player::moveVertical()
 		}
 		else inputVelocity.x = 0;
 	}
-}
-
-void Player::drawHitBox(float2 camCoords) //for debugging
-{
-	SDL_Rect tmpHitboxRect =
-	{
-		round((hitbox.rect.x - camCoords.x) * (TILE_SIZE * InputManager::getZoom())),
-		round((hitbox.rect.y - camCoords.y) * (TILE_SIZE * InputManager::getZoom())),
-		round(hitbox.rect.w * (TILE_SIZE * InputManager::getZoom())),
-		round(hitbox.rect.h * (TILE_SIZE * InputManager::getZoom()))
-	};
-
-
-	Drawable tmp = { hitbox.img, hitbox.texture, tmpHitboxRect };
-
-	drawObject(tmp);
 }
 
 void Player::collision()
@@ -237,31 +176,11 @@ void Player::calculateVelocity()
 
 	velocity += inputVelocity;
 
-	if(velocity.x != 0 && abs(velocity.x) < 0.001f) //????????????????????????
-	{
-		velocity.x = 0;
-		cout << "Player velocity x reset at " << velocity.x << endl;
-	}
-	if(velocity.y != 0 && abs(velocity.y) < 0.001f)
-	{
-		velocity.y = 0;
-		cout << "Player velocity y reset at " << velocity.y << endl;
-	}
-}
-
-float2 Player::calculateNetForce()
-{
-	return gravity;
+	if(velocity.x != 0 && abs(velocity.x) < 0.001f) velocity.x = 0;
+	if(velocity.y != 0 && abs(velocity.y) < 0.001f) velocity.y = 0;
 }
 
 void Player::addFriction()
 {
 	velocity += friction;
-}
-
-void Player::applyVelocity()
-{
-	hitbox.rect.x += velocity.x;
-	hitbox.rect.y += velocity.y;
-	cout << "Player velocity: " << velocity.x << ", " << velocity.y << endl;
 }

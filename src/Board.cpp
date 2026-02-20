@@ -2,8 +2,7 @@
 #include "InputManager.h"
 #include "SoundManager.h"
 #include "World.h"
-#include <cmath>
-#include <random>
+
 
 extern World world;
 
@@ -79,6 +78,15 @@ void Board::initMap()
 			grassBlock.init({ static_cast<float>(i),static_cast<float>(y) });
 
 			m_map[y][i] = grassBlock;
+
+			for (++y; y < MAP_HEIGHT; ++y) // fill downwards with grass blocks
+			{
+				DirtBlock dirtBlock;
+
+				dirtBlock.init({ static_cast<float>(i),static_cast<float>(y) });
+
+				m_map[y][i] = dirtBlock;
+			}
 		}
 
 		x ++;
