@@ -28,6 +28,7 @@ void Entity::init(Tile(*map)[MAP_WIDTH], string configFile)
 	stream >> tmp >> maxInputVelocity;
 	stream >> tmp >> jumpStrength;
 
+	EntityImg = "mob.bmp"; // temporary to bypass player config file, as texture is not used in Entity
 	texture = loadTexture(EntityImg);
 	hitbox.texture = loadTexture(hitboxImg);
 
