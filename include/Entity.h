@@ -12,7 +12,7 @@ public:
 	virtual void init(Tile(*map)[MAP_WIDTH] , string configFile);
 	virtual void update();
 	virtual void draw(float2 camCoords); // camera-aware draw
-	int2 getRealCoords();
+	int2 getIntCoords();
 	SDL_FRect getMapRect() const { return hitbox.rect; };
 
 protected:
@@ -29,7 +29,7 @@ protected:
 	void stopOutOfBounds();
 
 	float jumpStrength;
-	float moveSpeed;
+	float2 maxInputVelocity;
 	float2 gravity = { 0.0f, 0.005f };
 	float2 velocity = { 0, 0 };
 	float2 netForce;

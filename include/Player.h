@@ -21,7 +21,7 @@ private:
 	void addFriction();
 
 	int lastKeyPressed = -1;
+	float moveSpeed;
 	float2 friction;
 	float2 inputVelocity = { 0, 0 };
-	float2 maxInputVelocity;
 };

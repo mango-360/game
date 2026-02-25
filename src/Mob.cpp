@@ -29,7 +29,7 @@ void Mob::move()
 
 	for(auto i : normalDirs)
 	{
-		if (i.x != 0.0f) 
+		if (i.x != 0.0f && m_map[getIntCoords().y][getIntCoords().x - static_cast<int>(i.x)]->getTileType() != TILE_TYPE::NONE_TYPE)
 		{
 			cout << i << endl;
 
@@ -43,5 +43,5 @@ void Mob::move()
 
 void Mob::moveVertical()
 {
-	velocity.x = moveSpeed * 4 / 5;
+	velocity.x = maxInputVelocity.x * 2.0f / 5.0f;
 }

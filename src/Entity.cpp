@@ -24,7 +24,8 @@ void Entity::init(Tile(*map)[MAP_WIDTH], string configFile)
 	stream >> tmp >> srcRect;
 	stream >> tmp >> rect;
 	stream >> tmp >> hitboxImg >> hitbox.rect;
-	stream >> tmp >> moveSpeed;
+	stream >> tmp >> tmp; // temporary to sync with player config file, as moveSpeed is not used in Entity
+	stream >> tmp >> maxInputVelocity;
 	stream >> tmp >> jumpStrength;
 
 	texture = loadTexture(EntityImg);
@@ -82,9 +83,9 @@ void Entity::draw(float2 camCoords)
 	//drawObject(tmp); //hitbox
 }
 
-int2 Entity::getRealCoords()
+int2 Entity::getIntCoords()
 {
-	return { static_cast<int>(hitbox.rect.x * TILE_SIZE * InputManager::getZoom()), static_cast<int>(hitbox.rect.y * TILE_SIZE * InputManager::getZoom()) };
+	return { static_cast<int>(hitbox.rect.x), static_cast<int>(hitbox.rect.y) };
 }
 
 void Entity::jump()
