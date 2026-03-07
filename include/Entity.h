@@ -4,8 +4,11 @@
 #include "Tile.h"
 #include <algorithm>
 
+class Projectile;
+
 class Entity : public DrawableWithSrc
 {
+
 public:
 	Entity();
 	~Entity();
@@ -14,6 +17,8 @@ public:
 	virtual void draw(float2 camCoords); // camera-aware draw
 	int2 getIntCoords();
 	SDL_FRect getMapRect() const { return hitbox.rect; };
+
+	friend class Projectile;
 
 protected:
 	void zoomUpdate();
@@ -30,7 +35,6 @@ protected:
 
 	float jumpStrength;
 	float2 maxInputVelocity;
-	float2 gravity = { 0.0f, 0.005f };
 	float2 velocity = { 0, 0 };
 	float2 netForce;
 

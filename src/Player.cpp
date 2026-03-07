@@ -1,6 +1,7 @@
 #include "Player.h"
 #include <Presenter.h>
 #include "InputManager.h"
+#include "Projectile.h"
 
 
 Player::Player()
@@ -45,6 +46,8 @@ void Player::update()
 {
 	zoomUpdate();
 
+	shoot();
+
 	move();
 
 	calculateVelocity();
@@ -56,6 +59,33 @@ void Player::update()
 	applyVelocity();
 
 	stopOutOfBounds();
+}
+
+void Player::setProjectileSpawner(std::function<void(std::unique_ptr<Projectile>)> spawner)
+{
+	m_spawnProjectile = std::move(spawner);
+}
+
+void Player::shoot()
+{
+	if (InputManager::isKeyClicked(SDL_SCANCODE_P))
+	{
+		cout << "Shooting a Projectile" << endl;
+
+		auto projectile = std::make_unique<Projectile>();
+		projectile->init(this);
+
+		if (m_spawnProjectile)
+		{
+			// hand ownership to board via the callback
+			m_spawnProjectile(std::move(projectile));
+		}
+		else
+		{
+			// optional: fallback or debug log if no spawner provided
+			std::cout << "No projectile spawner registered on Player\n";
+		}
+	}
 }
 
 void Player::move()
@@ -160,7 +190,7 @@ void Player::collision()
 
 void Player::calculateFriction(int2 coords)
 {
-	friction.x = min(abs(velocity.x), abs(gravity.y * m_map[coords.x][coords.y]->getFriction()));
+	friction.x = min(abs(velocity.x), abs(GRAVITY.y * m_map[coords.x][coords.y]->getFriction()));
 
 	if (velocity.x > 0) friction.x *= -1;
 	if (velocity.y > 0) friction.y *= -1;

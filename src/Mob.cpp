@@ -1,5 +1,7 @@
 #include "Mob.h"
 
+Player* Mob::m_player = nullptr;
+
 Mob::Mob()
 {
 }
@@ -43,5 +45,14 @@ void Mob::move()
 
 void Mob::moveVertical()
 {
-	velocity.x = maxInputVelocity.x * 2.0f / 5.0f;
+	if (m_player->getMapRect().x < hitbox.rect.x)
+	{
+		velocity.x = -maxInputVelocity.x * 2.0f / 5.0f;
+		srcRect.x = TILE_SIZE;
+	}
+	else
+	{
+		velocity.x = maxInputVelocity.x * 2.0f / 5.0f;
+		srcRect.x = 0;
+	}
 }

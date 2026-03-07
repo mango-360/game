@@ -3,7 +3,6 @@
 #include "SoundManager.h"
 #include "World.h"
 
-
 extern World world;
 
 Board::Board()
@@ -32,7 +31,18 @@ void Board::init()
 
 	m_player.init(m_map);
 
-	m_mob.init(m_map, "player.txt");
+	Mob mob;
+	mob.init(m_map, "player.txt");
+	mob.setPlayer(&m_player);
+
+	m_mobs.push_back(mob);
+
+	Projectile::setMobs(&m_mobs);
+
+	// register spawner after player init:
+	m_player.setProjectileSpawner([this](std::unique_ptr<Projectile> p) {
+		m_projectiles.push_back(std::move(p));
+	});
 
 	initMap();
 
@@ -98,7 +108,10 @@ void Board::initMap()
 void Board::update()
 {
 	m_player.update();
-	m_mob.update();
+	//for (Mob& mob : m_mobs) mob.update();
+
+	for (auto& projectile : m_projectiles) projectile->update();
+	destroyProjectiles();
 
 	m_camera.update();
 
@@ -106,6 +119,8 @@ void Board::update()
 
 	toggleStatistics();
 	if(drawStatistics) m_statistics.update();
+
+	if (InputManager::isKeyPressed(SDL_SCANCODE_M)) SDL_Delay(60);
 }
 
 void Board::draw()
@@ -115,7 +130,10 @@ void Board::draw()
 	drawMap();
 
 	m_player.draw( { m_camera.getCameraRect().x, m_camera.getCameraRect().y} ); // draw player based on camera position
-	m_mob.draw({ m_camera.getCameraRect().x, m_camera.getCameraRect().y });
+
+	for (auto& mob : m_mobs) mob.draw({ m_camera.getCameraRect().x, m_camera.getCameraRect().y });
+
+	for (auto& projectile : m_projectiles) projectile->draw({ m_camera.getCameraRect().x, m_camera.getCameraRect().y });
 
 	if (drawStatistics) m_statistics.draw();
 }
@@ -157,4 +175,20 @@ void Board::drawMap()
 void Board::toggleStatistics()
 {
 	if(InputManager::isKeyClicked(SDL_SCANCODE_F3)) drawStatistics = !drawStatistics;
+}
+
+void Board::destroyProjectiles()
+{
+	auto it = m_projectiles.begin();
+	while (it != m_projectiles.end())
+	{
+		if (!(*it)->isAlive)
+		{
+			it = m_projectiles.erase(it);
+		}
+		else
+		{
+			++it;
+		}
+	}
 }

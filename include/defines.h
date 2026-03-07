@@ -20,6 +20,8 @@ static const int TILE_SIZE = 32;
 static const int MAP_WIDTH = 320;
 static const int MAP_HEIGHT = 240;
 
+static const float PROJECTILE_SIZE = 0.5f;
+
 struct float2
 {
 	float x = 0.0f, y = 0.0f;
@@ -52,6 +54,8 @@ struct float2
 	void operator*=(float2 a) { x *= a.x; y *= a.y; }
 	void operator/=(float2 a) { x /= a.x; y /= a.y; }
 };
+
+static const float2 GRAVITY = { 0.0f, 0.005f };
 
 struct int2
 {

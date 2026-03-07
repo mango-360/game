@@ -15,6 +15,8 @@
 #include "Player.h"
 #include "Mob.h"
 
+#include "Projectile.h"
+
 #include "Tile.h"
 #include "GrassBlock.h"
 #include "DirtBlock.h"
@@ -34,13 +36,16 @@ public:
 	Tile m_map[MAP_HEIGHT][MAP_WIDTH];
 
 	Player m_player;
-	
-	Mob m_mob;
+
+	vector<Mob> m_mobs;
+
+	vector<std::unique_ptr<Projectile>> m_projectiles;
 
 private:
 	void updateMap();
 	void drawMap();
 	void toggleStatistics();
+	void destroyProjectiles();
 
 	bool drawStatistics = false;
 

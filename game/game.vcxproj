@@ -32,6 +32,7 @@
     <ClInclude Include="..\include\Mob.h" />
     <ClInclude Include="..\include\Player.h" />
     <ClInclude Include="..\include\Presenter.h" />
+    <ClInclude Include="..\include\Projectile.h" />
     <ClInclude Include="..\include\SoundManager.h" />
     <ClInclude Include="..\include\State.h" />
     <ClInclude Include="..\include\StateManager.h" />
@@ -57,6 +58,7 @@
     <ClCompile Include="..\src\Mob.cpp" />
     <ClCompile Include="..\src\Player.cpp" />
     <ClCompile Include="..\src\Presenter.cpp" />
+    <ClCompile Include="..\src\Projectile.cpp" />
     <ClCompile Include="..\src\SoundManager.cpp" />
     <ClCompile Include="..\src\Statistics.cpp" />
     <ClCompile Include="..\src\State.cpp" />

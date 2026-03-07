@@ -1,0 +1,4 @@
+ProjectileImage: boblob.bmp
+SourceRect: 0 0 16 16
+Damage: 1
+Velocity: 0.1 0.0

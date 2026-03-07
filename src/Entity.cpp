@@ -73,7 +73,7 @@ void Entity::draw(float2 camCoords)
 	DrawableWithSrc tmpEntity = { tmp, srcRect };
 	tmpEntity.rect =
 	{
-		tmp.rect.x - (rect.w / 2 - tmp.rect.w / 2),
+		tmp.rect.x - (rect.w / 2 - tmp.rect.w / 2), // center the entity sprite on the hitbox
 		tmp.rect.y - (rect.h / 2 - tmp.rect.h / 2),
 		rect.w,
 		rect.h
@@ -138,7 +138,7 @@ void Entity::collision()
 	bool hitsGround = false;
 
 	float2 cp, cn;
-	float t = 0, min_t = INFINITY, prevFriction = 0;
+	float t = 0, min_t = INFINITY;
 	vector<pair<int2, float>> collsList;
 
 	// Work out collision point, add it to vector along with rect ID
@@ -193,7 +193,7 @@ void Entity::calculateVelocity()
 
 float2 Entity::calculateNetForce()
 {
-	return gravity;
+	return GRAVITY;
 }
 
 void Entity::applyVelocity()
