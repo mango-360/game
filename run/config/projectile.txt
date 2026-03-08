@@ -1,4 +1,6 @@
 ProjectileImage: boblob.bmp
+HitboxImage: hitbox.bmp
+Hitbox_Width/Height: 0.8 0.8
 SourceRect: 0 0 16 16
 Damage: 1
 Velocity: 0.1 0.0

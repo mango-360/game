@@ -68,7 +68,6 @@ void Entity::draw(float2 camCoords)
 		round(hitbox.rect.h * (TILE_SIZE * InputManager::getZoom()))
 	};
 
-
 	Drawable tmp = { hitbox.img, hitbox.texture, tmpHitboxRect };
 	DrawableWithSrc tmpEntity = { tmp, srcRect };
 	tmpEntity.rect =
@@ -98,8 +97,8 @@ void Entity::jump()
 
 void Entity::zoomUpdate()
 {
-	rect.w = srcRect.w * InputManager::getZoom();
-	rect.h = srcRect.h * InputManager::getZoom();
+	rect.w = TILE_SIZE * InputManager::getZoom();
+	rect.h = TILE_SIZE * InputManager::getZoom();
 }
 
 void Entity::move()

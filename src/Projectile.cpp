@@ -20,26 +20,37 @@ void Projectile::init(Entity* owner)
 	netForce = { 0.0f, 0.0f };
 
 	string tmp;
+	
+	float hitboxWidth, hitboxHeight;
 
 	fstream stream;
 
 	stream.open(CONFIG_FOLDER + "projectile.txt");
 
+	stream >> tmp >> img;
 	stream >> tmp >> hitbox.img;
+	stream >> tmp >> hitboxWidth >> hitboxHeight;
 	stream >> tmp >> srcRect;
 	stream >> tmp >> damage;
 	stream >> tmp >> velocity;
 
 	stream.close();
 
-	hitbox.rect = { m_owner->getMapRect().x + m_owner->getMapRect().w / 2, m_owner->getMapRect().y + m_owner->getMapRect().h / 2, 
-					srcRect.w * InputManager::getZoom() * PROJECTILE_SIZE, srcRect.h * InputManager::getZoom() * PROJECTILE_SIZE };
+	hitbox.rect = { m_owner->getMapRect().x + m_owner->getMapRect().w , m_owner->getMapRect().y + m_owner->getMapRect().h / 2 - hitboxHeight * PROJECTILE_SIZE / 2,
+					hitboxWidth * PROJECTILE_SIZE, hitboxHeight * PROJECTILE_SIZE };
 
 	hitbox.texture = loadTexture(hitbox.img);
+	texture = loadTexture(img);
 
-	if (m_owner->velocity.x < 0) velocity.x *= -1;
+	if (m_owner->velocity.x < 0 || owner->srcRect.x == owner->srcRect.w)
+	{
+		velocity.x *= -1;
+		srcRect.x = srcRect.w;
+		hitbox.rect.x = m_owner->getMapRect().x - hitbox.rect.w;
+	}
 
 	velocity += m_owner->velocity; 
+
 }
 
 void Projectile::update()
@@ -47,6 +58,12 @@ void Projectile::update()
 	zoomUpdate();
 
 	calculateVelocity();
+
+	collision();
+
+	applyVelocity();
+
+	stopOutOfBounds();
 }
 
 void Projectile::draw(float2 camCoords)
@@ -58,7 +75,6 @@ void Projectile::draw(float2 camCoords)
 		round(hitbox.rect.w * (TILE_SIZE * InputManager::getZoom())),
 		round(hitbox.rect.h * (TILE_SIZE * InputManager::getZoom()))
 	};
-
 
 	Drawable tmp = { hitbox.img, hitbox.texture, tmpHitboxRect };
 	DrawableWithSrc tmpProjectile = { tmp, srcRect };
@@ -77,8 +93,8 @@ void Projectile::draw(float2 camCoords)
 
 void Projectile::zoomUpdate()
 {
-	rect.w = srcRect.w * InputManager::getZoom() * PROJECTILE_SIZE;
-	rect.h = srcRect.h * InputManager::getZoom() * PROJECTILE_SIZE;
+	rect.w = TILE_SIZE * InputManager::getZoom() * PROJECTILE_SIZE;
+	rect.h = TILE_SIZE * InputManager::getZoom() * PROJECTILE_SIZE;
 }
 
 void Projectile::collision()

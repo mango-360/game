@@ -70,21 +70,10 @@ void Player::shoot()
 {
 	if (InputManager::isKeyClicked(SDL_SCANCODE_P))
 	{
-		cout << "Shooting a Projectile" << endl;
-
 		auto projectile = std::make_unique<Projectile>();
 		projectile->init(this);
 
-		if (m_spawnProjectile)
-		{
-			// hand ownership to board via the callback
-			m_spawnProjectile(std::move(projectile));
-		}
-		else
-		{
-			// optional: fallback or debug log if no spawner provided
-			std::cout << "No projectile spawner registered on Player\n";
-		}
+		if (m_spawnProjectile) m_spawnProjectile(std::move( projectile)); // hand ownership to board via the callback
 	}
 }
 
