@@ -139,8 +139,6 @@ void Projectile::collision()
 
 	for (auto j : collsList)
 	{
-		cout << "HIT TILE AT: " << j.first.y << ", " << j.first.x << endl;
-
 		isAlive = false;
 
 		break;
@@ -150,7 +148,6 @@ void Projectile::collision()
 	{
 		if (DynamicRectVsRect(&hitbox.rect, velocity, mob.getMapRect(), cp, cn, t))
 		{
-			cout << "HIT MOB!" << endl;
 			//mob.health -= damage;
 			isAlive = false;
 			break;

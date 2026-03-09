@@ -108,7 +108,7 @@ void Board::initMap()
 void Board::update()
 {
 	m_player.update();
-	//for (Mob& mob : m_mobs) mob.update();
+	for (Mob& mob : m_mobs) mob.update();
 
 	for (auto& projectile : m_projectiles) projectile->update();
 	destroyProjectiles();
