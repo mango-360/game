@@ -68,7 +68,7 @@ void Player::setProjectileSpawner(std::function<void(std::unique_ptr<Projectile>
 
 void Player::shoot()
 {
-	if (InputManager::isKeyClicked(SDL_SCANCODE_P))
+	if (InputManager::isKeyClicked(SDL_SCANCODE_P) || InputManager::isMousePressed())
 	{
 		auto projectile = std::make_unique<Projectile>();
 		projectile->init(this);
