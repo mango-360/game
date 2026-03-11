@@ -42,6 +42,7 @@ protected:
 	bool isLeftWall = false;
 	bool isOnWall = false;
 	bool onCeiling = false;
+	bool isJumping = false;
 
 	FDrawable hitbox;
 

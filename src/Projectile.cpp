@@ -42,7 +42,7 @@ void Projectile::init(Entity* owner)
 	hitbox.texture = loadTexture(hitbox.img);
 	texture = loadTexture(img);
 
-	if (m_owner->velocity.x < 0 || owner->srcRect.x == owner->srcRect.w)
+	if (m_owner->velocity.x < 0 || owner->srcRect.y == owner->srcRect.h)
 	{
 		velocity.x *= -1;
 		srcRect.x = srcRect.w;

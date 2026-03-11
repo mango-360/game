@@ -92,7 +92,7 @@ void Entity::jump()
 {
 	if (isOnGround) velocity.y = -jumpStrength;
 
-	isOnGround = false;
+	isJumping = true;
 }
 
 void Entity::zoomUpdate()
@@ -180,6 +180,7 @@ void Entity::collision()
 	}
 
 	isOnGround = hitsGround;
+	if (isOnGround) isJumping = false;
 }
 
 void Entity::calculateVelocity()

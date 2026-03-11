@@ -20,15 +20,21 @@ private:
 	void shoot();
 	void move();
 	void moveVertical();
+	void animateJump();
+	void animateFall();
+	void animateLand();
 
 	void collision();
 	void calculateFriction(int2 coords);
 	void calculateVelocity();
 	void addFriction();
+	void countFramesOnGround();
 
 	std::function<void(std::unique_ptr<Projectile>)> m_spawnProjectile;
 
 	int lastKeyPressed = -1;
+	int framesOnGround = 0;
+	int landingStartSpriteFrame = 11;
 	float moveSpeed;
 	float2 friction;
 	float2 inputVelocity = { 0, 0 };

@@ -49,6 +49,9 @@ void Player::update()
 	shoot();
 
 	move();
+	animateJump();
+	animateFall();
+	animateLand();
 
 	calculateVelocity();
 
@@ -59,6 +62,8 @@ void Player::update()
 	applyVelocity();
 
 	stopOutOfBounds();
+
+	countFramesOnGround();
 }
 
 void Player::setProjectileSpawner(std::function<void(std::unique_ptr<Projectile>)> spawner)
@@ -97,18 +102,18 @@ void Player::moveVertical()
 			if (lastKeyPressed == SDL_SCANCODE_D)
 			{
 				inputVelocity.x -= moveSpeed;
-				srcRect.x = srcRect.w;
+				srcRect.y = srcRect.h;
 			}
 			else
 			{
 				inputVelocity.x += moveSpeed;
-				srcRect.x = 0;
+				srcRect.y = 0;
 			}
 		}
 		else
 		{
 			inputVelocity.x += moveSpeed;
-			srcRect.x = 0;
+			srcRect.y = 0;
 			lastKeyPressed = SDL_SCANCODE_D;
 		}
 	}
@@ -117,10 +122,60 @@ void Player::moveVertical()
 		if (InputManager::isKeyPressed(SDL_SCANCODE_A))
 		{
 			inputVelocity.x -= moveSpeed;
-			srcRect.x = srcRect.w;
+			srcRect.y = srcRect.h;
 			lastKeyPressed = SDL_SCANCODE_A;
 		}
 		else inputVelocity.x = 0;
+	}
+}
+
+void Player::animateJump()
+{
+	if (isJumping)
+	{
+		if (isOnGround) srcRect.x = srcRect.w;
+
+		else
+		{
+			float phase = velocity.y / jumpStrength; // from -1 to 1 and above
+			
+				 if (phase < -0.83) srcRect.x = srcRect.w * 2;
+			else if (phase < -0.66) srcRect.x = srcRect.w * 3;
+			else if (phase < -0.50) srcRect.x = srcRect.w * 4;
+			else if (phase < -0.33) srcRect.x = srcRect.w * 5;
+			else if (phase < -0.16) srcRect.x = srcRect.w * 6;
+
+			else if (phase < 0.25) srcRect.x = srcRect.w * 7;
+			else if (phase < 0.50) srcRect.x = srcRect.w * 8;
+			else if (phase < 0.75) srcRect.x = srcRect.w * 9;
+			else				   srcRect.x = srcRect.w * 10;
+		}
+		
+		landingStartSpriteFrame = 11;
+	}
+}
+
+void Player::animateFall()
+{
+	if (!isOnGround && !isJumping)
+	{
+		float phase = velocity.y / jumpStrength;
+
+		if		(phase < 0.40) srcRect.x = 0;
+		else if (phase < 0.75) srcRect.x = srcRect.w * 9;
+		else				   srcRect.x = srcRect.w * 10;
+	}
+}
+
+void Player::animateLand()
+{
+	if (isOnGround && !isJumping)
+	{
+		int landingSpriteFrame = framesOnGround / LANDING_SPRITE_FRAME_DURATION;
+
+		cout << "Frames on ground: " << framesOnGround << ", landing sprite frame: " << landingSpriteFrame << endl;
+		if (landingSpriteFrame + landingStartSpriteFrame > 15) srcRect.x = 0;
+		else srcRect.x = srcRect.w * (landingStartSpriteFrame + landingSpriteFrame);
 	}
 }
 
@@ -175,6 +230,8 @@ void Player::collision()
 	}
 
 	isOnGround = hitsGround;
+	if (isOnGround) isJumping = false;
+	else if (!isJumping) landingStartSpriteFrame = 12;
 }
 
 void Player::calculateFriction(int2 coords)
@@ -202,4 +259,10 @@ void Player::calculateVelocity()
 void Player::addFriction()
 {
 	velocity += friction;
+}
+
+void Player::countFramesOnGround()
+{
+	if (!isOnGround) framesOnGround = 0;
+	else framesOnGround++;
 }
