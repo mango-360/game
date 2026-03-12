@@ -78,7 +78,7 @@ void Player::shoot()
 		auto projectile = std::make_unique<Projectile>();
 		projectile->init(this);
 
-		if (m_spawnProjectile) m_spawnProjectile(std::move( projectile)); // hand ownership to board via the callback
+		if (m_spawnProjectile) m_spawnProjectile(std::move(projectile)); // hand ownership to board via the callback
 	}
 }
 
@@ -173,7 +173,6 @@ void Player::animateLand()
 	{
 		int landingSpriteFrame = framesOnGround / LANDING_SPRITE_FRAME_DURATION;
 
-		cout << "Frames on ground: " << framesOnGround << ", landing sprite frame: " << landingSpriteFrame << endl;
 		if (landingSpriteFrame + landingStartSpriteFrame > 15) srcRect.x = 0;
 		else srcRect.x = srcRect.w * (landingStartSpriteFrame + landingSpriteFrame);
 	}

@@ -9,14 +9,14 @@ public:
 	~TextField();
 
 	void init(string configFile);
-	void update();
+	virtual void update();
 	void draw();
 	void destroy();
 
 	void setText(string text);
 
 	bool m_needToDrawBackground;
-private:
+protected:
 	Drawable m_text;
 
 	int m_fontSize;

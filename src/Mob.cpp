@@ -33,8 +33,6 @@ void Mob::move()
 	{
 		if (i.x != 0.0f && m_map[getIntCoords().y][getIntCoords().x - static_cast<int>(i.x)]->getTileType() != TILE_TYPE::NONE_TYPE)
 		{
-			cout << i << endl;
-
 			jump();
 			break;
 		}

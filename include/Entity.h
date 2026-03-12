@@ -17,6 +17,7 @@ public:
 	virtual void draw(float2 camCoords); // camera-aware draw
 	int2 getIntCoords();
 	SDL_FRect getMapRect() const { return hitbox.rect; };
+	SDL_FRect* getMapRectPtr() { return &hitbox.rect; }
 
 	friend class Projectile;
 

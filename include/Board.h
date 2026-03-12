@@ -8,6 +8,7 @@
 #include "Engine.h"
 #include "Presenter.h"
 #include "TextField.h"
+#include "DialogPopUp.h"
 
 #include "Camera.h"
 #include "Statistics.h"
@@ -54,4 +55,6 @@ private:
 	Camera m_camera;
 
 	Statistics m_statistics;
+
+	DialogPopUp m_dialog;
 };

@@ -18,7 +18,7 @@ void TextField::init(string configFile)
 	stream.open(CONFIG_FOLDER + configFile);
 
 	stream >> tmp >> m_fontSize;
-	stream >> tmp >> m_background.rect.x >> m_background.rect.y >> m_background.rect.w >> m_background.rect.h;
+	stream >> tmp >> m_background.rect;
 	stream >> tmp >> m_color;
 	stream >> tmp >> background;
 

@@ -70,6 +70,8 @@ void Statistics::update()
 
 	if (InputManager::isKeyClicked(SDL_SCANCODE_D)) m_keyboard[3].srcRect.x = 32;
 	else if (InputManager::isKeyUnclicked(SDL_SCANCODE_D)) m_keyboard[3].srcRect.x = 0;
+
+	if (InputManager::isKeyPressed(SDL_SCANCODE_M)) SDL_Delay(60); // SLOW MOTION
 }
 
 void Statistics::draw()

@@ -49,6 +49,8 @@ void Board::init()
 	m_camera.init(&m_player);
 
 	m_statistics.init();
+
+	m_dialog.init("dialog.txt", m_mobs[0].getMapRectPtr(), &m_player);
 }
 
 void Board::initMap()
@@ -108,7 +110,7 @@ void Board::initMap()
 void Board::update()
 {
 	m_player.update();
-	//for (Mob& mob : m_mobs) mob.update();
+	for (Mob& mob : m_mobs) mob.update();
 
 	for (auto& projectile : m_projectiles) projectile->update();
 	destroyProjectiles();
@@ -120,7 +122,7 @@ void Board::update()
 	toggleStatistics();
 	if(drawStatistics) m_statistics.update();
 
-	if (InputManager::isKeyPressed(SDL_SCANCODE_M)) SDL_Delay(60);
+	m_dialog.update();
 }
 
 void Board::draw()
@@ -136,6 +138,8 @@ void Board::draw()
 	for (auto& projectile : m_projectiles) projectile->draw({ m_camera.getCameraRect().x, m_camera.getCameraRect().y });
 
 	if (drawStatistics) m_statistics.draw();
+
+	m_dialog.draw();
 }
 
 void Board::destroy()
@@ -182,13 +186,7 @@ void Board::destroyProjectiles()
 	auto it = m_projectiles.begin();
 	while (it != m_projectiles.end())
 	{
-		if (!(*it)->isAlive)
-		{
-			it = m_projectiles.erase(it);
-		}
-		else
-		{
-			++it;
-		}
+		if (!(*it)->isAlive) it = m_projectiles.erase(it);
+		else ++it;
 	}
 }
