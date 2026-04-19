@@ -14,9 +14,11 @@ public:
 	void draw(float2 camCoords); // draw with camera offset
 	void destroy();
 	float getFriction() { return m_friction; };
+	bool getIsSolid() { return m_isSolid; };
 	SDL_Rect getTileRect() { return m_tile.rect; };
 	SDL_FRect getTileGridRect() { return m_gridRect; };
 	TILE_TYPE getTileType() { return m_type; };
+	TYLE_DROP getTileDrop() { return m_drop; };
 
 protected:
 
@@ -24,9 +26,13 @@ protected:
 
 	float m_friction;
 
+	bool m_isSolid;
+
 	Drawable m_tile;
 
 	TILE_TYPE m_type;
+
+	TYLE_DROP m_drop;
 
 	SDL_FRect m_gridRect;
 

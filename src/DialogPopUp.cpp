@@ -45,16 +45,18 @@ void DialogPopUp::init(string configFile, SDL_FRect* rect, Player* player)
 	m_player = player;
 
 	updateTriggerRect();
+
+	setText(dialog[dialogLine]);
 }
 
 void DialogPopUp::update()
 {
+	updateTriggerRect();
+	
 	triggerDialog();
 
 	if (isTriggered)
 	{
-		updateTriggerRect();
-
 		getNextLine();
 
 		TextField::update();
@@ -71,6 +73,9 @@ void DialogPopUp::updateTriggerRect()
 {
 	triggerRect.x = objectRect->x + (objectRect->w / 2) - (triggerRect.w / 2);
 	triggerRect.y = objectRect->y + (objectRect->h / 2) - (triggerRect.h / 2);
+
+	m_background.rect.x = Presenter::m_SCREEN_WIDTH / 2 - m_background.rect.w / 2;
+	m_background.rect.y = Presenter::m_SCREEN_HEIGHT / 2 - TILE_SIZE * InputManager::getZoom() - 30;
 }
 
 void DialogPopUp::getNextLine()
@@ -84,8 +89,8 @@ void DialogPopUp::getNextLine()
 		}
 		else
 		{
-			setText("");
 			dialogLine = 0;
+			setText(dialog[dialogLine]);
 
 			isTriggered = false;
 		}
@@ -95,5 +100,11 @@ void DialogPopUp::getNextLine()
 void DialogPopUp::triggerDialog()
 {
 	if (!isTriggered && FcollRectRect(triggerRect, m_player->getMapRect())) isTriggered = true;
-	else if (isTriggered && !FcollRectRect(triggerRect, m_player->getMapRect())) isTriggered = false;	
+	else if (isTriggered && !FcollRectRect(triggerRect, m_player->getMapRect()))
+	{
+		isTriggered = false;
+
+		dialogLine = 0;
+		setText(dialog[dialogLine]);
+	}	
 }

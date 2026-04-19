@@ -1,5 +1,6 @@
 #include "TextField.h"
 #include "Presenter.h"
+#include "InputManager.h"
 
 TextField::TextField()
 {
@@ -44,6 +45,8 @@ void TextField::update()
 		m_text.rect.w = text.first.x;
 		m_text.rect.h = text.first.y;
 	}
+
+	if (InputManager::isZoomChanged) setText(m_textString);
 }
 
 void TextField::draw()
@@ -64,7 +67,7 @@ void TextField::destroy()
 
 void TextField::setText(string text)
 {
-	if (m_textString != text)
+	if (m_textString != text || InputManager::isZoomChanged())
 	{
 		m_textString = text;
 

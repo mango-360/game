@@ -21,6 +21,7 @@
 #include "Tile.h"
 #include "GrassBlock.h"
 #include "DirtBlock.h"
+#include "Bush.h"
 
 class Board
 {

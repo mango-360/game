@@ -11,6 +11,7 @@ public:
 
 	static SDL_Texture* m_grassBlockTexture;
 	static SDL_Texture* m_dirtBlockTexture;
+	static SDL_Texture* m_bushTexture;
 
 	void loadAllTextures();
 	void destroyAllTextures();

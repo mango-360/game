@@ -192,7 +192,7 @@ void Player::collision()
 	{
 		for (int j = floor(hitbox.rect.x) - 1; j <= ceil(hitbox.rect.x + hitbox.rect.w); ++j)
 		{
-			if (m_map[i][j]->getTileType() == TILE_TYPE::NONE_TYPE) continue;
+			if (!m_map[i][j]->getIsSolid()) continue;
 
 			if (DynamicRectVsRect(&hitbox.rect, velocity, m_map[i][j]->getTileGridRect(), cp, cn, t))
 			{
@@ -206,13 +206,28 @@ void Player::collision()
 				{
 					hitsGround = true;
 
-					if(m_map[i][j]->getFriction() > prevFriction) calculateFriction({ i, j });
-
-					prevFriction = m_map[i][j]->getFriction();
+					if(m_map[i][j]->getFriction() > prevFriction) prevFriction = m_map[i][j]->getFriction();
 				}
 			}
 		}
 	}
+
+	SDL_FRect FuturePlayerRect = {hitbox.rect.x + velocity.x, hitbox.rect.y + velocity.y, hitbox.rect.w, hitbox.rect.h};
+
+	for (int x = floor(FuturePlayerRect.x); x <= ceil(FuturePlayerRect.x + FuturePlayerRect.w); ++x) //check nonsolid blocks for friction
+	{
+		for(int y = floor(FuturePlayerRect.y); y <= ceil(FuturePlayerRect.y + FuturePlayerRect.h); ++y)
+		{
+			if (!m_map[y][x]->getIsSolid() && m_map[y][x]->getFriction() > prevFriction && FcollRectRect(FuturePlayerRect, m_map[y][x]->getTileGridRect()))
+			{
+				prevFriction = m_map[y][x]->getFriction();
+				cout << "Friction: " << prevFriction << endl;
+				cout << "isOnGround: " << isOnGround << endl;
+			}
+		}
+	}
+
+	calculateFriction(prevFriction);
 
 	// Do the sort
 	sort(collsList.begin(), collsList.end(), [](const pair<int2, float>& a, const pair<int2, float>& b)
@@ -233,9 +248,10 @@ void Player::collision()
 	else if (!isJumping) landingStartSpriteFrame = 12;
 }
 
-void Player::calculateFriction(int2 coords)
+void Player::calculateFriction(float frictionValue)
 {
-	friction.x = min(abs(velocity.x), abs(GRAVITY.y * m_map[coords.x][coords.y]->getFriction()));
+	friction.x = min(abs(velocity.x), abs(GRAVITY.y * frictionValue));
+	friction.y = min(abs(velocity.y), abs(GRAVITY.y * frictionValue * 0.1f));
 
 	if (velocity.x > 0) friction.x *= -1;
 	if (velocity.y > 0) friction.y *= -1;

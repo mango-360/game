@@ -93,6 +93,17 @@ void Board::initMap()
 
 			m_map[y][i] = grassBlock;
 
+			// bush generation
+
+			uniform_int_distribution<int> bushChance(1, 10);
+
+			if(bushChance(rng) == 1)
+			{
+				Bush bush;
+				bush.init({ static_cast<float>(i),static_cast<float>(y - 1) });
+				m_map[y - 1][i] = bush; // place bush on top of grass block
+			}
+
 			for (++y; y < MAP_HEIGHT; ++y) // fill downwards with grass blocks
 			{
 				DirtBlock dirtBlock;
@@ -110,7 +121,7 @@ void Board::initMap()
 void Board::update()
 {
 	m_player.update();
-	for (Mob& mob : m_mobs) mob.update();
+	//for (Mob& mob : m_mobs) mob.update();
 
 	for (auto& projectile : m_projectiles) projectile->update();
 	destroyProjectiles();

@@ -108,6 +108,9 @@
     <ClCompile Include="..\src\DialogPopUp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\Bush.cpp">
+      <Filter>Source Files\Tiles</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\defines.h">
@@ -184,6 +187,9 @@
     </ClInclude>
     <ClInclude Include="..\include\DialogPopUp.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Bush.h">
+      <Filter>Header Files\Tiles</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

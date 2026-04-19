@@ -141,6 +141,15 @@ enum TILE_TYPE
 	AIR = 1,
 	GRASSBLOCK = 2,
 	DIRTBLOCK = 3,
+	BUSH = 4,
+};
+
+enum TYLE_DROP
+{
+	NONE_DROP = 0,
+	GRASSBLOCK_DROP = 2,
+	DIRTBLOCK_DROP = 3,
+	STICK = 4,
 };
 
 inline istream& operator>>(istream& is, SDL_Rect& rect)

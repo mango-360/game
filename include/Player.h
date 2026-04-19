@@ -25,7 +25,7 @@ private:
 	void animateLand();
 
 	void collision();
-	void calculateFriction(int2 coords);
+	void calculateFriction(float frictionValue);
 	void calculateVelocity();
 	void addFriction();
 	void countFramesOnGround();

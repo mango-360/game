@@ -1,9 +1,8 @@
 fontsize: 13
-bgrect: 0 70 405 30
+bgrect: 0 950 405 30
 color: 1
 background: rectangle.bmp
 TriggerWidth/Height: 1.5 1.5
-Dialogue: 
-Hello, traveler!
+Dialogue: Hello, traveler!
 What brings you here?
 Ready for an adventure!
