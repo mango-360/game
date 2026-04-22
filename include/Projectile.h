@@ -9,7 +9,6 @@ public:
 	~Projectile();
 
 	void init(Entity* owner);
-	static void setMobs(vector<Mob>* mobs) { m_mobs = mobs; }
 	void update();
 	void draw(float2 camCoords);
 
@@ -32,6 +31,4 @@ private:
 	vector<float2> normalDirs;
 
 	int damage;
-
-	static vector<Mob>* m_mobs;
 };

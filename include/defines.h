@@ -137,7 +137,7 @@ enum COLOR
 
 enum TILE_TYPE
 {
-	NONE_TYPE = 0,
+	NONE_TYPE = 99999,
 	AIR = 1,
 	GRASSBLOCK = 2,
 	DIRTBLOCK = 3,

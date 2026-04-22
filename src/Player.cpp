@@ -40,6 +40,9 @@ void Player::init(Tile(*map)[MAP_WIDTH])
 			m_map[y][x] = &map[y][x];
 		}
 	} 
+
+	landingStartSpriteFrame = 11;
+	NoJumpLandingSpriteFrame = 12;
 }
 
 void Player::update()
@@ -55,8 +58,6 @@ void Player::update()
 
 	calculateVelocity();
 
-	collision();
-	
 	addFriction();
 
 	applyVelocity();
@@ -73,13 +74,12 @@ void Player::setProjectileSpawner(std::function<void(std::unique_ptr<Projectile>
 
 void Player::shoot()
 {
-	if (InputManager::isKeyClicked(SDL_SCANCODE_P) || InputManager::isMousePressed())
-	{
-		auto projectile = std::make_unique<Projectile>();
-		projectile->init(this);
-
-		if (m_spawnProjectile) m_spawnProjectile(std::move(projectile)); // hand ownership to board via the callback
-	}
+    if ((InputManager::isKeyClicked(SDL_SCANCODE_P) || InputManager::isMousePressed()) && m_spawnProjectile)
+    {
+        auto projectile = std::make_unique<Projectile>();
+        projectile->init(this);
+        m_spawnProjectile(std::move(projectile)); // hand ownership to Board via callback
+    }
 }
 
 void Player::move()
@@ -178,83 +178,6 @@ void Player::animateLand()
 	}
 }
 
-void Player::collision()
-{
-	bool hitsGround = false;
-	friction = { 0, 0 };
-
-	float2 cp, cn;
-	float t = 0, min_t = INFINITY, prevFriction = 0;
-	vector<pair<int2, float>> collsList;
-
-	// Work out collision point, add it to vector along with rect ID
-	for (int i = floor(hitbox.rect.y) - 1; i <= ceil(hitbox.rect.y + hitbox.rect.h); ++i)
-	{
-		for (int j = floor(hitbox.rect.x) - 1; j <= ceil(hitbox.rect.x + hitbox.rect.w); ++j)
-		{
-			if (!m_map[i][j]->getIsSolid()) continue;
-
-			if (DynamicRectVsRect(&hitbox.rect, velocity, m_map[i][j]->getTileGridRect(), cp, cn, t))
-			{
-				/*cout << "Player at: " << floor(hitbox.rect.x) << ", " << floor(hitbox.rect.y) << endl;
-				cout << "Checking block at: " << j << ", " << i << endl;
-				cout << "Contact normal: " << cn << endl;*/
-
-				collsList.push_back({ {i, j}, t });
-
-				if (cn.y == -1)
-				{
-					hitsGround = true;
-
-					if(m_map[i][j]->getFriction() > prevFriction) prevFriction = m_map[i][j]->getFriction();
-				}
-			}
-		}
-	}
-
-	SDL_FRect FuturePlayerRect = {hitbox.rect.x + velocity.x, hitbox.rect.y + velocity.y, hitbox.rect.w, hitbox.rect.h};
-
-	for (int x = floor(FuturePlayerRect.x); x <= ceil(FuturePlayerRect.x + FuturePlayerRect.w); ++x) //check nonsolid blocks for friction
-	{
-		for(int y = floor(FuturePlayerRect.y); y <= ceil(FuturePlayerRect.y + FuturePlayerRect.h); ++y)
-		{
-			if (!m_map[y][x]->getIsSolid() && m_map[y][x]->getFriction() > prevFriction && FcollRectRect(FuturePlayerRect, m_map[y][x]->getTileGridRect()))
-			{
-				prevFriction = m_map[y][x]->getFriction();
-			}
-		}
-	}
-
-	calculateFriction(prevFriction);
-
-	// Do the sort
-	sort(collsList.begin(), collsList.end(), [](const pair<int2, float>& a, const pair<int2, float>& b)
-		{
-			return a.second < b.second;
-		});
-
-	// Now resolve the collision in correct order 
-	for (auto j : collsList) 
-	{
-		// Avoid taking the address of a temporary returned by getTileGridRect():
-		SDL_FRect tileRect = m_map[j.first.x][j.first.y]->getTileGridRect();
-		ResolveDynamicRectVsRect(&hitbox.rect, velocity, &tileRect);
-	}
-
-	isOnGround = hitsGround;
-	if (isOnGround) isJumping = false;
-	else if (!isJumping) landingStartSpriteFrame = 12;
-}
-
-void Player::calculateFriction(float frictionValue)
-{
-	friction.x = min(abs(velocity.x), abs(GRAVITY.y * frictionValue));
-	friction.y = min(abs(velocity.y), abs(GRAVITY.y * frictionValue * 0.1f));
-
-	if (velocity.x > 0) friction.x *= -1;
-	if (velocity.y > 0) friction.y *= -1;
-}
-
 void Player::calculateVelocity()
 {
 	velocity += calculateNetForce();
@@ -267,11 +190,6 @@ void Player::calculateVelocity()
 
 	if(velocity.x != 0 && abs(velocity.x) < 0.001f) velocity.x = 0;
 	if(velocity.y != 0 && abs(velocity.y) < 0.001f) velocity.y = 0;
-}
-
-void Player::addFriction()
-{
-	velocity += friction;
 }
 
 void Player::countFramesOnGround()

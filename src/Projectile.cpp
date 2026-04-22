@@ -2,8 +2,6 @@
 #include "InputManager.h"
 #include "Presenter.h"
 
-vector<Mob>* Projectile::m_mobs = nullptr;
-
 Projectile::Projectile()
 {
 }
@@ -133,17 +131,15 @@ void Projectile::collision()
 		}
 	}
 
-	
-
-	for (Mob& mob : *m_mobs)
-	{
-		if (DynamicRectVsRect(&hitbox.rect, velocity, mob.getMapRect(), cp, cn, t))
-		{
-			//mob.health -= damage;
-			isAlive = false;
-			return;
-		}
-	}
+	//for (Mob& mob : *m_mobs)
+	//{
+	//	if (DynamicRectVsRect(&hitbox.rect, velocity, mob.getMapRect(), cp, cn, t))
+	//	{
+	//		//mob.health -= damage;
+	//		isAlive = false;
+	//		return;
+	//	}
+	//}
 }
 
 void Projectile::calculateVelocity()

@@ -39,7 +39,7 @@ public:
 
 	Player m_player;
 
-	vector<Mob> m_mobs;
+	vector<Entity*> m_entities;
 
 	vector<std::unique_ptr<Projectile>> m_projectiles;
 
@@ -48,6 +48,12 @@ private:
 	void drawMap();
 	void toggleStatistics();
 	void destroyProjectiles();
+
+	void handleCollisions();
+	void handleEntityTileCollisions();
+	void handleEntityEntityCollisions();
+	void handleEntityProjectileCollisions();
+	void handleProjectileTileCollisions();
 
 	bool drawStatistics = false;
 

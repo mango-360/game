@@ -14,28 +14,23 @@ public:
 	Player();
 	~Player();
 	void init(Tile(*map)[MAP_WIDTH]);
-	void update();
+	void update() override;
 	void setProjectileSpawner(std::function<void(std::unique_ptr<Projectile>)> spawner);
 private:
 	void shoot();
-	void move();
-	void moveVertical();
+	void move() override;
+	void moveVertical() override;
 	void animateJump();
 	void animateFall();
 	void animateLand();
 
-	void collision();
-	void calculateFriction(float frictionValue);
-	void calculateVelocity();
-	void addFriction();
+	void calculateVelocity() override;
 	void countFramesOnGround();
 
 	std::function<void(std::unique_ptr<Projectile>)> m_spawnProjectile;
 
 	int lastKeyPressed = -1;
 	int framesOnGround = 0;
-	int landingStartSpriteFrame = 11;
 	float moveSpeed;
-	float2 friction;
 	float2 inputVelocity = { 0, 0 };
 };

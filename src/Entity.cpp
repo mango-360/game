@@ -51,7 +51,7 @@ void Entity::update()
 
 	calculateVelocity();
 
-	collision();
+	addFriction();
 
 	applyVelocity();
 
@@ -132,55 +132,18 @@ void Entity::drawHitBox(float2 camCoords) //for debugging
 	drawObject(tmp);
 }
 
-void Entity::collision()
+void Entity::resolveCollision(SDL_FRect tileRect)
 {
-	bool hitsGround = false;
+	ResolveDynamicRectVsRect(&hitbox.rect, velocity, &tileRect);
+}
 
-	float2 cp, cn;
-	float t = 0, min_t = INFINITY;
-	vector<pair<int2, float>> collsList;
+void Entity::calculateFriction(float frictionValue)
+{
+	friction.x = min(abs(velocity.x), abs(GRAVITY.y * frictionValue));
+	friction.y = min(abs(velocity.y), abs(GRAVITY.y * frictionValue * 0.1f));
 
-	// Work out collision point, add it to vector along with rect ID
-	for (int i = floor(hitbox.rect.y) - 1; i <= ceil(hitbox.rect.y + hitbox.rect.h); ++i)
-	{
-		for (int j = floor(hitbox.rect.x) - 1; j <= ceil(hitbox.rect.x + hitbox.rect.w); ++j)
-		{
-			if (m_map[i][j]->getTileType() == TILE_TYPE::NONE_TYPE) continue;
-
-			if (DynamicRectVsRect(&hitbox.rect, velocity, m_map[i][j]->getTileGridRect(), cp, cn, t))
-			{
-				/*cout << "Entity at: " << floor(hitbox.rect.x) << ", " << floor(hitbox.rect.y) << endl;
-				cout << "Checking block at: " << j << ", " << i << endl;
-				cout << "Contact normal: " << cn << endl;*/
-
-				collsList.push_back({ {i, j}, t });
-
-				if (cn.y == -1)
-				{
-					hitsGround = true;
-				}
-
-				normalDirs.push_back(cn);
-			}
-		}
-	}
-
-	// Do the sort
-	sort(collsList.begin(), collsList.end(), [](const pair<int2, float>& a, const pair<int2, float>& b)
-		{
-			return a.second < b.second;
-		});
-
-	// Now resolve the collision in correct order 
-	for (auto j : collsList)
-	{
-		// Avoid taking the address of a temporary returned by getTileGridRect():
-		SDL_FRect tileRect = m_map[j.first.x][j.first.y]->getTileGridRect();
-		ResolveDynamicRectVsRect(&hitbox.rect, velocity, &tileRect);
-	}
-
-	isOnGround = hitsGround;
-	if (isOnGround) isJumping = false;
+	if (velocity.x > 0) friction.x *= -1;
+	if (velocity.y > 0) friction.y *= -1;
 }
 
 void Entity::calculateVelocity()
@@ -189,6 +152,11 @@ void Entity::calculateVelocity()
 
 	if (velocity.x != 0 && abs(velocity.x) < 0.001f) velocity.x = 0;
 	if (velocity.y != 0 && abs(velocity.y) < 0.001f) velocity.y = 0;
+}
+
+void Entity::addFriction()
+{
+	velocity += friction;
 }
 
 float2 Entity::calculateNetForce()

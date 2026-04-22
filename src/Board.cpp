@@ -35,9 +35,8 @@ void Board::init()
 	mob.init(m_map, "player.txt");
 	mob.setPlayer(&m_player);
 
-	m_mobs.push_back(mob);
-
-	Projectile::setMobs(&m_mobs);
+	m_entities.push_back(&mob);
+	m_entities.push_back(&m_player);
 
 	// register spawner after player init:
 	m_player.setProjectileSpawner([this](std::unique_ptr<Projectile> p) {
@@ -50,7 +49,7 @@ void Board::init()
 
 	m_statistics.init();
 
-	m_dialog.init("dialog.txt", m_mobs[0].getMapRectPtr(), &m_player);
+	m_dialog.init("dialog.txt", mob.getMapRectPtr(), &m_player);
 }
 
 void Board::initMap()
@@ -120,10 +119,11 @@ void Board::initMap()
 
 void Board::update()
 {
-	m_player.update();
-	//for (Mob& mob : m_mobs) mob.update();
+	/*for (auto& projectile : m_projectiles) projectile->update();*/
+	handleCollisions();
 
-	for (auto& projectile : m_projectiles) projectile->update();
+	for (Entity* entity : m_entities) entity->update();
+
 	destroyProjectiles();
 
 	m_camera.update();
@@ -134,6 +134,7 @@ void Board::update()
 	if(drawStatistics) m_statistics.update();
 
 	m_dialog.update();
+	
 }
 
 void Board::draw()
@@ -142,10 +143,7 @@ void Board::draw()
 
 	drawMap();
 
-	m_player.draw( { m_camera.getCameraRect().x, m_camera.getCameraRect().y} ); // draw player based on camera position
-
-	for (auto& mob : m_mobs) mob.draw({ m_camera.getCameraRect().x, m_camera.getCameraRect().y });
-
+	for (auto& entity : m_entities) entity->draw({ m_camera.getCameraRect().x, m_camera.getCameraRect().y });
 	for (auto& projectile : m_projectiles) projectile->draw({ m_camera.getCameraRect().x, m_camera.getCameraRect().y });
 
 	if (drawStatistics) m_statistics.draw();
@@ -200,4 +198,101 @@ void Board::destroyProjectiles()
 		if (!(*it)->isAlive) it = m_projectiles.erase(it);
 		else ++it;
 	}
+}
+
+void Board::handleCollisions()
+{
+	handleEntityTileCollisions();
+
+	handleEntityEntityCollisions();
+
+	handleEntityProjectileCollisions();
+
+	handleProjectileTileCollisions();
+}
+
+void Board::handleEntityTileCollisions()
+{
+	for(Entity* entity : m_entities)
+	{
+		bool hitsGround = false;
+		float2 friction = { 0, 0 };
+
+		float2 cp, cn;
+		float t = 0, min_t = INFINITY, prevFriction = 0;
+		vector<pair<int2, float>> collsList;
+
+		// Work out collision point, add it to vector along with rect ID
+		for (int i = floor(entity->getMapRect().y) - 1; i <= ceil(entity->getMapRect().y + entity->getMapRect().h); ++i)
+		{
+			for (int j = floor(entity->getMapRect().x) - 1; j <= ceil(entity->getMapRect().x + entity->getMapRect().w); ++j)
+			{
+				if (!m_map[i][j].getIsSolid())
+				{
+					continue;
+				}
+				cout << "TILE OF TYPE " << m_map[i][j].getTileType() << " IS SOLID" << endl;
+
+				const SDL_FRect& mapRect = entity->getMapRect(); // bind to local ref
+
+				if (DynamicRectVsRect(&mapRect, entity->getVelocity(), m_map[i][j].getTileGridRect(), cp, cn, t))
+				{
+					collsList.push_back({ {i, j}, t });
+
+					if (cn.y == -1)
+					{
+						hitsGround = true;
+
+						if (m_map[i][j].getFriction() > prevFriction) prevFriction = m_map[i][j].getFriction();
+					}
+				}
+			}
+		}
+
+		SDL_FRect FutureEntityRect = { entity->getMapRect() };
+
+		for (int x = floor(FutureEntityRect.x); x <= ceil(FutureEntityRect.x + FutureEntityRect.w); ++x) //check nonsolid blocks for friction
+		{
+			for (int y = floor(FutureEntityRect.y); y <= ceil(FutureEntityRect.y + FutureEntityRect.h); ++y)
+			{
+				if (!m_map[y][x].getIsSolid() && m_map[y][x].getFriction() > prevFriction && FcollRectRect(FutureEntityRect, m_map[y][x].getTileGridRect()))
+				{
+					prevFriction = m_map[y][x].getFriction();
+				}
+			}
+		}
+
+		// Do the sort
+		sort(collsList.begin(), collsList.end(), [](const pair<int2, float>& a, const pair<int2, float>& b)
+			{
+				return a.second < b.second;
+			});
+
+		// Now resolve the collision in correct order 
+		for (auto j : collsList)
+		{
+			// Avoid taking the address of a temporary returned by getTileGridRect():
+			SDL_FRect tileRect = m_map[j.first.x][j.first.y].getTileGridRect();
+			entity->resolveCollision(tileRect);
+		}
+
+
+		entity->calculateFriction(prevFriction);
+		entity->isOnGround = hitsGround;
+		if (entity->isOnGround) entity->isJumping = false;
+		else if (!entity->isJumping) entity->landingStartSpriteFrame = entity->NoJumpLandingSpriteFrame;
+	}
+	
+}
+
+void Board::handleEntityEntityCollisions()
+{
+}
+
+void Board::handleEntityProjectileCollisions()
+{
+}
+
+void Board::handleProjectileTileCollisions()
+{
 }
