@@ -12,8 +12,6 @@ Mob::~Mob()
 
 void Mob::update()
 {
-	cout << "Player and mob initialized" << endl;
-	SDL_Delay(10000);
 	zoomUpdate();
 
 	move();
@@ -23,7 +21,6 @@ void Mob::update()
 	applyVelocity();
 
 	stopOutOfBounds();
-	
 }
 
 void Mob::move()

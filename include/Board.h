@@ -38,6 +38,7 @@ public:
 	Tile m_map[MAP_HEIGHT][MAP_WIDTH];
 
 	Player m_player;
+	Mob m_mob;
 
 	vector<Entity*> m_entities;
 

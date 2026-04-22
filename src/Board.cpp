@@ -31,11 +31,10 @@ void Board::init()
 
 	m_player.init(m_map);
 
-	Mob mob;
-	mob.init(m_map, "player.txt");
-	mob.setPlayer(&m_player);
+	m_mob.init(m_map, "player.txt");
+	m_mob.setPlayer(&m_player);
 
-	m_entities.push_back(&mob);
+	m_entities.push_back(&m_mob);
 	m_entities.push_back(&m_player);
 
 	// register spawner after player init:
@@ -49,7 +48,7 @@ void Board::init()
 
 	m_statistics.init();
 
-	m_dialog.init("dialog.txt", mob.getMapRectPtr(), &m_player);
+	m_dialog.init("dialog.txt", m_mob.getMapRectPtr(), &m_player);
 }
 
 void Board::initMap()
@@ -122,7 +121,10 @@ void Board::update()
 	/*for (auto& projectile : m_projectiles) projectile->update();*/
 	handleCollisions();
 
-	for (Entity* entity : m_entities) entity->update();
+	for (Entity* entity : m_entities)
+	{
+		entity->update();
+	}
 
 	destroyProjectiles();
 
