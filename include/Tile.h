@@ -37,5 +37,9 @@ protected:
 	SDL_FRect m_gridRect;
 
 	void updateZoom();
+
+	bool isBroken() { return m_hp <= 0; };
+
+	void dealDamage(int damage) { m_hp -= damage; };
 private:
 };

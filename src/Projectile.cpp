@@ -112,10 +112,6 @@ void Projectile::collision()
 
 			if (DynamicRectVsRect(&hitbox.rect, velocity, m_owner->m_map[i][j]->getTileGridRect(), cp, cn, t))
 			{
-				/*cout << "Entity at: " << floor(hitbox.rect.x) << ", " << floor(hitbox.rect.y) << endl;
-				cout << "Checking block at: " << j << ", " << i << endl;
-				cout << "Contact normal: " << cn << endl;*/
-
 				collsList.push_back({ {i, j}, t });
 
 				normalDirs.push_back(cn);
@@ -129,20 +125,15 @@ void Projectile::collision()
 			return a.second < b.second;
 		});
 
-	// Now resolve the collision in correct order
 	for (auto j : collsList)
 	{
-		// Avoid taking the address of a temporary returned by getTileGridRect():
-		SDL_FRect tileRect = m_owner->m_map[j.first.x][j.first.y]->getTileGridRect();
-		ResolveDynamicRectVsRect(&hitbox.rect, velocity, &tileRect);
+		if(!m_owner->m_map[j.first.x][j.first.y]->getIsSolid())
+		{
+			
+		}
 	}
 
-	for (auto j : collsList)
-	{
-		isAlive = false;
-
-		break;
-	}
+	
 
 	for (Mob& mob : *m_mobs)
 	{
@@ -150,7 +141,7 @@ void Projectile::collision()
 		{
 			//mob.health -= damage;
 			isAlive = false;
-			break;
+			return;
 		}
 	}
 }

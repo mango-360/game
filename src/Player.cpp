@@ -221,8 +221,6 @@ void Player::collision()
 			if (!m_map[y][x]->getIsSolid() && m_map[y][x]->getFriction() > prevFriction && FcollRectRect(FuturePlayerRect, m_map[y][x]->getTileGridRect()))
 			{
 				prevFriction = m_map[y][x]->getFriction();
-				cout << "Friction: " << prevFriction << endl;
-				cout << "isOnGround: " << isOnGround << endl;
 			}
 		}
 	}
