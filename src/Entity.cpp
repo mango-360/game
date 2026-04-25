@@ -7,7 +7,6 @@ Tile* Entity::m_map[MAP_HEIGHT][MAP_WIDTH] = { nullptr };
 Entity::Entity()
 {
 }
-
 Entity::~Entity()
 {
 }
@@ -43,6 +42,11 @@ void Entity::init(Tile(*map)[MAP_WIDTH], string configFile)
 	}
 }
 
+void Entity::zoomUpdate()
+{
+	rect.w = TILE_SIZE * InputManager::getZoom();
+	rect.h = TILE_SIZE * InputManager::getZoom();
+}
 void Entity::update()
 {
 	zoomUpdate();
@@ -58,6 +62,21 @@ void Entity::update()
 	stopOutOfBounds();
 }
 
+void Entity::drawHitBox(float2 camCoords) //for debugging
+{
+	SDL_Rect tmpHitboxRect =
+	{
+		round((hitbox.rect.x - camCoords.x) * (TILE_SIZE * InputManager::getZoom())),
+		round((hitbox.rect.y - camCoords.y) * (TILE_SIZE * InputManager::getZoom())),
+		round(hitbox.rect.w * (TILE_SIZE * InputManager::getZoom())),
+		round(hitbox.rect.h * (TILE_SIZE * InputManager::getZoom()))
+	};
+
+
+	Drawable tmp = { hitbox.img, hitbox.texture, tmpHitboxRect };
+
+	drawObject(tmp);
+}
 void Entity::draw(float2 camCoords)
 {
 	SDL_Rect tmpHitboxRect =
@@ -80,7 +99,6 @@ void Entity::draw(float2 camCoords)
 	tmpEntity.texture = texture;
 
 	drawObject(tmpEntity);
-	//drawObject(tmp); //hitbox
 }
 
 int2 Entity::getIntCoords()
@@ -94,13 +112,9 @@ void Entity::jump()
 
 	isJumping = true;
 }
-
-void Entity::zoomUpdate()
+void Entity::moveVertical()
 {
-	rect.w = TILE_SIZE * InputManager::getZoom();
-	rect.h = TILE_SIZE * InputManager::getZoom();
 }
-
 void Entity::move()
 {
 
@@ -112,29 +126,21 @@ void Entity::move()
 	}
 }
 
-void Entity::moveVertical()
+float2 Entity::calculateNetForce()
 {
+	return GRAVITY;
 }
-
-void Entity::drawHitBox(float2 camCoords) //for debugging
+void Entity::calculateVelocity()
 {
-	SDL_Rect tmpHitboxRect =
-	{
-		round((hitbox.rect.x - camCoords.x) * (TILE_SIZE * InputManager::getZoom())),
-		round((hitbox.rect.y - camCoords.y) * (TILE_SIZE * InputManager::getZoom())),
-		round(hitbox.rect.w * (TILE_SIZE * InputManager::getZoom())),
-		round(hitbox.rect.h * (TILE_SIZE * InputManager::getZoom()))
-	};
+	velocity += calculateNetForce();
 
-
-	Drawable tmp = { hitbox.img, hitbox.texture, tmpHitboxRect };
-
-	drawObject(tmp);
+	if (velocity.x != 0 && abs(velocity.x) < 0.001f) velocity.x = 0;
+	if (velocity.y != 0 && abs(velocity.y) < 0.001f) velocity.y = 0;
 }
-
-void Entity::resolveCollision(SDL_FRect tileRect)
+void Entity::applyVelocity()
 {
-	ResolveDynamicRectVsRect(&hitbox.rect, velocity, &tileRect);
+	hitbox.rect.x += velocity.x;
+	hitbox.rect.y += velocity.y;
 }
 
 void Entity::calculateFriction(float frictionValue)
@@ -145,31 +151,15 @@ void Entity::calculateFriction(float frictionValue)
 	if (velocity.x > 0) friction.x *= -1;
 	if (velocity.y > 0) friction.y *= -1;
 }
-
-void Entity::calculateVelocity()
-{
-	velocity += calculateNetForce();
-
-	if (velocity.x != 0 && abs(velocity.x) < 0.001f) velocity.x = 0;
-	if (velocity.y != 0 && abs(velocity.y) < 0.001f) velocity.y = 0;
-}
-
 void Entity::addFriction()
 {
 	velocity += friction;
 }
 
-float2 Entity::calculateNetForce()
+void Entity::resolveCollision(SDL_FRect tileRect)
 {
-	return GRAVITY;
+	ResolveDynamicRectVsRect(&hitbox.rect, velocity, &tileRect);
 }
-
-void Entity::applyVelocity()
-{
-	hitbox.rect.x += velocity.x;
-	hitbox.rect.y += velocity.y;
-}
-
 void Entity::stopOutOfBounds()
 {
 	if (hitbox.rect.x < 0)

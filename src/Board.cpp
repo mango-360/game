@@ -8,47 +8,8 @@ extern World world;
 Board::Board()
 {
 }
-
 Board::~Board()
 {
-}
-
-void Board::init()
-{
-	string configFile = "board.txt";
-	
-	string tmp, backgroundImg;
-
-	fstream stream;
-
-	stream.open(CONFIG_FOLDER + configFile);
-
-	stream >> tmp >> backgroundImg;
-
-	stream.close();
-
-	m_background = loadTexture(backgroundImg);
-
-	m_player.init(m_map);
-
-	m_mob.init(m_map, "player.txt");
-	m_mob.setPlayer(&m_player);
-
-	m_entities.push_back(&m_mob);
-	m_entities.push_back(&m_player);
-
-	// register spawner after player init:
-	m_player.setProjectileSpawner([this](std::unique_ptr<Projectile> p) {
-		m_projectiles.push_back(std::move(p));
-	});
-
-	initMap();
-
-	m_camera.init(&m_player);
-
-	m_statistics.init();
-
-	m_dialog.init("dialog.txt", m_mob.getMapRectPtr(), &m_player);
 }
 
 void Board::initMap()
@@ -115,7 +76,57 @@ void Board::initMap()
 		x ++;
 	}
 }
+void Board::init()
+{
+	string configFile = "board.txt";
+	
+	string tmp, backgroundImg;
 
+	fstream stream;
+
+	stream.open(CONFIG_FOLDER + configFile);
+
+	stream >> tmp >> backgroundImg;
+
+	stream.close();
+
+	m_background = loadTexture(backgroundImg);
+
+	m_player.init(m_map);
+
+	m_mob.init(m_map, "player.txt");
+	m_mob.setPlayer(&m_player);
+
+	m_entities.push_back(&m_mob);
+	m_entities.push_back(&m_player);
+
+	// register spawner after player init:
+	m_player.setProjectileSpawner([this](std::unique_ptr<Projectile> p) {
+		m_projectiles.push_back(std::move(p));
+	});
+
+	initMap();
+
+	m_camera.init(&m_player);
+
+	m_statistics.init();
+
+	m_dialog.init("dialog.txt", m_mob.getMapRectPtr(), &m_player);
+}
+
+void Board::updateMap()
+{
+	if (InputManager::isZoomChanged())
+	{
+		for (int i = 0; i < MAP_HEIGHT; ++i)
+		{
+			for (int j = 0; j < MAP_WIDTH; ++j)
+			{
+				m_map[i][j].update();
+			}
+		}
+	}
+}
 void Board::update()
 {
 	/*for (auto& projectile : m_projectiles) projectile->update();*/
@@ -139,39 +150,6 @@ void Board::update()
 	
 }
 
-void Board::draw()
-{
-	drawObject(m_background);
-
-	drawMap();
-
-	for (auto& entity : m_entities) entity->draw({ m_camera.getCameraRect().x, m_camera.getCameraRect().y });
-	for (auto& projectile : m_projectiles) projectile->draw({ m_camera.getCameraRect().x, m_camera.getCameraRect().y });
-
-	if (drawStatistics) m_statistics.draw();
-
-	m_dialog.draw();
-}
-
-void Board::destroy()
-{
-	SDL_DestroyTexture(m_background);
-}
-
-void Board::updateMap()
-{
-	if (InputManager::isZoomChanged())
-	{
-		for (int i = 0; i < MAP_HEIGHT; ++i)
-		{
-			for (int j = 0; j < MAP_WIDTH; ++j)
-			{
-				m_map[i][j].update();
-			}
-		}
-	}
-}
-
 void Board::drawMap()
 {
 	Camera_Rect camRect = m_camera.getCameraRect();
@@ -186,10 +164,18 @@ void Board::drawMap()
 		}
 	}
 }
-
-void Board::toggleStatistics()
+void Board::draw()
 {
-	if(InputManager::isKeyClicked(SDL_SCANCODE_F3)) drawStatistics = !drawStatistics;
+	drawObject(m_background);
+
+	drawMap();
+
+	for (auto& entity : m_entities) entity->draw({ m_camera.getCameraRect().x, m_camera.getCameraRect().y });
+	for (auto& projectile : m_projectiles) projectile->draw({ m_camera.getCameraRect().x, m_camera.getCameraRect().y });
+
+	if (drawStatistics) m_statistics.draw();
+
+	m_dialog.draw();
 }
 
 void Board::destroyProjectiles()
@@ -201,16 +187,14 @@ void Board::destroyProjectiles()
 		else ++it;
 	}
 }
-
-void Board::handleCollisions()
+void Board::destroy()
 {
-	handleEntityTileCollisions();
+	SDL_DestroyTexture(m_background);
+}
 
-	handleEntityEntityCollisions();
-
-	handleEntityProjectileCollisions();
-
-	handleProjectileTileCollisions();
+void Board::toggleStatistics()
+{
+	if(InputManager::isKeyClicked(SDL_SCANCODE_F3)) drawStatistics = !drawStatistics;
 }
 
 void Board::handleEntityTileCollisions()
@@ -286,15 +270,22 @@ void Board::handleEntityTileCollisions()
 	}
 	
 }
-
 void Board::handleEntityEntityCollisions()
 {
 }
-
 void Board::handleEntityProjectileCollisions()
 {
 }
-
 void Board::handleProjectileTileCollisions()
 {
+}
+void Board::handleCollisions()
+{
+	handleEntityTileCollisions();
+
+	handleEntityEntityCollisions();
+
+	handleEntityProjectileCollisions();
+
+	handleProjectileTileCollisions();
 }

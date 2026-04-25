@@ -6,7 +6,6 @@
 DialogPopUp::DialogPopUp()
 {
 }
-
 DialogPopUp::~DialogPopUp()
 {
 }
@@ -77,6 +76,17 @@ void DialogPopUp::updateTriggerRect()
 	m_background.rect.x = Presenter::m_SCREEN_WIDTH / 2 - m_background.rect.w / 2;
 	m_background.rect.y = Presenter::m_SCREEN_HEIGHT / 2 - TILE_SIZE * InputManager::getZoom() - 30;
 }
+void DialogPopUp::triggerDialog()
+{
+	if (!isTriggered && FcollRectRect(triggerRect, m_player->getMapRect())) isTriggered = true;
+	else if (isTriggered && !FcollRectRect(triggerRect, m_player->getMapRect()))
+	{
+		isTriggered = false;
+
+		dialogLine = 0;
+		setText(dialog[dialogLine]);
+	}	
+}
 
 void DialogPopUp::getNextLine()
 {
@@ -95,16 +105,4 @@ void DialogPopUp::getNextLine()
 			isTriggered = false;
 		}
 	}
-}
-
-void DialogPopUp::triggerDialog()
-{
-	if (!isTriggered && FcollRectRect(triggerRect, m_player->getMapRect())) isTriggered = true;
-	else if (isTriggered && !FcollRectRect(triggerRect, m_player->getMapRect()))
-	{
-		isTriggered = false;
-
-		dialogLine = 0;
-		setText(dialog[dialogLine]);
-	}	
 }

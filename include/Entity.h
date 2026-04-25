@@ -12,9 +12,12 @@ class Entity : public DrawableWithSrc
 public:
 	Entity();
 	~Entity();
+
 	virtual void init(Tile(*map)[MAP_WIDTH] , string configFile);
 	virtual void update();
-	virtual void draw(float2 camCoords); // camera-aware draw
+
+	void drawHitBox(float2 camCoords); 
+	virtual void draw(float2 camCoords);
 
 	void resolveCollision(SDL_FRect tileRect);
 	void calculateFriction(float frictionValue);
@@ -37,15 +40,17 @@ public:
 
 protected:
 	void zoomUpdate();
-	virtual void move();
+
+	void addFriction();
+	
 	void jump();
 	virtual void moveVertical();
-	void drawHitBox(float2 camCoords); // for debugging
+	virtual void move();
 
-	virtual void calculateVelocity();
-	void addFriction();
 	float2 calculateNetForce();
+	virtual void calculateVelocity();
 	void applyVelocity();
+
 	void stopOutOfBounds();
 
 	float jumpStrength;
