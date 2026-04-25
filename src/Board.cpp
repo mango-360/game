@@ -8,8 +8,47 @@ extern World world;
 Board::Board()
 {
 }
+
 Board::~Board()
 {
+}
+
+void Board::init()
+{
+	string configFile = "board.txt";
+	
+	string tmp, backgroundImg;
+
+	fstream stream;
+
+	stream.open(CONFIG_FOLDER + configFile);
+
+	stream >> tmp >> backgroundImg;
+
+	stream.close();
+
+	m_background = loadTexture(backgroundImg);
+
+	m_player.init(m_map);
+
+	m_mob.init(m_map, "player.txt");
+	m_mob.setPlayer(&m_player);
+
+	m_entities.push_back(&m_mob);
+	m_entities.push_back(&m_player);
+
+	// register spawner after player init:
+	m_player.setProjectileSpawner([this](std::unique_ptr<Projectile> p) {
+		m_projectiles.push_back(std::move(p));
+	});
+
+	initMap();
+
+	m_camera.init(&m_player);
+
+	m_statistics.init();
+
+	m_dialog.init("dialog.txt", m_mob.getMapRectPtr(), &m_player);
 }
 
 void Board::initMap()
@@ -76,57 +115,7 @@ void Board::initMap()
 		x ++;
 	}
 }
-void Board::init()
-{
-	string configFile = "board.txt";
-	
-	string tmp, backgroundImg;
 
-	fstream stream;
-
-	stream.open(CONFIG_FOLDER + configFile);
-
-	stream >> tmp >> backgroundImg;
-
-	stream.close();
-
-	m_background = loadTexture(backgroundImg);
-
-	m_player.init(m_map);
-
-	m_mob.init(m_map, "player.txt");
-	m_mob.setPlayer(&m_player);
-
-	m_entities.push_back(&m_mob);
-	m_entities.push_back(&m_player);
-
-	// register spawner after player init:
-	m_player.setProjectileSpawner([this](std::unique_ptr<Projectile> p) {
-		m_projectiles.push_back(std::move(p));
-	});
-
-	initMap();
-
-	m_camera.init(&m_player);
-
-	m_statistics.init();
-
-	m_dialog.init("dialog.txt", m_mob.getMapRectPtr(), &m_player);
-}
-
-void Board::updateMap()
-{
-	if (InputManager::isZoomChanged())
-	{
-		for (int i = 0; i < MAP_HEIGHT; ++i)
-		{
-			for (int j = 0; j < MAP_WIDTH; ++j)
-			{
-				m_map[i][j].update();
-			}
-		}
-	}
-}
 void Board::update()
 {
 	/*for (auto& projectile : m_projectiles) projectile->update();*/
@@ -150,20 +139,6 @@ void Board::update()
 	
 }
 
-void Board::drawMap()
-{
-	Camera_Rect camRect = m_camera.getCameraRect();
-
-	for (int y = floor(camRect.y); y <= floor(camRect.y + camRect.h); ++y)
-	{
-		for (int x = floor(camRect.x); x <= floor(camRect.x + camRect.w); ++x)
-		{
-			if(y < 0 || y >= MAP_HEIGHT || x < 0 || x >= MAP_WIDTH) continue; // skip out-of-bounds tiles
-
-			m_map[y][x].draw({ camRect.x, camRect.y });
-		}
-	}
-}
 void Board::draw()
 {
 	drawObject(m_background);
@@ -178,6 +153,45 @@ void Board::draw()
 	m_dialog.draw();
 }
 
+void Board::destroy()
+{
+	SDL_DestroyTexture(m_background);
+}
+
+void Board::updateMap()
+{
+	if (InputManager::isZoomChanged())
+	{
+		for (int i = 0; i < MAP_HEIGHT; ++i)
+		{
+			for (int j = 0; j < MAP_WIDTH; ++j)
+			{
+				m_map[i][j].update();
+			}
+		}
+	}
+}
+
+void Board::drawMap()
+{
+	Camera_Rect camRect = m_camera.getCameraRect();
+
+	for (int y = floor(camRect.y); y <= floor(camRect.y + camRect.h); ++y)
+	{
+		for (int x = floor(camRect.x); x <= floor(camRect.x + camRect.w); ++x)
+		{
+			if(y < 0 || y >= MAP_HEIGHT || x < 0 || x >= MAP_WIDTH) continue; // skip out-of-bounds tiles
+
+			m_map[y][x].draw({ camRect.x, camRect.y });
+		}
+	}
+}
+
+void Board::toggleStatistics()
+{
+	if(InputManager::isKeyClicked(SDL_SCANCODE_F3)) drawStatistics = !drawStatistics;
+}
+
 void Board::destroyProjectiles()
 {
 	auto it = m_projectiles.begin();
@@ -187,14 +201,16 @@ void Board::destroyProjectiles()
 		else ++it;
 	}
 }
-void Board::destroy()
-{
-	SDL_DestroyTexture(m_background);
-}
 
-void Board::toggleStatistics()
+void Board::handleCollisions()
 {
-	if(InputManager::isKeyClicked(SDL_SCANCODE_F3)) drawStatistics = !drawStatistics;
+	handleEntityTileCollisions();
+
+	handleEntityEntityCollisions();
+
+	handleEntityProjectileCollisions();
+
+	handleProjectileTileCollisions();
 }
 
 void Board::handleEntityTileCollisions()
@@ -270,22 +286,15 @@ void Board::handleEntityTileCollisions()
 	}
 	
 }
+
 void Board::handleEntityEntityCollisions()
 {
 }
+
 void Board::handleEntityProjectileCollisions()
 {
 }
+
 void Board::handleProjectileTileCollisions()
 {
-}
-void Board::handleCollisions()
-{
-	handleEntityTileCollisions();
-
-	handleEntityEntityCollisions();
-
-	handleEntityProjectileCollisions();
-
-	handleProjectileTileCollisions();
 }

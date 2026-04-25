@@ -77,8 +77,6 @@ void Statistics::update()
 void Statistics::draw()
 {
 	m_position.draw();
-
-
 	
 	Presenter::drawObject(m_keyboard[0]);
 	Presenter::drawObject(m_keyboard[1]);

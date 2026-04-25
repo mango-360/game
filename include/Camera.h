@@ -5,10 +5,9 @@
 
 class Camera
 {
-public:
+	public:
 	Camera();
 	~Camera();
-
 	void init(Player* player);
 	void update();
 	Camera_Rect getCameraRect() const { return rect; };

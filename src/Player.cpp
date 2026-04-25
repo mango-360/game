@@ -3,9 +3,11 @@
 #include "InputManager.h"
 #include "Projectile.h"
 
+
 Player::Player()
 {
 }
+
 Player::~Player()
 {
 }
@@ -42,6 +44,7 @@ void Player::init(Tile(*map)[MAP_WIDTH])
 	landingStartSpriteFrame = 11;
 	NoJumpLandingSpriteFrame = 12;
 }
+
 void Player::update()
 {
 	zoomUpdate();
@@ -68,6 +71,7 @@ void Player::setProjectileSpawner(std::function<void(std::unique_ptr<Projectile>
 {
 	m_spawnProjectile = std::move(spawner);
 }
+
 void Player::shoot()
 {
     if ((InputManager::isKeyClicked(SDL_SCANCODE_P) || InputManager::isMousePressed()) && m_spawnProjectile)
@@ -76,6 +80,17 @@ void Player::shoot()
         projectile->init(this);
         m_spawnProjectile(std::move(projectile)); // hand ownership to Board via callback
     }
+}
+
+void Player::move()
+{
+
+	moveVertical();
+
+	if ((InputManager::isKeyPressed(SDL_SCANCODE_W) || InputManager::isKeyPressed(SDL_SCANCODE_SPACE)) && isOnGround)
+	{
+		jump();
+	}
 }
 
 void Player::moveVertical()
@@ -113,30 +128,6 @@ void Player::moveVertical()
 		else inputVelocity.x = 0;
 	}
 }
-void Player::move()
-{
-
-	moveVertical();
-
-	if ((InputManager::isKeyPressed(SDL_SCANCODE_W) || InputManager::isKeyPressed(SDL_SCANCODE_SPACE)) && isOnGround)
-	{
-		jump();
-	}
-}
-
-void Player::calculateVelocity()
-{
-	velocity += calculateNetForce();
-
-	if(velocity.x > 0) inputVelocity.x = clamp(inputVelocity.x, -maxInputVelocity.x, max(0.0f, maxInputVelocity.x - velocity.x)); // clamps x input velocity
-	else	inputVelocity.x = clamp(inputVelocity.x, min(0.0f, -maxInputVelocity.x - velocity.x), maxInputVelocity.x); 
-	//inputVelocity.y = clamp(inputVelocity.y, -maxInputVelocity.y, maxInputVelocity.y); // clamps y input velocity
-
-	velocity += inputVelocity;
-
-	if(velocity.x != 0 && abs(velocity.x) < 0.001f) velocity.x = 0;
-	if(velocity.y != 0 && abs(velocity.y) < 0.001f) velocity.y = 0;
-}
 
 void Player::animateJump()
 {
@@ -163,6 +154,7 @@ void Player::animateJump()
 		landingStartSpriteFrame = 11;
 	}
 }
+
 void Player::animateFall()
 {
 	if (!isOnGround && !isJumping)
@@ -174,6 +166,7 @@ void Player::animateFall()
 		else				   srcRect.x = srcRect.w * 10;
 	}
 }
+
 void Player::animateLand()
 {
 	if (isOnGround && !isJumping)
@@ -184,6 +177,21 @@ void Player::animateLand()
 		else srcRect.x = srcRect.w * (landingStartSpriteFrame + landingSpriteFrame);
 	}
 }
+
+void Player::calculateVelocity()
+{
+	velocity += calculateNetForce();
+
+	if(velocity.x > 0) inputVelocity.x = clamp(inputVelocity.x, -maxInputVelocity.x, max(0.0f, maxInputVelocity.x - velocity.x)); // clamps x input velocity
+	else	inputVelocity.x = clamp(inputVelocity.x, min(0.0f, -maxInputVelocity.x - velocity.x), maxInputVelocity.x); 
+	//inputVelocity.y = clamp(inputVelocity.y, -maxInputVelocity.y, maxInputVelocity.y); // clamps y input velocity
+
+	velocity += inputVelocity;
+
+	if(velocity.x != 0 && abs(velocity.x) < 0.001f) velocity.x = 0;
+	if(velocity.y != 0 && abs(velocity.y) < 0.001f) velocity.y = 0;
+}
+
 void Player::countFramesOnGround()
 {
 	if (!isOnGround) framesOnGround = 0;

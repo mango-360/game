@@ -13,25 +13,21 @@ class Player : public Entity
 public:
 	Player();
 	~Player();
-
 	void init(Tile(*map)[MAP_WIDTH]);
 	void update() override;
-
 	void setProjectileSpawner(std::function<void(std::unique_ptr<Projectile>)> spawner);
 private:
 	void shoot();
-
-	void moveVertical() override;
 	void move() override;
-
-	void calculateVelocity() override;
-
+	void moveVertical() override;
 	void animateJump();
 	void animateFall();
 	void animateLand();
+
+	void calculateVelocity() override;
 	void countFramesOnGround();
 
-	function<void(std::unique_ptr<Projectile>)> m_spawnProjectile;
+	std::function<void(std::unique_ptr<Projectile>)> m_spawnProjectile;
 
 	int lastKeyPressed = -1;
 	int framesOnGround = 0;

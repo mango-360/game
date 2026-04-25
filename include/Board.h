@@ -29,8 +29,8 @@ public:
 	Board();
 	~Board();
 
-	void initMap();
 	void init();
+	void initMap();
 	void update();
 	void draw();
 	void destroy();
@@ -47,16 +47,14 @@ public:
 private:
 	void updateMap();
 	void drawMap();
-
 	void toggleStatistics();
-
 	void destroyProjectiles();
 
+	void handleCollisions();
 	void handleEntityTileCollisions();
 	void handleEntityEntityCollisions();
 	void handleEntityProjectileCollisions();
 	void handleProjectileTileCollisions();
-	void handleCollisions();
 
 	bool drawStatistics = false;
 
