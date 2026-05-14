@@ -97,6 +97,17 @@ void Projectile::collision()
 	float t = 0, min_t = INFINITY;
 	vector<pair<int2, float>> collsList;
 
+	//check tile of projectile
+	if(m_owner->m_map[(int)hitbox.rect.y][(int)hitbox.rect.x]->getIsSolid())
+	{
+		isAlive = false;
+		return;
+	}
+	else if (!m_owner->m_map[(int)hitbox.rect.y][(int)hitbox.rect.x]->getTileType() != TILE_TYPE::NONE_TYPE)
+	{
+		dealDamageToTile((int)hitbox.rect.y, (int)hitbox.rect.x);
+	}
+
 	// Work out collision point, add it to vector along with rect ID
 	for (int i = floor(hitbox.rect.y) - 1; i <= ceil(hitbox.rect.y + hitbox.rect.h); ++i)
 	{
@@ -125,9 +136,7 @@ void Projectile::collision()
 
 		if(!m_owner->m_map[j.first.x][j.first.y]->getIsSolid())
 		{
-			m_owner->m_map[j.first.x][j.first.y]->dealDamage(damage);
-			if(m_owner->m_map[j.first.x][j.first.y]->isBroken())
-				m_owner->m_map[j.first.x][j.first.y]->destroy();
+			dealDamageToTile(j.first.x, j.first.y);
 		}
 		else
 		{
@@ -173,4 +182,12 @@ void Projectile::stopOutOfBounds()
 	{
 		isAlive = false;
 	}
+}
+
+void Projectile::dealDamageToTile(int x, int y)
+{
+	m_owner->m_map[x][y]->dealDamage(damage);
+
+	if(m_owner->m_map[x][y]->isBroken())
+		m_owner->m_map[x][y]->destroy();
 }

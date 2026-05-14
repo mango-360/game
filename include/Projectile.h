@@ -22,6 +22,8 @@ private:
 	void applyVelocity();
 	void stopOutOfBounds();
 
+	void dealDamageToTile(int x, int y);
+
 	Entity* m_owner;
 
 	float2 velocity = { 0, 0 };
