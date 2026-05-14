@@ -15,6 +15,8 @@ public:
 	~Player();
 	void init(Tile(*map)[MAP_WIDTH]);
 	void update() override;
+	void updatePrePhysics() override;
+	void updatePostPhysics() override;
 	void setProjectileSpawner(std::function<void(std::unique_ptr<Projectile>)> spawner);
 private:
 	void shoot();

@@ -45,6 +45,12 @@ void Entity::init(Tile(*map)[MAP_WIDTH], string configFile)
 
 void Entity::update()
 {
+	updatePrePhysics();
+	updatePostPhysics();
+}
+
+void Entity::updatePrePhysics()
+{
 	zoomUpdate();
 
 	move();
@@ -52,7 +58,10 @@ void Entity::update()
 	calculateVelocity();
 
 	addFriction();
+}
 
+void Entity::updatePostPhysics()
+{
 	applyVelocity();
 
 	stopOutOfBounds();

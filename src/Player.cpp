@@ -47,6 +47,12 @@ void Player::init(Tile(*map)[MAP_WIDTH])
 
 void Player::update()
 {
+	updatePrePhysics();
+	updatePostPhysics();
+}
+
+void Player::updatePrePhysics()
+{
 	zoomUpdate();
 
 	shoot();
@@ -59,7 +65,10 @@ void Player::update()
 	calculateVelocity();
 
 	addFriction();
+}
 
+void Player::updatePostPhysics()
+{
 	applyVelocity();
 
 	stopOutOfBounds();

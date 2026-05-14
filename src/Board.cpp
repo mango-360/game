@@ -119,11 +119,16 @@ void Board::initMap()
 void Board::update()
 {
 	/*for (auto& projectile : m_projectiles) projectile->update();*/
+	for (Entity* entity : m_entities)
+	{
+		entity->updatePrePhysics();
+	}
+
 	handleCollisions();
 
 	for (Entity* entity : m_entities)
 	{
-		entity->update();
+		entity->updatePostPhysics();
 	}
 
 	destroyProjectiles();
@@ -229,6 +234,11 @@ void Board::handleEntityTileCollisions()
 		{
 			for (int j = floor(entity->getMapRect().x) - 1; j <= ceil(entity->getMapRect().x + entity->getMapRect().w); ++j)
 			{
+				if (i < 0 || i >= MAP_HEIGHT || j < 0 || j >= MAP_WIDTH)
+				{
+					continue;
+				}
+
 				if (!m_map[i][j].getIsSolid())
 				{
 					continue;
@@ -257,6 +267,11 @@ void Board::handleEntityTileCollisions()
 		{
 			for (int y = floor(FutureEntityRect.y); y <= ceil(FutureEntityRect.y + FutureEntityRect.h); ++y)
 			{
+				if (y < 0 || y >= MAP_HEIGHT || x < 0 || x >= MAP_WIDTH)
+				{
+					continue;
+				}
+
 				if (!m_map[y][x].getIsSolid() && m_map[y][x].getFriction() > prevFriction && FcollRectRect(FutureEntityRect, m_map[y][x].getTileGridRect()))
 				{
 					prevFriction = m_map[y][x].getFriction();

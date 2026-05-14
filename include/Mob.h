@@ -10,6 +10,8 @@ public:
 	~Mob();
 	void setPlayer(Player* player) { m_player = player; }
 	void update() override;
+	void updatePrePhysics() override;
+	void updatePostPhysics() override;
 
 private:
 	void move() override;
