@@ -42,7 +42,7 @@ public:
 
 	vector<Entity*> m_entities;
 
-	vector<std::unique_ptr<Projectile>> m_projectiles;
+	vector<unique_ptr<Projectile>> m_projectiles;
 
 private:
 	void updateMap();

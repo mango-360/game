@@ -56,12 +56,12 @@ void Entity::updatePrePhysics()
 	move();
 
 	calculateVelocity();
-
-	addFriction();
 }
 
 void Entity::updatePostPhysics()
 {
+	addFriction();
+
 	applyVelocity();
 
 	stopOutOfBounds();

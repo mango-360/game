@@ -12,11 +12,12 @@ public:
 	void update();
 	void draw(float2 camCoords);
 
+	void calculateVelocity();
+	void collision();
+
 	bool isAlive = true;
 private:
 	void zoomUpdate();
-	void collision();
-	void calculateVelocity();
 	float2 calculateNetForce();
 	void applyVelocity();
 	void stopOutOfBounds();

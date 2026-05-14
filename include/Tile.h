@@ -20,6 +20,8 @@ public:
 	TILE_TYPE getTileType() { return m_type; };
 	TYLE_DROP getTileDrop() { return m_drop; };
 
+	void dealDamage(int damage) { m_hp -= damage; };
+	bool isBroken() { return m_hp <= 0; };
 protected:
 
 	int m_hp;
@@ -38,8 +40,4 @@ protected:
 
 	void updateZoom();
 
-	bool isBroken() { return m_hp <= 0; };
-
-	void dealDamage(int damage) { m_hp -= damage; };
-private:
 };

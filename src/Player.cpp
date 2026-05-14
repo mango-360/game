@@ -63,12 +63,12 @@ void Player::updatePrePhysics()
 	animateLand();
 
 	calculateVelocity();
-
-	addFriction();
 }
 
 void Player::updatePostPhysics()
 {
+	addFriction();
+
 	applyVelocity();
 
 	stopOutOfBounds();

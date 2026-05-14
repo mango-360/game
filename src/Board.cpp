@@ -38,7 +38,7 @@ void Board::init()
 	m_entities.push_back(&m_player);
 
 	// register spawner after player init:
-	m_player.setProjectileSpawner([this](std::unique_ptr<Projectile> p) {
+	m_player.setProjectileSpawner([this](unique_ptr<Projectile> p) {
 		m_projectiles.push_back(std::move(p));
 	});
 
@@ -118,13 +118,14 @@ void Board::initMap()
 
 void Board::update()
 {
-	/*for (auto& projectile : m_projectiles) projectile->update();*/
 	for (Entity* entity : m_entities)
 	{
 		entity->updatePrePhysics();
 	}
 
 	handleCollisions();
+
+	for (auto& projectile : m_projectiles) projectile->update();
 
 	for (Entity* entity : m_entities)
 	{
@@ -243,8 +244,6 @@ void Board::handleEntityTileCollisions()
 				{
 					continue;
 				}
-				cout << "TILE OF TYPE " << m_map[i][j].getTileType() << " IS SOLID" << endl;
-
 				const SDL_FRect& mapRect = entity->getMapRect(); // bind to local ref
 
 				if (DynamicRectVsRect(&mapRect, entity->getVelocity(), m_map[i][j].getTileGridRect(), cp, cn, t))
@@ -312,4 +311,10 @@ void Board::handleEntityProjectileCollisions()
 
 void Board::handleProjectileTileCollisions()
 {
+	for(unique_ptr<Projectile>& projectile : m_projectiles)
+	{
+		projectile->calculateVelocity();
+
+		projectile->collision();
+	}
 }

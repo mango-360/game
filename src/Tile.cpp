@@ -46,8 +46,8 @@ void Tile::draw(float2 camCoords)
 
 void Tile::destroy()
 {
-	SDL_DestroyTexture(m_tile.texture);
-
+	m_tile.texture = nullptr;
+	m_type = TILE_TYPE::AIR;
 }
 
 void Tile::updateZoom()

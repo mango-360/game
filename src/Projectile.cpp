@@ -55,10 +55,6 @@ void Projectile::update()
 {
 	zoomUpdate();
 
-	calculateVelocity();
-
-	collision();
-
 	applyVelocity();
 
 	stopOutOfBounds();
@@ -125,9 +121,18 @@ void Projectile::collision()
 
 	for (auto j : collsList)
 	{
+		cout << "Projectile collided with tile at: " << j.first.x << ", " << j.first.y << " with normal: " << normalDirs[0].x << ", " << normalDirs[0].y << endl;
+
 		if(!m_owner->m_map[j.first.x][j.first.y]->getIsSolid())
 		{
-			
+			m_owner->m_map[j.first.x][j.first.y]->dealDamage(damage);
+			if(m_owner->m_map[j.first.x][j.first.y]->isBroken())
+				m_owner->m_map[j.first.x][j.first.y]->destroy();
+		}
+		else
+		{
+			isAlive = false;
+			return;
 		}
 	}
 
