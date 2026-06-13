@@ -18,6 +18,7 @@
 
 #include "Projectile.h"
 
+
 #include "Tile.h"
 #include "GrassBlock.h"
 #include "DirtBlock.h"
@@ -43,6 +44,8 @@ public:
 	vector<Entity*> m_entities;
 
 	vector<unique_ptr<Projectile>> m_projectiles;
+
+	vector<unique_ptr<Drop>> m_drops;
 
 private:
 	void updateMap();

@@ -1,3 +1,6 @@
+TYLE_IMAGES
 grassBlock.bmp
 dirtBlock.bmp
 bush.bmp
+DROP_IMAGES
+stick_drop.bmp

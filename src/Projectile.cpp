@@ -1,6 +1,7 @@
 #include "Projectile.h"
 #include "InputManager.h"
 #include "Presenter.h"
+#include "Drop.h"
 
 Projectile::Projectile()
 {
@@ -135,6 +136,11 @@ void Projectile::collision()
 	}
 }
 
+void Projectile::setDropSpawner(function<void(unique_ptr<Drop>)> spawner)
+{
+	m_spawnDrop = move(spawner);
+}
+
 void Projectile::calculateVelocity()
 {
 	velocity += calculateNetForce();
@@ -188,6 +194,10 @@ void Projectile::dealDamageToTile(int x, int y)
 {
 	m_owner->m_map[x][y]->dealDamage(damage);
 
-	if(m_owner->m_map[x][y]->isBroken())
+	if (m_owner->m_map[x][y]->isBroken()) {
+		auto drop = std::make_unique<Drop>();
+		drop->init({y, x} , m_owner->m_map[x][y]->getTileDrop());
+		m_spawnDrop(std::move(drop)); // hand ownership to Board via callback
 		m_owner->m_map[x][y]->destroy();
+	}
 }

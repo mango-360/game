@@ -17,7 +17,7 @@ public:
 	void update() override;
 	void updatePrePhysics() override;
 	void updatePostPhysics() override;
-	void setProjectileSpawner(std::function<void(std::unique_ptr<Projectile>)> spawner);
+	void setProjectileSpawner(function<void(unique_ptr<Projectile>)> spawner);
 private:
 	void shoot();
 	void move() override;
@@ -25,6 +25,7 @@ private:
 	void animateJump();
 	void animateFall();
 	void animateLand();
+	void pickUpDrop();
 
 	void calculateVelocity() override;
 	void countFramesOnGround();

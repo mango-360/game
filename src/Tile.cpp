@@ -48,6 +48,7 @@ void Tile::destroy()
 {
 	m_tile.texture = nullptr;
 	m_type = TILE_TYPE::AIR;
+	m_drop = DROP_TYPE::NONE_DROP;
 }
 
 void Tile::updateZoom()

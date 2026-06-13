@@ -1,6 +1,7 @@
 #include "Board.h"
 #include "InputManager.h"
 #include "SoundManager.h"
+#include "Drop.h"
 #include "World.h"
 
 extern World world;
@@ -37,8 +38,16 @@ void Board::init()
 	m_entities.push_back(&m_mob);
 	m_entities.push_back(&m_player);
 
-	// register spawner after player init:
+  // register spawner after player init: set a projectile spawner that also
+	// assigns a drop-spawner on the projectile so projectiles can hand drops
+	// back to the Board when a tile breaks.
 	m_player.setProjectileSpawner([this](unique_ptr<Projectile> p) {
+
+		// set how this projectile should hand spawned drops to the board
+		p->setDropSpawner([this](unique_ptr<Drop> d) {
+			m_drops.push_back(std::move(d));
+		});
+
 		m_projectiles.push_back(std::move(p));
 	});
 
@@ -134,6 +143,9 @@ void Board::update()
 
 	destroyProjectiles();
 
+	// update drops
+	for (auto& drop : m_drops) drop->update();
+
 	m_camera.update();
 
 	updateMap();
@@ -151,8 +163,9 @@ void Board::draw()
 
 	drawMap();
 
-	for (auto& entity : m_entities) entity->draw({ m_camera.getCameraRect().x, m_camera.getCameraRect().y });
 	for (auto& projectile : m_projectiles) projectile->draw({ m_camera.getCameraRect().x, m_camera.getCameraRect().y });
+	for (auto& drop : m_drops) drop->draw({ m_camera.getCameraRect().x, m_camera.getCameraRect().y });
+	for (auto& entity : m_entities) entity->draw({ m_camera.getCameraRect().x, m_camera.getCameraRect().y });
 
 	if (drawStatistics) m_statistics.draw();
 

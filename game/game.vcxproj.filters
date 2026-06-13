@@ -31,6 +31,12 @@
     <Filter Include="Header Files\States">
       <UniqueIdentifier>{7c5ebaa8-ab26-466f-b0dc-bc2d00847d05}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Drops">
+      <UniqueIdentifier>{1fee69b2-99a5-4550-ba48-9209884a5583}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Drops">
+      <UniqueIdentifier>{5920502c-7566-4f91-9fe2-7fb1f6559e33}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\main.cpp">
@@ -111,6 +117,9 @@
     <ClCompile Include="..\src\Bush.cpp">
       <Filter>Source Files\Tiles</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\Drop.cpp">
+      <Filter>Source Files\Drops</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\defines.h">
@@ -190,6 +199,9 @@
     </ClInclude>
     <ClInclude Include="..\include\Bush.h">
       <Filter>Header Files\Tiles</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Drop.h">
+      <Filter>Header Files\Drops</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

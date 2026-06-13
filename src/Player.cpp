@@ -76,7 +76,7 @@ void Player::updatePostPhysics()
 	countFramesOnGround();
 }
 
-void Player::setProjectileSpawner(std::function<void(std::unique_ptr<Projectile>)> spawner)
+void Player::setProjectileSpawner(function<void(unique_ptr<Projectile>)> spawner)
 {
 	m_spawnProjectile = std::move(spawner);
 }
@@ -185,6 +185,11 @@ void Player::animateLand()
 		if (landingSpriteFrame + landingStartSpriteFrame > 15) srcRect.x = 0;
 		else srcRect.x = srcRect.w * (landingStartSpriteFrame + landingSpriteFrame);
 	}
+}
+
+void Player::pickUpDrop()
+{
+
 }
 
 void Player::calculateVelocity()

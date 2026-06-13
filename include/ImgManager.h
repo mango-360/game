@@ -13,6 +13,8 @@ public:
 	static SDL_Texture* m_dirtBlockTexture;
 	static SDL_Texture* m_bushTexture;
 
+	static SDL_Texture* m_stickTexture;
+
 	void loadAllTextures();
 	void destroyAllTextures();
 };

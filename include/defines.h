@@ -14,6 +14,7 @@ static const string SOUND_FOLDER = "sound\\";
 static const string FONT_FOLDER = "font\\";
 static const string TEXT_FIELD_FOLDER = "textField\\";
 static const string TILES_FOLDER = "tiles\\";
+static const string DROPS_FOLDER = "drops\\";
 static const string STATISTICS_FOLDER = "statistics\\";
 
 static const int TILE_SIZE = 32;
@@ -144,7 +145,7 @@ enum TILE_TYPE
 	BUSH = 4,
 };
 
-enum TYLE_DROP
+enum DROP_TYPE
 {
 	NONE_DROP = 0,
 	GRASSBLOCK_DROP = 2,

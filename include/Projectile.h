@@ -2,6 +2,8 @@
 
 #include "Mob.h"
 
+class Drop;
+
 class Projectile : public DrawableWithSrc
 {
 public:
@@ -15,6 +17,8 @@ public:
 	void calculateVelocity();
 	void collision();
 
+	void setDropSpawner(function<void(unique_ptr<Drop>)> spawner);
+
 	bool isAlive = true;
 private:
 	void zoomUpdate();
@@ -24,6 +28,8 @@ private:
 	void firstFrameColl();
 
 	void dealDamageToTile(int x, int y);
+
+	std::function<void(std::unique_ptr<Drop>)> m_spawnDrop;
 
 	Entity* m_owner;
 
