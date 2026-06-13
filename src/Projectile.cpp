@@ -97,16 +97,7 @@ void Projectile::collision()
 	float t = 0, min_t = INFINITY;
 	vector<pair<int2, float>> collsList;
 
-	//check tile of projectile
-	if(m_owner->m_map[(int)hitbox.rect.y][(int)hitbox.rect.x]->getIsSolid())
-	{
-		isAlive = false;
-		return;
-	}
-	else if (!m_owner->m_map[(int)hitbox.rect.y][(int)hitbox.rect.x]->getTileType() != TILE_TYPE::NONE_TYPE)
-	{
-		dealDamageToTile((int)hitbox.rect.y, (int)hitbox.rect.x);
-	}
+	if (firstFrame) firstFrameColl();
 
 	// Work out collision point, add it to vector along with rect ID
 	for (int i = floor(hitbox.rect.y) - 1; i <= ceil(hitbox.rect.y + hitbox.rect.h); ++i)
@@ -132,8 +123,6 @@ void Projectile::collision()
 
 	for (auto j : collsList)
 	{
-		cout << "Projectile collided with tile at: " << j.first.x << ", " << j.first.y << " with normal: " << normalDirs[0].x << ", " << normalDirs[0].y << endl;
-
 		if(!m_owner->m_map[j.first.x][j.first.y]->getIsSolid())
 		{
 			dealDamageToTile(j.first.x, j.first.y);
@@ -144,16 +133,6 @@ void Projectile::collision()
 			return;
 		}
 	}
-
-	//for (Mob& mob : *m_mobs)
-	//{
-	//	if (DynamicRectVsRect(&hitbox.rect, velocity, mob.getMapRect(), cp, cn, t))
-	//	{
-	//		//mob.health -= damage;
-	//		isAlive = false;
-	//		return;
-	//	}
-	//}
 }
 
 void Projectile::calculateVelocity()
@@ -182,6 +161,27 @@ void Projectile::stopOutOfBounds()
 	{
 		isAlive = false;
 	}
+}
+
+void Projectile::firstFrameColl()
+{
+	for (int i = (int)(hitbox.rect.y); i <= (int)(hitbox.rect.y + hitbox.rect.h); ++i)
+	{
+		for (int j = (int)(hitbox.rect.x); j <= (int)(hitbox.rect.x + hitbox.rect.w); ++j)
+		{
+			if (m_owner->m_map[i][j]->getIsSolid())
+			{
+				isAlive = false;
+				return;
+			}
+			else if (!m_owner->m_map[i][j]->getTileType() != TILE_TYPE::NONE_TYPE)
+			{
+				dealDamageToTile(i, j);
+			}
+		}
+	}
+
+	firstFrame = false;
 }
 
 void Projectile::dealDamageToTile(int x, int y)

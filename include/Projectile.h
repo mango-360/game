@@ -21,6 +21,7 @@ private:
 	float2 calculateNetForce();
 	void applyVelocity();
 	void stopOutOfBounds();
+	void firstFrameColl();
 
 	void dealDamageToTile(int x, int y);
 
@@ -34,4 +35,6 @@ private:
 	vector<float2> normalDirs;
 
 	int damage;
+
+	bool firstFrame = true;
 };
