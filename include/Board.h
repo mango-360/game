@@ -59,6 +59,8 @@ private:
 	void handleEntityProjectileCollisions();
 	void handleProjectileTileCollisions();
 
+	void playerPickUpDrop();
+
 	bool drawStatistics = false;
 
 	SDL_Texture* m_background;

@@ -21,6 +21,7 @@ static const int TILE_SIZE = 32;
 static const int MAP_WIDTH = 320;
 static const int MAP_HEIGHT = 240;
 static const int LANDING_SPRITE_FRAME_DURATION = 5; 
+static const int INVENTORY_SIZE = 10; 
 
 static const float PROJECTILE_SIZE = 0.5f;
 

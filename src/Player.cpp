@@ -43,6 +43,10 @@ void Player::init(Tile(*map)[MAP_WIDTH])
 
 	landingStartSpriteFrame = 11;
 	NoJumpLandingSpriteFrame = 12;
+
+	//empty inventory
+	for(int i = 0; i < INVENTORY_SIZE; ++i) 
+		inventory[i].second = 0;
 }
 
 void Player::update()
@@ -55,9 +59,14 @@ void Player::updatePrePhysics()
 {
 	zoomUpdate();
 
-	shoot();
+	toggleInventory();
 
-	move();
+	if (!isInvOpen)
+	{
+		shoot();
+		move();
+	}
+
 	animateJump();
 	animateFall();
 	animateLand();
@@ -187,9 +196,52 @@ void Player::animateLand()
 	}
 }
 
-void Player::pickUpDrop()
+void Player::toggleInventory()
 {
+	if(InputManager::isKeyClicked(SDL_SCANCODE_GRAVE))
+	{
+		isInvOpen = !isInvOpen;
+		
+		//show Inventory
+		if (isInvOpen)
+		{
+			for(int i = 0; i < INVENTORY_SIZE; ++i)
+			{
+				if(inventory[i].second != 0)
+				{
+					cout << "Slot " << i + 1 << ": " << inventory[i].first.getDropType() << " x" << inventory[i].second << endl;
+				}
+				else
+				{
+					cout << "Slot " << i + 1 << ": Empty" << endl;
+				}
+			}
+		}
+	}
+}
 
+void Player::addToInventory(unique_ptr<Drop> drop)
+{
+	int openSlot = -1;
+
+	for(int i = INVENTORY_SIZE - 1; i >= 0; --i)
+	{
+		if(inventory[i].second == 0)
+		{
+			openSlot = i;
+		}
+		else if(inventory[i].first.getDropType() == drop->getDropType() && inventory[i].second < inventory[i].first.getStackSize())
+		{
+			openSlot = i;
+			break;
+		}
+	}
+
+	if (openSlot != -1)
+	{
+		inventory[openSlot].first = *drop;
+		inventory[openSlot].second++;
+	}
 }
 
 void Player::calculateVelocity()

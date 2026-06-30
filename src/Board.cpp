@@ -145,6 +145,7 @@ void Board::update()
 
 	// update drops
 	for (auto& drop : m_drops) drop->update();
+	playerPickUpDrop();
 
 	m_camera.update();
 
@@ -329,5 +330,21 @@ void Board::handleProjectileTileCollisions()
 		projectile->calculateVelocity();
 
 		projectile->collision();
+	}
+}
+
+void Board::playerPickUpDrop()
+{
+	for (auto it = m_drops.begin(); it != m_drops.end(); )
+	{
+		if (FcollRectRect(m_player.getMapRect(), (*it)->getGridRect()))
+		{
+			//SoundManager::playSound("pickup.wav");
+			// transfer ownership of the drop to the player
+			m_player.addToInventory(std::move(*it));
+			// remove null unique_ptr from board
+			it = m_drops.erase(it);
+		}
+		else ++it;
 	}
 }

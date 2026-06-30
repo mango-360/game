@@ -10,10 +10,18 @@ public:
 	void init(int2 coords, DROP_TYPE dropType);
 	void update();
 	void draw(float2 camCoords);
+	void destroy();
+	
+	int getStackSize() const { return stackSize; }
+	DROP_TYPE getDropType() const { return m_dropType; }
+
+	SDL_FRect getGridRect() const { return m_gridRect; }
 
 protected:
 	void zoomUpdate();
 
+	int stackSize = 5;
+	
 	Drawable m_dropDrawable;
 
 	DROP_TYPE m_dropType;
