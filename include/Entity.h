@@ -13,7 +13,6 @@ public:
 	Entity();
 	~Entity();
 	virtual void init(Tile(*map)[MAP_WIDTH] , string configFile);
-	virtual void update();
 	virtual void updatePrePhysics();
 	virtual void updatePostPhysics();
 	virtual void draw(float2 camCoords); // camera-aware draw

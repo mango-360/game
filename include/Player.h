@@ -15,7 +15,6 @@ public:
 	Player();
 	~Player();
 	void init(Tile(*map)[MAP_WIDTH]);
-	void update() override;
 	void updatePrePhysics() override;
 	void updatePostPhysics() override;
 	void setProjectileSpawner(function<void(unique_ptr<Projectile>)> spawner);
@@ -37,10 +36,12 @@ private:
 	std::function<void(std::unique_ptr<Projectile>)> m_spawnProjectile;
 
 	bool isInvOpen = false;
+	bool closingInv = false;
 
 	int lastKeyPressed = -1;
 	int framesOnGround = 0;
 	float moveSpeed;
+	float prevZoom;
 	float2 inputVelocity = { 0, 0 };
 
 	std::pair<Drop, int> inventory[INVENTORY_SIZE];

@@ -101,3 +101,14 @@ bool InputManager::isKeyUnclicked(SDL_Scancode code)
 {
 	return !m_keyboardState[code] && m_prevKeyboardState[code];
 }
+
+bool InputManager::changeZoom(float newZoom)
+{
+	if (newZoom != m_zoom)
+	{
+		m_zoom += zoomStep * (newZoom > m_zoom ? 1 : -1);
+		hasZoomChanged = true;
+		return true;
+	}
+	return false;
+}

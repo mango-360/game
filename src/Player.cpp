@@ -49,20 +49,26 @@ void Player::init(Tile(*map)[MAP_WIDTH])
 		inventory[i].second = 0;
 }
 
-void Player::update()
-{
-	updatePrePhysics();
-	updatePostPhysics();
-}
-
 void Player::updatePrePhysics()
 {
 	zoomUpdate();
 
 	toggleInventory();
 
-	if (!isInvOpen)
+	if (isInvOpen)
 	{
+		if(!InputManager::changeZoom(INVENTORY_ZOOM)) 
+		{
+			cout << "Zoom changed to: " << InputManager::getZoom() << endl;
+		}
+	}
+	else 
+	{
+		if(closingInv) 		
+		{
+			if(!InputManager::changeZoom(prevZoom)) 
+				closingInv = false;
+		}  
 		shoot();
 		move();
 	}
@@ -205,11 +211,13 @@ void Player::toggleInventory()
 		//show Inventory
 		if (isInvOpen)
 		{
-			for(int i = 0; i < INVENTORY_SIZE; ++i)
+			prevZoom = InputManager::getZoom();
+			for (int i = 0; i < INVENTORY_SIZE; ++i)
 			{
 				cout << "Slot " << i + 1 << ": " << inventory[i].first.getDropType() << " x" << inventory[i].second << endl;
 			}
 		}
+		else closingInv = true;
 	}
 }
 

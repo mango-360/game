@@ -24,6 +24,7 @@ static const int LANDING_SPRITE_FRAME_DURATION = 5;
 static const int INVENTORY_SIZE = 10; 
 
 static const float PROJECTILE_SIZE = 0.5f;
+static const float INVENTORY_ZOOM = 40.0f;
 
 struct float2
 {

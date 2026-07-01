@@ -24,7 +24,7 @@ public:
 	static bool isKeyUnclicked(SDL_Scancode code); 
 	static bool isZoomChanged() { return hasZoomChanged; };
 	static float getZoom() { return m_zoom; };
-
+	static bool changeZoom(float newZoom);
 
 private:
 	SDL_Event m_event;
@@ -34,10 +34,10 @@ private:
 	static bool m_mousePressed;
 	static bool hasZoomChanged;
 
-	const float zoomStep = 0.125f;
-	const float minZoom = 1.0f;
-	const float maxZoom = 5.0f;
-	
 	static float m_zoom;
+	static constexpr float zoomStep = 0.125f;
+	static constexpr float minZoom = 1.0f;
+	static constexpr float maxZoom = 5.0f;
+	
 	static Uint8 m_keyboardStateCopy[SDL_NUM_SCANCODES];  // ADD THIS
 }; 
