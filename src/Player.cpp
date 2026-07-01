@@ -207,14 +207,7 @@ void Player::toggleInventory()
 		{
 			for(int i = 0; i < INVENTORY_SIZE; ++i)
 			{
-				if(inventory[i].second != 0)
-				{
-					cout << "Slot " << i + 1 << ": " << inventory[i].first.getDropType() << " x" << inventory[i].second << endl;
-				}
-				else
-				{
-					cout << "Slot " << i + 1 << ": Empty" << endl;
-				}
+				cout << "Slot " << i + 1 << ": " << inventory[i].first.getDropType() << " x" << inventory[i].second << endl;
 			}
 		}
 	}
@@ -241,6 +234,8 @@ void Player::addToInventory(unique_ptr<Drop> drop)
 	{
 		inventory[openSlot].first = *drop;
 		inventory[openSlot].second++;
+
+		cout << "ITEM ADDED" << endl;
 	}
 }
 

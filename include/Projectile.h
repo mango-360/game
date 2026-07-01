@@ -40,6 +40,8 @@ private:
 
 	vector<float2> normalDirs;
 
+	TILE_TYPE canBreak[1] = { TILE_TYPE::BUSH };
+
 	int damage;
 
 	bool firstFrame = true;

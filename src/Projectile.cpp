@@ -49,7 +49,6 @@ void Projectile::init(Entity* owner)
 	}
 
 	velocity += m_owner->velocity; 
-
 }
 
 void Projectile::update()
@@ -105,7 +104,7 @@ void Projectile::collision()
 	{
 		for (int j = floor(hitbox.rect.x) - 1; j <= ceil(hitbox.rect.x + hitbox.rect.w); ++j)
 		{
-			if (m_owner->m_map[i][j]->getTileType() == TILE_TYPE::NONE_TYPE) continue;
+			if (m_owner->m_map[i][j]->getTileType() == TILE_TYPE::AIR) continue;
 
 			if (DynamicRectVsRect(&hitbox.rect, velocity, m_owner->m_map[i][j]->getTileGridRect(), cp, cn, t))
 			{
@@ -124,11 +123,9 @@ void Projectile::collision()
 
 	for (auto j : collsList)
 	{
-		if(!m_owner->m_map[j.first.x][j.first.y]->getIsSolid())
-		{
-			dealDamageToTile(j.first.x, j.first.y);
-		}
-		else
+		dealDamageToTile(j.first.x, j.first.y);
+
+		if(m_owner->m_map[j.first.x][j.first.y]->getIsSolid())
 		{
 			isAlive = false;
 			return;
@@ -175,14 +172,12 @@ void Projectile::firstFrameColl()
 	{
 		for (int j = (int)(hitbox.rect.x); j <= (int)(hitbox.rect.x + hitbox.rect.w); ++j)
 		{
+			dealDamageToTile(i, j);
+
 			if (m_owner->m_map[i][j]->getIsSolid())
 			{
 				isAlive = false;
 				return;
-			}
-			else if (!m_owner->m_map[i][j]->getTileType() != TILE_TYPE::NONE_TYPE)
-			{
-				dealDamageToTile(i, j);
 			}
 		}
 	}
@@ -192,7 +187,14 @@ void Projectile::firstFrameColl()
 
 void Projectile::dealDamageToTile(int x, int y)
 {
-	m_owner->m_map[x][y]->dealDamage(damage);
+	for (int i = 0; i < size(canBreak); ++i)
+	{
+		if ((int)m_owner->m_map[x][y]->getTileType() == (int)canBreak[i])
+		{
+			m_owner->m_map[x][y]->dealDamage(damage);
+			break;
+		}
+	}
 
 	if (m_owner->m_map[x][y]->isBroken()) {
 		auto drop = std::make_unique<Drop>();

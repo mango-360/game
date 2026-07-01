@@ -144,7 +144,9 @@ void Board::update()
 	destroyProjectiles();
 
 	// update drops
-	for (auto& drop : m_drops) drop->update();
+	for (auto& drop : m_drops) 
+		drop->update();
+
 	playerPickUpDrop();
 
 	m_camera.update();
@@ -335,6 +337,8 @@ void Board::handleProjectileTileCollisions()
 
 void Board::playerPickUpDrop()
 {
+	//cout << m_drops.size() << endl;
+
 	for (auto it = m_drops.begin(); it != m_drops.end(); )
 	{
 		if (FcollRectRect(m_player.getMapRect(), (*it)->getGridRect()))
@@ -344,6 +348,7 @@ void Board::playerPickUpDrop()
 			m_player.addToInventory(std::move(*it));
 			// remove null unique_ptr from board
 			it = m_drops.erase(it);
+			return;
 		}
 		else ++it;
 	}

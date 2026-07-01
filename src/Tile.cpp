@@ -14,8 +14,8 @@ void Tile::init(float2 coords)
 {
 	m_tile.texture = nullptr;
 	m_tile.rect = { 0, 0, static_cast<int>(TILE_SIZE * InputManager::getZoom()), static_cast<int>(TILE_SIZE * InputManager::getZoom()) };
-	m_hp = 0;
-	m_type = TILE_TYPE::NONE_TYPE;
+	m_hp = 1;
+	m_type = TILE_TYPE::AIR;
 	m_gridRect = { coords.x, coords.y, 1, 1 };
 	m_friction = 0;
 	m_isSolid = false;
@@ -47,8 +47,11 @@ void Tile::draw(float2 camCoords)
 void Tile::destroy()
 {
 	m_tile.texture = nullptr;
+	m_tile.rect = { 0, 0, static_cast<int>(TILE_SIZE * InputManager::getZoom()), static_cast<int>(TILE_SIZE * InputManager::getZoom()) };
+	m_hp = 1;
 	m_type = TILE_TYPE::AIR;
-	m_drop = DROP_TYPE::NONE_DROP;
+	m_friction = 0;
+	m_isSolid = false;
 }
 
 void Tile::updateZoom()
