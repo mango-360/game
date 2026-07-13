@@ -101,8 +101,7 @@ void Board::initMap()
 			m_map[y][i] = grassBlock;
 
 			// bush generation
-
-			uniform_int_distribution<int> bushChance(1, 10);
+			uniform_int_distribution<int> bushChance(1, BUSH_INVERSE_SPAWN_CHANCE);
 
 			if(bushChance(rng) == 1)
 			{
@@ -337,15 +336,12 @@ void Board::handleProjectileTileCollisions()
 	}
 }
 
-void Board::playerPickUpDrop()
+void Board::playerPickUpDrop() // erases drop even if inventory is full!!!
 {
-	//cout << m_drops.size() << endl;
-
 	for (auto it = m_drops.begin(); it != m_drops.end(); )
 	{
 		if (FcollRectRect(m_player.getMapRect(), (*it)->getGridRect()))
 		{
-			//SoundManager::playSound("pickup.wav");
 			// transfer ownership of the drop to the player
 			m_player.addToInventory(std::move(*it));
 			// remove null unique_ptr from board

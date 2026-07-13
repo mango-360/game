@@ -3,9 +3,11 @@
 #include "Entity.h"
 #include "Tile.h"
 #include "Drop.h"
+#include "TextField.h"
 #include <functional>
 #include <utility>
 #include <memory>
+#include <string>
 
 class Projectile;
 
@@ -32,7 +34,7 @@ private:
 	void animateLand();
 
 	void toggleInventory();
-	void initDropRect(Drop* drop);
+	void initDropInInventory(Drop* drop, int index);
 
 	void calculateVelocity() override;
 	void countFramesOnGround();
@@ -51,4 +53,6 @@ private:
 	std::pair<Drop, int> inventory[INVENTORY_SIZE];
 
 	DrawableWithOpacity m_inventorySlots[INVENTORY_SIZE];
+
+	TextField m_inventoryItemCount;
 };

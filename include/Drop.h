@@ -17,7 +17,7 @@ public:
 
 	SDL_FRect getGridRect() const { return m_gridRect; }
 
-	Drawable m_dropDrawable;
+	DrawableWithOpacity m_dropDrawable;
 protected:
 	void zoomUpdate();
 

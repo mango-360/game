@@ -50,7 +50,7 @@ void SoundManager::playSound(SOUND sound)
 	case ITEM_PICK_UP:
 		Mix_PlayChannel(1, m_itemPickUp, 0);
 
-		Mix_Volume(1, 50);
+		Mix_Volume(1, 25);
 		break;
 	default:
 		cout << "No such sound!" << endl;

@@ -22,9 +22,12 @@ static const int MAP_WIDTH = 320;
 static const int MAP_HEIGHT = 240;
 static const int LANDING_SPRITE_FRAME_DURATION = 5; 
 static const int INVENTORY_SIZE = 11; 
+static const int BUSH_INVERSE_SPAWN_CHANCE = 10;
 
 static const float PROJECTILE_SIZE = 0.5f;
 static const float INVENTORY_ZOOM = 40.0f;
+static const float INV_ITEM_COUNT_SLOT_RATIO = 0.7f;
+static const float OPEN_INV_END_MARGIN = 10.0f;
 
 struct float2
 {
@@ -112,7 +115,7 @@ struct FDrawableWithSrc : public FDrawable
 
 struct DrawableWithOpacity : public Drawable
 {
-	int opacity = 0;
+	int opacity = 255;
 };
 
 struct Camera_Rect

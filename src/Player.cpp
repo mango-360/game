@@ -7,7 +7,6 @@
 
 #include "Projectile.h"
 
-
 Player::Player()
 {
 }
@@ -223,13 +222,10 @@ void Player::toggleInventory()
 	}
 }
 
-void Player::initDropRect(Drop* drop)
+void Player::initDropInInventory(Drop* drop, int index)
 {
-	/*drop->m_dropDrawable.rect = {
-		drop->getGridRect().x * TILE_SIZE * InputManager::getZoom(),
-		drop->getGridRect().y * TILE_SIZE * InputManager::getZoom(),
-		drop->getGridRect().w * TILE_SIZE * InputManager::getZoom(),
-		drop->getGridRect().h* TILE_SIZE* InputManager::getZoom() };*/
+	drop->m_dropDrawable.rect = m_inventorySlots[index].rect;
+	drop->m_dropDrawable.opacity = 0;
 }
 
 void Player::addToInventory(unique_ptr<Drop> drop)
@@ -253,6 +249,8 @@ void Player::addToInventory(unique_ptr<Drop> drop)
 	{
 		inventory[openSlot].first = *drop;
 		inventory[openSlot].second++;
+		
+		initDropInInventory(&inventory[openSlot].first, openSlot);
 
 		SoundManager::playSound(SOUND::ITEM_PICK_UP);
 	}
@@ -293,16 +291,31 @@ void Player::initInventory()
 	//empty inventory
 	for (int i = 0; i < INVENTORY_SIZE; ++i)
 		inventory[i].second = 0;
+
+	m_inventoryItemCount.init("inventoryTextField.txt");
 }
 
 void Player::drawInventory()
 {
-	if ((isInvOpen || closingInv) && InputManager::getZoom() >= INVENTORY_ZOOM - 10.0f)
+	if ((isInvOpen || closingInv) && InputManager::getZoom() >= INVENTORY_ZOOM - OPEN_INV_END_MARGIN)
 	{
 		for (int i = 0; i < INVENTORY_SIZE; ++i)
 		{
-			m_inventorySlots[i].opacity = (int)((InputManager::getZoom() - INVENTORY_ZOOM + 10.0f) * 25.5f);
+			m_inventorySlots[i].opacity = (int)((InputManager::getZoom() - INVENTORY_ZOOM + OPEN_INV_END_MARGIN) * (255.0f / OPEN_INV_END_MARGIN));
+			inventory[i].first.m_dropDrawable.opacity = m_inventorySlots[i].opacity;
+
 			drawObject(m_inventorySlots[i]);
+			drawObject(inventory[i].first.m_dropDrawable);
+
+			if(inventory[i].second > 1)
+			{
+				m_inventoryItemCount.setText(to_string(inventory[i].second),
+					{ (int)(m_inventorySlots[i].rect.x + m_inventorySlots[i].rect.w * INV_ITEM_COUNT_SLOT_RATIO), (int)(m_inventorySlots[i].rect.y + m_inventorySlots[i].rect.h * INV_ITEM_COUNT_SLOT_RATIO) }, 
+					true, 
+					inventory[i].first.m_dropDrawable.opacity);
+
+				m_inventoryItemCount.draw();
+			}
 		}
 	}
 }
