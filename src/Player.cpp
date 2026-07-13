@@ -1,6 +1,10 @@
 #include "Player.h"
 #include <Presenter.h>
+
 #include "InputManager.h"
+#include "SoundManager.h"
+#include "ImgManager.h"
+
 #include "Projectile.h"
 
 
@@ -44,9 +48,7 @@ void Player::init(Tile(*map)[MAP_WIDTH])
 	landingStartSpriteFrame = 11;
 	NoJumpLandingSpriteFrame = 12;
 
-	//empty inventory
-	for(int i = 0; i < INVENTORY_SIZE; ++i) 
-		inventory[i].second = 0;
+	initInventory();
 }
 
 void Player::updatePrePhysics()
@@ -59,7 +61,7 @@ void Player::updatePrePhysics()
 	{
 		if(!InputManager::changeZoom(INVENTORY_ZOOM)) 
 		{
-			cout << "Zoom changed to: " << InputManager::getZoom() << endl;
+			
 		}
 	}
 	else 
@@ -211,7 +213,7 @@ void Player::toggleInventory()
 		//show Inventory
 		if (isInvOpen)
 		{
-			prevZoom = InputManager::getZoom();
+			if(!closingInv) prevZoom = InputManager::getZoom();
 			for (int i = 0; i < INVENTORY_SIZE; ++i)
 			{
 				cout << "Slot " << i + 1 << ": " << inventory[i].first.getDropType() << " x" << inventory[i].second << endl;
@@ -219,6 +221,15 @@ void Player::toggleInventory()
 		}
 		else closingInv = true;
 	}
+}
+
+void Player::initDropRect(Drop* drop)
+{
+	/*drop->m_dropDrawable.rect = {
+		drop->getGridRect().x * TILE_SIZE * InputManager::getZoom(),
+		drop->getGridRect().y * TILE_SIZE * InputManager::getZoom(),
+		drop->getGridRect().w * TILE_SIZE * InputManager::getZoom(),
+		drop->getGridRect().h* TILE_SIZE* InputManager::getZoom() };*/
 }
 
 void Player::addToInventory(unique_ptr<Drop> drop)
@@ -243,7 +254,56 @@ void Player::addToInventory(unique_ptr<Drop> drop)
 		inventory[openSlot].first = *drop;
 		inventory[openSlot].second++;
 
-		cout << "ITEM ADDED" << endl;
+		SoundManager::playSound(SOUND::ITEM_PICK_UP);
+	}
+}
+
+void Player::initInventory()
+{
+	string tmp;
+
+	int2 startPos;
+
+	int dimentions, gapWidth, rowSpacing;
+	int firstRowNum, secondRowNum, thirdRowNum;
+
+	fstream stream;
+
+	stream.open(CONFIG_FOLDER + "inventory.txt");
+
+	stream >> tmp >> startPos;
+	stream >> tmp >> dimentions;
+	stream >> tmp >> gapWidth;
+	stream >> tmp >> rowSpacing;
+
+	stream >> tmp >> firstRowNum;
+	stream >> tmp >> secondRowNum;
+	stream >> tmp >> thirdRowNum;
+
+	stream.close();
+
+	for (int i = 0; i < INVENTORY_SIZE; ++i)
+	{
+		m_inventorySlots[i].texture = ImgManager::m_slotImg;
+		if(i < firstRowNum) m_inventorySlots[i].rect = { startPos.x + (dimentions + gapWidth) * i, startPos.y, dimentions, dimentions };
+		else if(i < firstRowNum + secondRowNum) m_inventorySlots[i].rect = { startPos.x + (dimentions + gapWidth) * (i - firstRowNum - 1), startPos.y + rowSpacing + dimentions, dimentions, dimentions };
+		else m_inventorySlots[i].rect = { startPos.x + (dimentions + gapWidth) * (i - firstRowNum - secondRowNum), startPos.y + rowSpacing * 2 + dimentions * 2, dimentions, dimentions };
+	}
+
+	//empty inventory
+	for (int i = 0; i < INVENTORY_SIZE; ++i)
+		inventory[i].second = 0;
+}
+
+void Player::drawInventory()
+{
+	if ((isInvOpen || closingInv) && InputManager::getZoom() >= INVENTORY_ZOOM - 10.0f)
+	{
+		for (int i = 0; i < INVENTORY_SIZE; ++i)
+		{
+			m_inventorySlots[i].opacity = (int)((InputManager::getZoom() - INVENTORY_ZOOM + 10.0f) * 25.5f);
+			drawObject(m_inventorySlots[i]);
+		}
 	}
 }
 

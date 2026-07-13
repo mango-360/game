@@ -20,7 +20,10 @@ public:
 	void setProjectileSpawner(function<void(unique_ptr<Projectile>)> spawner);
 	
 	void addToInventory(unique_ptr<Drop> drop);
+	void drawInventory();
 private:
+	void initInventory();
+
 	void shoot();
 	void move() override;
 	void moveVertical() override;
@@ -29,6 +32,7 @@ private:
 	void animateLand();
 
 	void toggleInventory();
+	void initDropRect(Drop* drop);
 
 	void calculateVelocity() override;
 	void countFramesOnGround();
@@ -45,4 +49,6 @@ private:
 	float2 inputVelocity = { 0, 0 };
 
 	std::pair<Drop, int> inventory[INVENTORY_SIZE];
+
+	DrawableWithOpacity m_inventorySlots[INVENTORY_SIZE];
 };

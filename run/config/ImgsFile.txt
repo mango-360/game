@@ -4,3 +4,4 @@ dirtBlock.bmp
 bush.bmp
 DROP_IMAGES
 stick_drop.bmp
+SLOT_IMAGE: bobInventorySlot.bmp

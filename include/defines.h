@@ -21,7 +21,7 @@ static const int TILE_SIZE = 32;
 static const int MAP_WIDTH = 320;
 static const int MAP_HEIGHT = 240;
 static const int LANDING_SPRITE_FRAME_DURATION = 5; 
-static const int INVENTORY_SIZE = 10; 
+static const int INVENTORY_SIZE = 11; 
 
 static const float PROJECTILE_SIZE = 0.5f;
 static const float INVENTORY_ZOOM = 40.0f;
@@ -110,6 +110,11 @@ struct FDrawableWithSrc : public FDrawable
 	SDL_FRect srcRect;
 };
 
+struct DrawableWithOpacity : public Drawable
+{
+	int opacity = 0;
+};
+
 struct Camera_Rect
 {
 	float x, y, w, h;
@@ -118,8 +123,7 @@ struct Camera_Rect
 enum SOUND
 {
 	BACKGROUND_MUSIC,
-	X_PLACE,
-	O_PLACE,
+	ITEM_PICK_UP,
 };
 
 enum GAME_STATE

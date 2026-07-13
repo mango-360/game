@@ -5,6 +5,7 @@ SDL_Texture* ImgManager::m_grassBlockTexture = nullptr;
 SDL_Texture* ImgManager::m_dirtBlockTexture = nullptr;
 SDL_Texture* ImgManager::m_bushTexture = nullptr;
 SDL_Texture* ImgManager::m_stickTexture = nullptr;
+SDL_Texture* ImgManager::m_slotImg = nullptr;
 
 ImgManager::ImgManager()
 {
@@ -16,7 +17,7 @@ ImgManager::~ImgManager()
 
 void ImgManager::loadAllTextures()
 {
-	string ImgsFile = "ImgsFile.txt", tmp, grassBlockImg, dirtBlockImg, bushImg;
+	string ImgsFile = "ImgsFile.txt", tmp, grassBlockImg, dirtBlockImg, bushImg, slotImg;
 	string stickImg;
 	fstream stream;
 	stream.open(CONFIG_FOLDER + ImgsFile);
@@ -31,6 +32,8 @@ void ImgManager::loadAllTextures()
 
 	stream >> stickImg;
 
+	stream >> tmp >> slotImg;
+
 	stream.close();
 
 	m_grassBlockTexture = loadTexture(TILES_FOLDER + grassBlockImg);
@@ -38,6 +41,8 @@ void ImgManager::loadAllTextures()
 	m_bushTexture = loadTexture(TILES_FOLDER + bushImg);
 
 	m_stickTexture = loadTexture(TILES_FOLDER + DROPS_FOLDER + stickImg);
+
+	m_slotImg = loadTexture(slotImg);
 }
 
 void ImgManager::destroyAllTextures()

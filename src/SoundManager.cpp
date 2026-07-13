@@ -1,8 +1,7 @@
 #include "SoundManager.h"
 
 Mix_Chunk* SoundManager::m_backgroundMusic = nullptr;
-Mix_Chunk* SoundManager::m_xPlace = nullptr;
-Mix_Chunk* SoundManager::m_oPlace = nullptr;
+Mix_Chunk* SoundManager::m_itemPickUp = nullptr;
 
 SoundManager::SoundManager()
 {
@@ -16,13 +15,12 @@ void SoundManager::init()
 {
 	fstream stream;
 
-	string tmp, backgroundMusic, xPlace, oPlace;
+	string tmp, backgroundMusic, itemPickUp;
 
 	stream.open(CONFIG_FOLDER + "soundManager.txt");
 
 	stream >> tmp >> backgroundMusic;
-	stream >> tmp >> xPlace;
-	stream >> tmp >> oPlace;
+	stream >> tmp >> itemPickUp;
 
 	stream.close();
 
@@ -33,10 +31,9 @@ void SoundManager::init()
 	}
 
 	m_backgroundMusic = Mix_LoadWAV((SOUND_FOLDER + backgroundMusic).c_str());
-	m_xPlace = Mix_LoadWAV((SOUND_FOLDER + xPlace).c_str());
-	m_oPlace = Mix_LoadWAV((SOUND_FOLDER + oPlace).c_str());
+	m_itemPickUp = Mix_LoadWAV((SOUND_FOLDER + itemPickUp).c_str());
 
-	Mix_AllocateChannels(3);
+	Mix_AllocateChannels(2);
 
 	playSound(BACKGROUND_MUSIC);
 }
@@ -50,15 +47,10 @@ void SoundManager::playSound(SOUND sound)
 
 		Mix_Volume(0, 1);
 		break;
-	case X_PLACE:
-		Mix_PlayChannel(1, m_xPlace, 0);
+	case ITEM_PICK_UP:
+		Mix_PlayChannel(1, m_itemPickUp, 0);
 
 		Mix_Volume(1, 50);
-		break;
-	case O_PLACE:
-		Mix_PlayChannel(2, m_oPlace, 0);
-
-		Mix_Volume(2, 50);
 		break;
 	default:
 		cout << "No such sound!" << endl;
@@ -69,10 +61,8 @@ void SoundManager::playSound(SOUND sound)
 void SoundManager::destroy()
 {
 	Mix_FreeChunk(m_backgroundMusic);
-	Mix_FreeChunk(m_xPlace);
-	Mix_FreeChunk(m_oPlace);
+	Mix_FreeChunk(m_itemPickUp);
 
 	m_backgroundMusic = nullptr;
-	m_xPlace = nullptr;
-	m_oPlace = nullptr;
+	m_itemPickUp = nullptr;
 }

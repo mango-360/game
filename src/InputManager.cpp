@@ -106,9 +106,17 @@ bool InputManager::changeZoom(float newZoom)
 {
 	if (newZoom != m_zoom)
 	{
-		m_zoom += zoomStep * (newZoom > m_zoom ? 1 : -1);
+		if (abs(newZoom - m_zoom) < 5 * zoomStep)
+		{
+			m_zoom = newZoom;
+			hasZoomChanged = true;
+			return true;
+		}
+
+		m_zoom += 5 * zoomStep * (newZoom > m_zoom ? 1 : -1);
 		hasZoomChanged = true;
 		return true;
+
 	}
 	return false;
 }

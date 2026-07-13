@@ -15,6 +15,8 @@ public:
 
 	static SDL_Texture* m_stickTexture;
 
+	static SDL_Texture* m_slotImg;
+
 	void loadAllTextures();
 	void destroyAllTextures();
 };

@@ -173,6 +173,8 @@ void Board::draw()
 	if (drawStatistics) m_statistics.draw();
 
 	m_dialog.draw();
+
+	m_player.drawInventory();
 }
 
 void Board::destroy()

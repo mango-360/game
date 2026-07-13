@@ -22,6 +22,7 @@ public:
 	static void drawObject(SDL_Texture* texture);
 	static void drawObject(Drawable& drawable);
 	static void drawObject(DrawableWithSrc& drawableWithSrc);
+	static void drawObject(DrawableWithOpacity& drawableWithOpacity);
 
 private:
 	void improveRederer();

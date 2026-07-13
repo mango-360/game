@@ -17,12 +17,12 @@ public:
 
 	SDL_FRect getGridRect() const { return m_gridRect; }
 
+	Drawable m_dropDrawable;
 protected:
 	void zoomUpdate();
 
 	int stackSize = 5;
 	
-	Drawable m_dropDrawable;
 
 	DROP_TYPE m_dropType;
 	TILE_TYPE m_dropTileType;
