@@ -23,6 +23,8 @@ static const int MAP_HEIGHT = 240;
 static const int LANDING_SPRITE_FRAME_DURATION = 5; 
 static const int INVENTORY_SIZE = 11; 
 static const int BUSH_INVERSE_SPAWN_CHANCE = 10;
+static const int STATISTICS_DELAY = 60;
+static const int STATISTICS_HITBOX_OPACITY = 100;
 
 static const float PROJECTILE_SIZE = 0.5f;
 static const float INVENTORY_ZOOM = 40.0f;
@@ -114,6 +116,11 @@ struct FDrawableWithSrc : public FDrawable
 };
 
 struct DrawableWithOpacity : public Drawable
+{
+	int opacity = 255;
+};
+
+struct FDrawableWithOpacity : public FDrawable
 {
 	int opacity = 255;
 };

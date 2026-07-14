@@ -142,7 +142,6 @@ void Board::update()
 
 	destroyProjectiles();
 
-	// update drops
 	for (auto& drop : m_drops) 
 		drop->update();
 
@@ -152,8 +151,8 @@ void Board::update()
 
 	updateMap();
 
-	toggleStatistics();
-	if(drawStatistics) m_statistics.update();
+	m_statistics.toggleStatistics();
+	if(m_statistics.drawStatistics) m_statistics.update();
 
 	m_dialog.update();
 	
@@ -169,7 +168,7 @@ void Board::draw()
 	for (auto& drop : m_drops) drop->draw({ m_camera.getCameraRect().x, m_camera.getCameraRect().y });
 	for (auto& entity : m_entities) entity->draw({ m_camera.getCameraRect().x, m_camera.getCameraRect().y });
 
-	if (drawStatistics) m_statistics.draw();
+	if (m_statistics.drawStatistics) m_statistics.draw();
 
 	m_dialog.draw();
 
@@ -208,11 +207,6 @@ void Board::drawMap()
 			m_map[y][x].draw({ camRect.x, camRect.y });
 		}
 	}
-}
-
-void Board::toggleStatistics()
-{
-	if(InputManager::isKeyClicked(SDL_SCANCODE_F3)) drawStatistics = !drawStatistics;
 }
 
 void Board::destroyProjectiles()

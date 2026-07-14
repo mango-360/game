@@ -55,7 +55,7 @@ protected:
 	float2 netForce;
 	float2 friction;
 
-	FDrawable hitbox;
+	FDrawableWithOpacity hitbox;
 
 	vector<float2> normalDirs;
 

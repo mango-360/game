@@ -50,7 +50,6 @@ public:
 private:
 	void updateMap();
 	void drawMap();
-	void toggleStatistics();
 	void destroyProjectiles();
 
 	void handleCollisions();
@@ -60,8 +59,6 @@ private:
 	void handleProjectileTileCollisions();
 
 	void playerPickUpDrop();
-
-	bool drawStatistics = false;
 
 	SDL_Texture* m_background;
 

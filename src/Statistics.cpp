@@ -2,6 +2,7 @@
 #include "World.h"
 extern World world;
 
+bool Statistics::drawHitbox = false;
 
 Statistics::Statistics()
 {
@@ -50,8 +51,6 @@ void Statistics::init()
 	}
 
 	stream.close();
-
-
 }
 
 void Statistics::update()
@@ -71,7 +70,9 @@ void Statistics::update()
 	if (InputManager::isKeyClicked(SDL_SCANCODE_D)) m_keyboard[3].srcRect.x = 32;
 	else if (InputManager::isKeyUnclicked(SDL_SCANCODE_D)) m_keyboard[3].srcRect.x = 0;
 
-	if (InputManager::isKeyPressed(SDL_SCANCODE_M)) SDL_Delay(60); // SLOW MOTION
+	if (InputManager::isKeyPressed(SDL_SCANCODE_M)) SDL_Delay(STATISTICS_DELAY); 
+
+	toggleHitboxDraw();
 }
 
 void Statistics::draw()
@@ -84,7 +85,26 @@ void Statistics::draw()
 	Presenter::drawObject(m_keyboard[3]);
 }
 
+void Statistics::drawHitboxes(static DrawableWithOpacity& drawable)
+{
+	if (drawHitbox) drawObject(drawable);
+}
+
 void Statistics::destroy()
 {
 	m_position.destroy();
+}
+
+void Statistics::toggleStatistics()
+{
+	if (InputManager::isKeyClicked(SDL_SCANCODE_F3)) 
+		drawStatistics = !drawStatistics;
+	if (!drawStatistics) 
+		drawHitbox = false;
+}
+
+void Statistics::toggleHitboxDraw()
+{
+	if (InputManager::isKeyClicked(SDL_SCANCODE_H)) 
+		drawHitbox = !drawHitbox;
 }

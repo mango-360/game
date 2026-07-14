@@ -209,14 +209,9 @@ void Player::toggleInventory()
 	{
 		isInvOpen = !isInvOpen;
 		
-		//show Inventory
 		if (isInvOpen)
 		{
 			if(!closingInv) prevZoom = InputManager::getZoom();
-			for (int i = 0; i < INVENTORY_SIZE; ++i)
-			{
-				cout << "Slot " << i + 1 << ": " << inventory[i].first.getDropType() << " x" << inventory[i].second << endl;
-			}
 		}
 		else closingInv = true;
 	}

@@ -1,6 +1,7 @@
 #include "Entity.h"
 #include "Presenter.h"
 #include "InputManager.h"
+#include "Statistics.h"
 
 Tile* Entity::m_map[MAP_HEIGHT][MAP_WIDTH] = { nullptr };
 
@@ -67,11 +68,11 @@ void Entity::draw(float2 camCoords)
 	{
 		round((hitbox.rect.x - camCoords.x) * (TILE_SIZE * InputManager::getZoom())),
 		round((hitbox.rect.y - camCoords.y) * (TILE_SIZE * InputManager::getZoom())),
-		round(hitbox.rect.w * (TILE_SIZE * InputManager::getZoom())),
+		round(hitbox.rect.w * (TILE_SIZE * InputManager::getZoom())), 
 		round(hitbox.rect.h * (TILE_SIZE * InputManager::getZoom()))
 	};
 
-	Drawable tmp = { hitbox.img, hitbox.texture, tmpHitboxRect };
+	DrawableWithOpacity tmp = { hitbox.img, hitbox.texture, tmpHitboxRect, STATISTICS_HITBOX_OPACITY };
 	DrawableWithSrc tmpEntity = { tmp, srcRect };
 	tmpEntity.rect =
 	{
@@ -83,7 +84,7 @@ void Entity::draw(float2 camCoords)
 	tmpEntity.texture = texture;
 
 	drawObject(tmpEntity);
-	//drawObject(tmp); //hitbox
+	Statistics::drawHitboxes(tmp);
 }
 
 int2 Entity::getIntCoords()
