@@ -1,4 +1,5 @@
 #include "Engine.h"
+#include "InputManager.h"
 
 SDL_Texture* LoadTexture(string imgPath, SDL_Renderer* renderer)
 {
@@ -21,8 +22,10 @@ SDL_Texture* LoadTexture(string imgPath, SDL_Renderer* renderer)
 	return texture;
 }
 
-bool isMouseInRect(int2 mouseCoor, SDL_Rect rect)
+bool isMouseInRect(SDL_Rect rect)
 {
+	int2 mouseCoor = InputManager::m_mouseCoor;
+
     if (mouseCoor.x >= rect.x && mouseCoor.x <= rect.x + rect.w && 
         mouseCoor.y >= rect.y && mouseCoor.y <= rect.y + rect.h) 
         return true;

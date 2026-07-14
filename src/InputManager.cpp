@@ -1,6 +1,7 @@
 #include "InputManager.h"
 
-bool InputManager::m_mousePressed = false;
+bool InputManager::m_mouseClicked = false;
+bool InputManager::m_mouseReleased = false;
 bool InputManager::hasZoomChanged = false;
 int2 InputManager::m_mouseCoor = {0, 0};
 const Uint8* InputManager::m_keyboardState = nullptr;
@@ -26,7 +27,8 @@ void InputManager::handleInput()
 		m_prevKeyboardState = m_keyboardStateCopy;
 	}
 
-	m_mousePressed = false;
+	m_mouseClicked = false;
+	m_mouseReleased = false;
 	hasZoomChanged = false;
 
 	while (SDL_PollEvent(&m_event))
@@ -40,7 +42,11 @@ void InputManager::handleInput()
 			break;
 		case SDL_MOUSEBUTTONDOWN:
 			if (m_event.button.button == SDL_BUTTON_LEFT)
-				m_mousePressed = true;
+				m_mouseClicked = true;
+			break;
+		case SDL_MOUSEBUTTONUP:
+			if (m_event.button.button == SDL_BUTTON_LEFT)
+				m_mouseReleased = true;
 			break;
 		case SDL_MOUSEWHEEL:
 			if (m_event.wheel.y > 0) // Toward Screen
@@ -69,9 +75,14 @@ void InputManager::setMouseMultiply(float2 multiplier)
 	m_mouseMultiplier = multiplier;
 }
 
-bool InputManager::isMousePressed()
+bool InputManager::isMouseClicked()
 {
-	return m_mousePressed;
+	return m_mouseClicked;
+}
+
+bool InputManager::isMouseReleased()
+{
+	return m_mouseReleased;
 }
 
 bool InputManager::isAnyKeyPressed()

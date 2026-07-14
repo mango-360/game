@@ -21,7 +21,7 @@ void TitleScreen::run()
 {
 	drawObject(m_background);
 
-	if (InputManager::isMousePressed() || InputManager::isAnyKeyPressed())
+	if (InputManager::isMouseClicked() || InputManager::isAnyKeyPressed())
 	{
 		world.m_stateManager.changeState(GAME_STATE::GAME);
 		return;

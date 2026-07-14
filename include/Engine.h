@@ -3,7 +3,7 @@
 #include "defines.h"
 
 SDL_Texture* LoadTexture(string imgPath, SDL_Renderer* renderer);
-bool isMouseInRect(int2 mouseCoor, SDL_Rect rect);
+bool isMouseInRect(SDL_Rect rect);
 bool collRectRect(SDL_Rect rect1, SDL_Rect rect2);
 bool FcollRectRect(SDL_FRect rect1, SDL_FRect rect2);
 bool FcollRayRect(float2 rayOrigin, float2 rayDir, SDL_FRect* rect, float2& contactPoint, float2& contactNormal, float& tHitNear);

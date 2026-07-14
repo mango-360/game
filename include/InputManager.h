@@ -17,7 +17,8 @@ public:
 	void handleInput();
 	void setMouseMultiply(float2 multiplier);
 
-	static bool isMousePressed();
+	static bool isMouseClicked();
+	static bool isMouseReleased();
 	static bool isAnyKeyPressed();
 	static bool isKeyPressed(SDL_Scancode code);
 	static bool isKeyClicked(SDL_Scancode code); 
@@ -31,7 +32,8 @@ private:
 
 	float2 m_mouseMultiplier;
 
-	static bool m_mousePressed;
+	static bool m_mouseClicked;
+	static bool m_mouseReleased;
 	static bool hasZoomChanged;
 
 	static float m_zoom;

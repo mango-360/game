@@ -22,6 +22,7 @@ public:
 	void setProjectileSpawner(function<void(unique_ptr<Projectile>)> spawner);
 	
 	void addToInventory(unique_ptr<Drop> drop);
+	void updateInventory();
 	void drawInventory();
 private:
 	void initInventory();
@@ -46,6 +47,8 @@ private:
 
 	int lastKeyPressed = -1;
 	int framesOnGround = 0;
+	int activeSlotIndex = -1;
+
 	float moveSpeed;
 	float prevZoom;
 	float2 inputVelocity = { 0, 0 };

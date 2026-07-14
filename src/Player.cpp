@@ -60,7 +60,7 @@ void Player::updatePrePhysics()
 	{
 		if(!InputManager::changeZoom(INVENTORY_ZOOM)) 
 		{
-			
+			updateInventory();
 		}
 	}
 	else 
@@ -99,7 +99,7 @@ void Player::setProjectileSpawner(function<void(unique_ptr<Projectile>)> spawner
 
 void Player::shoot()
 {
-    if ((InputManager::isKeyClicked(SDL_SCANCODE_P) || InputManager::isMousePressed()) && m_spawnProjectile)
+    if ((InputManager::isKeyClicked(SDL_SCANCODE_P) || InputManager::isMouseClicked()) && m_spawnProjectile)
     {
         auto projectile = std::make_unique<Projectile>();
         projectile->init(this);
@@ -248,6 +248,54 @@ void Player::addToInventory(unique_ptr<Drop> drop)
 		initDropInInventory(&inventory[openSlot].first, openSlot);
 
 		SoundManager::playSound(SOUND::ITEM_PICK_UP);
+	}
+}
+
+void Player::updateInventory()
+{
+	if (InputManager::isMouseClicked())
+	{
+		activeSlotIndex = -1;
+
+		for (int i = 0; i < INVENTORY_SIZE; ++i)
+		{
+			if (isMouseInRect(m_inventorySlots[i].rect))
+			{
+				activeSlotIndex = i;
+			}
+		}
+	}
+
+	if(InputManager::isMouseReleased())
+	{
+		for (int i = 0; i < INVENTORY_SIZE; ++i)
+		{
+			if (isMouseInRect(m_inventorySlots[i].rect) // check for released slot
+				&& activeSlotIndex != i && activeSlotIndex != -1 && inventory[activeSlotIndex].second > 0   // check for a different occupied active slot
+				&& inventory[i].second < inventory[i].first.getStackSize()) //check for stack size
+			{
+				if (inventory[i].first.getDropType() != inventory[activeSlotIndex].first.getDropType())
+					swap(inventory[i], inventory[activeSlotIndex]);
+				else
+				{
+					if(inventory[activeSlotIndex].second + inventory[i].second <= inventory[i].first.getStackSize())
+					{
+						inventory[i].second += inventory[activeSlotIndex].second;
+						inventory[activeSlotIndex].second = 0;
+					}
+					else
+					{
+						int spaceLeft = inventory[i].first.getStackSize() - inventory[i].second;
+						inventory[i].second += spaceLeft;
+						inventory[activeSlotIndex].second -= spaceLeft;
+					}
+				}
+				initDropInInventory(&inventory[activeSlotIndex].first, activeSlotIndex);
+				initDropInInventory(&inventory[i].first, i);
+
+				break;
+			}
+		}
 	}
 }
 
