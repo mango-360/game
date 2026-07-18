@@ -2,6 +2,8 @@
 
 bool InputManager::m_mouseClicked = false;
 bool InputManager::m_mouseReleased = false;
+bool InputManager::m_mouseDown = false;
+bool InputManager::m_mouseRightClicked = false;
 bool InputManager::hasZoomChanged = false;
 int2 InputManager::m_mouseCoor = {0, 0};
 const Uint8* InputManager::m_keyboardState = nullptr;
@@ -29,6 +31,7 @@ void InputManager::handleInput()
 
 	m_mouseClicked = false;
 	m_mouseReleased = false;
+	m_mouseRightClicked = false;
 	hasZoomChanged = false;
 
 	while (SDL_PollEvent(&m_event))
@@ -42,11 +45,21 @@ void InputManager::handleInput()
 			break;
 		case SDL_MOUSEBUTTONDOWN:
 			if (m_event.button.button == SDL_BUTTON_LEFT)
+			{
 				m_mouseClicked = true;
+				m_mouseDown = true;
+			}
+
+			if (m_event.button.button == SDL_BUTTON_RIGHT)
+				m_mouseRightClicked = true;
+
 			break;
 		case SDL_MOUSEBUTTONUP:
 			if (m_event.button.button == SDL_BUTTON_LEFT)
+			{
 				m_mouseReleased = true;
+				m_mouseDown = false;
+			}
 			break;
 		case SDL_MOUSEWHEEL:
 			if (m_event.wheel.y > 0) // Toward Screen
@@ -83,6 +96,16 @@ bool InputManager::isMouseClicked()
 bool InputManager::isMouseReleased()
 {
 	return m_mouseReleased;
+}
+
+bool InputManager::isMouseDown()
+{
+	return m_mouseDown;
+}
+
+bool InputManager::isMouseRightClicked()
+{
+	return m_mouseRightClicked;
 }
 
 bool InputManager::isAnyKeyPressed()

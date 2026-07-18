@@ -11,6 +11,8 @@ public:
 	void update();
 	void draw(float2 camCoords);
 	void destroy();
+
+	void reset();
 	
 	int getStackSize() const { return stackSize; }
 	DROP_TYPE getDropType() const { return m_dropType; }

@@ -55,6 +55,19 @@ void Drop::draw(float2 camCoords)
     drawObject(m_dropDrawable);
 }
 
+void Drop::destroy()
+{
+    m_dropDrawable.texture = nullptr;
+}
+
+void Drop::reset()
+{
+    m_dropType = DROP_TYPE::NONE_DROP;
+    m_dropTileType = TILE_TYPE::NONE_TYPE;
+    m_dropDrawable.rect = { -1, -1, 0, 0 };
+    m_dropDrawable.texture = nullptr;
+}
+
 void Drop::zoomUpdate()
 {
     if (InputManager::isZoomChanged())

@@ -19,6 +19,8 @@ public:
 
 	static bool isMouseClicked();
 	static bool isMouseReleased();
+	static bool isMouseDown();
+	static bool isMouseRightClicked();
 	static bool isAnyKeyPressed();
 	static bool isKeyPressed(SDL_Scancode code);
 	static bool isKeyClicked(SDL_Scancode code); 
@@ -34,6 +36,8 @@ private:
 
 	static bool m_mouseClicked;
 	static bool m_mouseReleased;
+	static bool m_mouseDown;
+	static bool m_mouseRightClicked;
 	static bool hasZoomChanged;
 
 	static float m_zoom;

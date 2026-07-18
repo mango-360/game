@@ -67,6 +67,8 @@ void Player::updatePrePhysics()
 	{
 		if(closingInv) 		
 		{
+			closeInventory();
+
 			if(!InputManager::changeZoom(prevZoom)) 
 				closingInv = false;
 		}  
@@ -217,10 +219,16 @@ void Player::toggleInventory()
 	}
 }
 
-void Player::initDropInInventory(Drop* drop, int index)
+void Player::initDropInInventory(int index)
 {
-	drop->m_dropDrawable.rect = m_inventorySlots[index].rect;
-	drop->m_dropDrawable.opacity = 0;
+	inventory[index].first.m_dropDrawable.rect = m_inventorySlots[index].rect;
+	inventory[index].first.m_dropDrawable.opacity = 0;
+
+	if (inventory[index].second <= 0)
+	{
+		inventory[index].first.reset();
+		inventory[index].second = 0;
+	}
 }
 
 void Player::addToInventory(unique_ptr<Drop> drop)
@@ -245,7 +253,7 @@ void Player::addToInventory(unique_ptr<Drop> drop)
 		inventory[openSlot].first = *drop;
 		inventory[openSlot].second++;
 		
-		initDropInInventory(&inventory[openSlot].first, openSlot);
+		initDropInInventory(openSlot);
 
 		SoundManager::playSound(SOUND::ITEM_PICK_UP);
 	}
@@ -255,47 +263,133 @@ void Player::updateInventory()
 {
 	if (InputManager::isMouseClicked())
 	{
-		activeSlotIndex = -1;
-
 		for (int i = 0; i < INVENTORY_SIZE; ++i)
 		{
 			if (isMouseInRect(m_inventorySlots[i].rect))
 			{
-				activeSlotIndex = i;
+				if (activeSlotIndex == -1)
+				{
+					activeSlotIndex = i;
+					m_inventorySlots[activeSlotIndex].texture = ImgManager::m_activeSlotImg;
+					m_inventoryHoldItem = inventory[activeSlotIndex];
+					inventory[activeSlotIndex].first.reset();
+					inventory[activeSlotIndex].second = 0;
+				}
+				else if (i == activeSlotIndex)
+				{
+					m_inventorySlots[activeSlotIndex].texture = ImgManager::m_slotImg;
+					inventory[activeSlotIndex].first = m_inventoryHoldItem.first;
+					inventory[activeSlotIndex].second += m_inventoryHoldItem.second;
+					initDropInInventory(i);
+					m_inventoryHoldItem.first.reset();
+					m_inventoryHoldItem.first.m_dropDrawable.rect = { 0, 0, (int)(m_inventorySlots[activeSlotIndex].rect.w * HOLD_ITEM_SLOT_SIZE_RATIO), (int)(m_inventorySlots[activeSlotIndex].rect.h * HOLD_ITEM_SLOT_SIZE_RATIO) };
+					m_inventoryHoldItem.second = 0;
+					activeSlotIndex = -1;
+				}
+				else if (m_inventoryHoldItem.first.getDropType() == DROP_TYPE::NONE_DROP)
+				{
+					m_inventorySlots[activeSlotIndex].texture = ImgManager::m_slotImg;
+
+					activeSlotIndex = i;
+					m_inventorySlots[activeSlotIndex].texture = ImgManager::m_activeSlotImg;
+					m_inventoryHoldItem = inventory[activeSlotIndex];
+					inventory[activeSlotIndex].first.reset();
+					inventory[activeSlotIndex].second = 0;
+				}
+				else if (inventory[i].first.getDropType() == DROP_TYPE::NONE_DROP)
+				{
+					m_inventorySlots[activeSlotIndex].texture = ImgManager::m_slotImg;
+					swap(inventory[i], m_inventoryHoldItem);
+					initDropInInventory(i);
+					m_inventoryHoldItem.first.m_dropDrawable.rect = { 0, 0, (int)(m_inventorySlots[activeSlotIndex].rect.w * HOLD_ITEM_SLOT_SIZE_RATIO), (int)(m_inventorySlots[activeSlotIndex].rect.h * HOLD_ITEM_SLOT_SIZE_RATIO) };
+					m_inventoryHoldItem.second = 0;
+					activeSlotIndex = -1;
+				}
+				else if	(m_inventoryHoldItem.first.getDropType() != inventory[i].first.getDropType())
+				{
+					swap(inventory[i], m_inventoryHoldItem);
+					initDropInInventory(i);
+				}
+				else if (m_inventoryHoldItem.second + inventory[i].second <= inventory[i].first.getStackSize())
+				{
+					inventory[i].second += m_inventoryHoldItem.second;
+					m_inventoryHoldItem.first.reset();
+					m_inventoryHoldItem.second = 0;
+					m_inventorySlots[activeSlotIndex].texture = ImgManager::m_slotImg;
+					activeSlotIndex = -1;
+				}
+				else
+				{
+					int spaceLeft = inventory[i].first.getStackSize() - inventory[i].second;
+					inventory[i].second += spaceLeft;
+					m_inventoryHoldItem.second -= spaceLeft;
+				}
+				break;
 			}
 		}
 	}
 
-	if(InputManager::isMouseReleased())
+	if (InputManager::isMouseRightClicked())
 	{
 		for (int i = 0; i < INVENTORY_SIZE; ++i)
 		{
-			if (isMouseInRect(m_inventorySlots[i].rect) // check for released slot
-				&& activeSlotIndex != i && activeSlotIndex != -1 && inventory[activeSlotIndex].second > 0   // check for a different occupied active slot
-				&& inventory[i].second < inventory[i].first.getStackSize()) //check for stack size
+			if (isMouseInRect(m_inventorySlots[i].rect))
 			{
-				if (inventory[i].first.getDropType() != inventory[activeSlotIndex].first.getDropType())
-					swap(inventory[i], inventory[activeSlotIndex]);
-				else
+				if (activeSlotIndex == -1)
 				{
-					if(inventory[activeSlotIndex].second + inventory[i].second <= inventory[i].first.getStackSize())
+					activeSlotIndex = i;
+					m_inventorySlots[activeSlotIndex].texture = ImgManager::m_activeSlotImg;
+					m_inventoryHoldItem = inventory[activeSlotIndex];
+					inventory[activeSlotIndex].second = m_inventoryHoldItem.second / 2;
+					m_inventoryHoldItem.second -= inventory[activeSlotIndex].second;
+					initDropInInventory(i);
+					
+					if (m_inventoryHoldItem.second <= 0)
 					{
-						inventory[i].second += inventory[activeSlotIndex].second;
-						inventory[activeSlotIndex].second = 0;
-					}
-					else
-					{
-						int spaceLeft = inventory[i].first.getStackSize() - inventory[i].second;
-						inventory[i].second += spaceLeft;
-						inventory[activeSlotIndex].second -= spaceLeft;
+						m_inventoryHoldItem.first.reset();
+						m_inventoryHoldItem.second = 0;
+						m_inventorySlots[activeSlotIndex].texture = ImgManager::m_slotImg;
+						activeSlotIndex = -1;
 					}
 				}
-				initDropInInventory(&inventory[activeSlotIndex].first, activeSlotIndex);
-				initDropInInventory(&inventory[i].first, i);
+				else if (inventory[i].first.getDropType() == DROP_TYPE::NONE_DROP 
+					|| (inventory[i].first.getDropType() == m_inventoryHoldItem.first.getDropType() && inventory[i].second < inventory[i].first.getStackSize()))
+				{
+					inventory[i].first = m_inventoryHoldItem.first;
+					inventory[i].second++;
+					initDropInInventory(i);
+					m_inventoryHoldItem.second--;
 
-				break;
+					if (m_inventoryHoldItem.second <= 0)
+					{
+						m_inventoryHoldItem.first.reset();
+						m_inventoryHoldItem.second = 0;
+						m_inventorySlots[activeSlotIndex].texture = ImgManager::m_slotImg;
+						activeSlotIndex = -1;
+					}
+				}
 			}
 		}
+	}
+	if(activeSlotIndex != -1) // selected item mouse track
+	{
+		m_inventoryHoldItem.first.m_dropDrawable.rect.x = InputManager::m_mouseCoor.x - m_inventoryHoldItem.first.m_dropDrawable.rect.w / 2;
+		m_inventoryHoldItem.first.m_dropDrawable.rect.y = InputManager::m_mouseCoor.y - m_inventoryHoldItem.first.m_dropDrawable.rect.h / 2;
+	}
+}
+
+void Player::closeInventory()
+{
+	if(activeSlotIndex != -1)
+	{
+		m_inventorySlots[activeSlotIndex].texture = ImgManager::m_slotImg;
+		inventory[activeSlotIndex].first = m_inventoryHoldItem.first;
+		inventory[activeSlotIndex].second += m_inventoryHoldItem.second;
+		initDropInInventory(activeSlotIndex);
+		m_inventoryHoldItem.first.reset();
+		m_inventoryHoldItem.first.m_dropDrawable.rect = { 0, 0, (int)(m_inventorySlots[activeSlotIndex].rect.w * HOLD_ITEM_SLOT_SIZE_RATIO), (int)(m_inventorySlots[activeSlotIndex].rect.h * HOLD_ITEM_SLOT_SIZE_RATIO) };
+		m_inventoryHoldItem.second = 0;
+		activeSlotIndex = -1;
 	}
 }
 
@@ -333,7 +427,14 @@ void Player::initInventory()
 
 	//empty inventory
 	for (int i = 0; i < INVENTORY_SIZE; ++i)
+	{
 		inventory[i].second = 0;
+		inventory[i].first.reset();
+	}
+
+	m_inventoryHoldItem.first.reset();
+	m_inventoryHoldItem.second = 0;
+	m_inventoryHoldItem.first.m_dropDrawable.rect = { 0, 0, (int)(dimentions * HOLD_ITEM_SLOT_SIZE_RATIO), (int)(dimentions * HOLD_ITEM_SLOT_SIZE_RATIO) };
 
 	m_inventoryItemCount.init("inventoryTextField.txt");
 }
@@ -348,15 +449,33 @@ void Player::drawInventory()
 			inventory[i].first.m_dropDrawable.opacity = m_inventorySlots[i].opacity;
 
 			drawObject(m_inventorySlots[i]);
-			drawObject(inventory[i].first.m_dropDrawable);
+		}
 
-			if(inventory[i].second > 1)
+		for (int i = 0; i < INVENTORY_SIZE; ++i)
+		{
+			drawObject(inventory[i].first.m_dropDrawable);
+			
+			if (inventory[i].second > 1)
 			{
 				m_inventoryItemCount.setText(to_string(inventory[i].second),
-					{ (int)(m_inventorySlots[i].rect.x + m_inventorySlots[i].rect.w * INV_ITEM_COUNT_SLOT_RATIO), (int)(m_inventorySlots[i].rect.y + m_inventorySlots[i].rect.h * INV_ITEM_COUNT_SLOT_RATIO) }, 
-					true, 
+					{ (int)(inventory[i].first.m_dropDrawable.rect.x + inventory[i].first.m_dropDrawable.rect.w * INV_ITEM_COUNT_ITEM_RATIO), (int)(inventory[i].first.m_dropDrawable.rect.y + inventory[i].first.m_dropDrawable.rect.h * INV_ITEM_COUNT_ITEM_RATIO) },
+					true,
 					inventory[i].first.m_dropDrawable.opacity);
 
+				m_inventoryItemCount.draw();
+			}
+		}
+
+		if (activeSlotIndex != -1)
+		{
+			drawObject(m_inventoryHoldItem.first.m_dropDrawable);
+
+			if (m_inventoryHoldItem.second > 1)
+			{
+				m_inventoryItemCount.setText(to_string(m_inventoryHoldItem.second),
+						{ (int)(m_inventoryHoldItem.first.m_dropDrawable.rect.x + m_inventoryHoldItem.first.m_dropDrawable.rect.w * INV_ITEM_COUNT_ITEM_RATIO), (int)(m_inventoryHoldItem.first.m_dropDrawable.rect.y + m_inventoryHoldItem.first.m_dropDrawable.rect.h * INV_ITEM_COUNT_ITEM_RATIO) },
+						true,
+						m_inventoryHoldItem.first.m_dropDrawable.opacity);
 				m_inventoryItemCount.draw();
 			}
 		}

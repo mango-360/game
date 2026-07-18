@@ -22,14 +22,15 @@ static const int MAP_WIDTH = 320;
 static const int MAP_HEIGHT = 240;
 static const int LANDING_SPRITE_FRAME_DURATION = 5; 
 static const int INVENTORY_SIZE = 11; 
-static const int BUSH_INVERSE_SPAWN_CHANCE = 10;
+static const int BUSH_INVERSE_SPAWN_CHANCE = 4;
 static const int STATISTICS_DELAY = 60;
 static const int STATISTICS_HITBOX_OPACITY = 100;
 
 static const float PROJECTILE_SIZE = 0.5f;
 static const float INVENTORY_ZOOM = 40.0f;
-static const float INV_ITEM_COUNT_SLOT_RATIO = 0.7f;
+static const float INV_ITEM_COUNT_ITEM_RATIO = 0.7f;
 static const float OPEN_INV_END_MARGIN = 10.0f;
+static const float HOLD_ITEM_SLOT_SIZE_RATIO = 1.3f;
 
 struct float2
 {
