@@ -28,11 +28,15 @@ void Drop::init(int2 coords, DROP_TYPE dropType)
         break;
     case DROP_TYPE::STICK:
         m_dropDrawable.texture = ImgManager::m_stickTexture;
-        m_dropTileType = TILE_TYPE::BUSH;
+        m_dropTileType = TILE_TYPE::NONE_TYPE;
         break;
+	case DROP_TYPE::LEAF:
+        m_dropDrawable.texture = ImgManager::m_leafTexture;
+        m_dropTileType = TILE_TYPE::NONE_TYPE;
+		break;
     default:
         m_dropDrawable.texture = nullptr;
-        m_dropTileType = TILE_TYPE::AIR;
+        m_dropTileType = TILE_TYPE::NONE_TYPE;
         break;
     }
 

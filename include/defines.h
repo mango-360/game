@@ -5,8 +5,12 @@
 #include <SDL.h>
 #include <SDL_ttf.h>
 #include <vector>
+#include <random>
 
 using namespace std;
+
+inline std::mt19937 rng(std::random_device{}());
+inline std::uniform_real_distribution<float> chance(0.0f, 100.0f);
 
 static const string IMG_FOLDER = "img\\";
 static const string CONFIG_FOLDER = "config\\";
@@ -32,7 +36,7 @@ static const float INV_ITEM_COUNT_ITEM_RATIO = 0.7f;
 static const float OPEN_INV_END_MARGIN = 10.0f;
 static const float HOLD_ITEM_SLOT_SIZE_RATIO = 1.3f;
 
-struct float2
+struct float2 
 {
 	float x = 0.0f, y = 0.0f;
 
@@ -168,6 +172,7 @@ enum DROP_TYPE
 	GRASSBLOCK_DROP = 2,
 	DIRTBLOCK_DROP = 3,
 	STICK = 4,
+	LEAF = 5,
 };
 
 inline istream& operator>>(istream& is, SDL_Rect& rect)

@@ -67,7 +67,6 @@ void Board::initMap()
 
 	int surfaceLevel = 12;
 
-	// modern RNG, seeded from random_device
 	std::mt19937 rng(std::random_device{}());
 	std::uniform_int_distribution<int> startDist(0, 120);
 	int x = startDist(rng);

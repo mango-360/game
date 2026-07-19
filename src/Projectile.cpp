@@ -197,9 +197,18 @@ void Projectile::dealDamageToTile(int x, int y)
 	}
 
 	if (m_owner->m_map[x][y]->isBroken()) {
-		auto drop = std::make_unique<Drop>();
-		drop->init({y, x} , m_owner->m_map[x][y]->getTileDrop());
-		m_spawnDrop(std::move(drop)); // hand ownership to Board via callback
+		if (chance(rng) < 50.0f)
+		{
+			auto drop = std::make_unique<Drop>();
+			drop->init({y, x} , DROP_TYPE::LEAF);
+			m_spawnDrop(std::move(drop)); // hand ownership to Board via callback
+		}
+		else if (chance(rng) > 50.0f)
+		{
+			auto drop = std::make_unique<Drop>();
+			drop->init({ y, x }, m_owner->m_map[x][y]->getTileDrop());
+			m_spawnDrop(std::move(drop)); // hand ownership to Board via callback
+		}
 		m_owner->m_map[x][y]->destroy();
 	}
 }

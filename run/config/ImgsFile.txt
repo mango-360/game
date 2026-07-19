@@ -1,8 +1,9 @@
-TYLE_IMAGES
+TYLE_IMAGES:
 grassBlock.bmp
 dirtBlock.bmp
 bush.bmp
-DROP_IMAGES
+DROP_IMAGES:
 stick_drop.bmp
+leaf_drop.bmp
 SLOT_IMAGE: bobInventorySlot.bmp
 ACTIVE_SLOT_IMAGE: bobActiveInventorySlot.bmp
