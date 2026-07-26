@@ -91,49 +91,7 @@ void Projectile::zoomUpdate()
 	rect.h = TILE_SIZE * InputManager::getZoom() * PROJECTILE_SIZE;
 }
 
-void Projectile::collision()
-{
-	float2 cp, cn;
-	float t = 0, min_t = INFINITY;
-	vector<pair<int2, float>> collsList;
-
-	if (firstFrame) firstFrameColl();
-
-	// Work out collision point, add it to vector along with rect ID
-	for (int i = floor(hitbox.rect.y) - 1; i <= ceil(hitbox.rect.y + hitbox.rect.h); ++i)
-	{
-		for (int j = floor(hitbox.rect.x) - 1; j <= ceil(hitbox.rect.x + hitbox.rect.w); ++j)
-		{
-			if (m_owner->m_map[i][j]->getTileType() == TILE_TYPE::AIR) continue;
-
-			if (DynamicRectVsRect(&hitbox.rect, velocity, m_owner->m_map[i][j]->getTileGridRect(), cp, cn, t))
-			{
-				collsList.push_back({ {i, j}, t });
-
-				normalDirs.push_back(cn);
-			}
-		}
-	}
-
-	// Do the sort
-	sort(collsList.begin(), collsList.end(), [](const pair<int2, float>& a, const pair<int2, float>& b)
-		{
-			return a.second < b.second;
-		});
-
-	for (auto j : collsList)
-	{
-		dealDamageToTile(j.first.x, j.first.y);
-
-		if(m_owner->m_map[j.first.x][j.first.y]->getIsSolid())
-		{
-			isAlive = false;
-			return;
-		}
-	}
-}
-
-void Projectile::setDropSpawner(function<void(unique_ptr<Drop>)> spawner)
+	void Projectile::setDropSpawner(function<void(unique_ptr<Drop>)> spawner)
 {
 	m_spawnDrop = move(spawner);
 }
@@ -163,52 +121,5 @@ void Projectile::stopOutOfBounds()
 		hitbox.rect.y < 0 || hitbox.rect.y + hitbox.rect.h > MAP_HEIGHT * TILE_SIZE)
 	{
 		isAlive = false;
-	}
-}
-
-void Projectile::firstFrameColl()
-{
-	for (int i = (int)(hitbox.rect.y); i <= (int)(hitbox.rect.y + hitbox.rect.h); ++i)
-	{
-		for (int j = (int)(hitbox.rect.x); j <= (int)(hitbox.rect.x + hitbox.rect.w); ++j)
-		{
-			dealDamageToTile(i, j);
-
-			if (m_owner->m_map[i][j]->getIsSolid())
-			{
-				isAlive = false;
-				return;
-			}
-		}
-	}
-
-	firstFrame = false;
-}
-
-void Projectile::dealDamageToTile(int x, int y)
-{
-	for (int i = 0; i < size(canBreak); ++i)
-	{
-		if (m_owner->m_map[x][y]->getTileType() == canBreak[i])
-		{
-			m_owner->m_map[x][y]->dealDamage(damage);
-			break;
-		}
-	}
-
-	if (m_owner->m_map[x][y]->isBroken()) {
-		if (chance(rng) < 50.0f)
-		{
-			auto drop = std::make_unique<Drop>();
-			drop->init({y, x} , DROP_TYPE::LEAF);
-			m_spawnDrop(std::move(drop)); // hand ownership to Board via callback
-		}
-		else
-		{
-			auto drop = std::make_unique<Drop>();
-			drop->init({ y, x }, m_owner->m_map[x][y]->getTileDrop());
-			m_spawnDrop(std::move(drop)); // hand ownership to Board via callback
-		}
-		m_owner->m_map[x][y]->destroy();
 	}
 }

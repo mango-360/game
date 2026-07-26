@@ -251,7 +251,8 @@ void Board::handleEntityTileCollisions()
 				{
 					continue;
 				}
-				const SDL_FRect& mapRect = entity->getMapRect(); // bind to local ref
+
+				const SDL_FRect& mapRect = entity->getMapRect();
 
 				if (DynamicRectVsRect(&mapRect, entity->getVelocity(), m_map[i][j].getTileGridRect(), cp, cn, t))
 				{
@@ -321,12 +322,84 @@ void Board::handleEntityProjectileCollisions()
 
 void Board::handleProjectileTileCollisions()
 {
-	for(unique_ptr<Projectile>& projectile : m_projectiles)
+	for(auto projectile = m_projectiles.begin(); projectile != m_projectiles.end(); )
 	{
-		projectile->calculateVelocity();
+		(*projectile)->calculateVelocity();
 
-		projectile->collision();
+		projTileColl(projectile);
 	}
+}
+
+void Board::projTileColl(vector<unique_ptr<Projectile>>::iterator& projectile)
+{
+	float2 cp, cn;
+	float t = 0, min_t = INFINITY;
+	vector<pair<int2, float>> collsList;
+
+	if ((*projectile)->firstFrame)
+	{
+		for (int i = (int)((*projectile)->getMapRect().y); i <= (int)((*projectile)->getMapRect().y + (*projectile)->getMapRect().h); ++i)
+		{
+			for (int j = (int)((*projectile)->getMapRect().x); j <= (int)((*projectile)->getMapRect().x + (*projectile)->getMapRect().w); ++j)
+			{
+				for (int k = 0; k < size((*projectile)->canBreak); ++k)
+				{
+					if (m_map[i][j].getTileType() == (*projectile)->canBreak[k])
+					{
+						m_map[i][j].dealDamage((*projectile)->getDamage());
+						break;
+					}
+				}
+
+				if (m_map[i][j].getIsSolid())
+				{
+					cout << "erasing in first frame" << endl;
+					projectile = m_projectiles.erase(projectile);
+					return;
+				}
+			}
+		}
+
+		(*projectile)->firstFrame = false;
+	}
+
+	// Work out collision point, add it to vector along with rect ID
+	for (int i = (int)((*projectile)->getMapRect().y); i <= (int)((*projectile)->getMapRect().y + (*projectile)->getMapRect().h); ++i)
+	{
+		for (int j = (int)((*projectile)->getMapRect().x); j <= (int)((*projectile)->getMapRect().x + (*projectile)->getMapRect().w); ++j)
+		{
+			if (m_map[i][j].getTileType() == TILE_TYPE::AIR) continue;
+
+			const SDL_FRect& mapRect = (*projectile)->getMapRect();
+
+			if (DynamicRectVsRect(&mapRect, (*projectile)->getVelocity(), m_map[i][j].getTileGridRect(), cp, cn, t))
+			{
+				collsList.push_back({ {i, j}, t });
+				cout << "pushing back collisions" << endl;
+			}
+		}
+	}
+
+	// Do the sort
+	sort(collsList.begin(), collsList.end(), [](const pair<int2, float>& a, const pair<int2, float>& b)
+		{
+			return a.second < b.second;
+		});
+
+	for (auto j : collsList)
+	{
+		cout << "checking collisions" << endl;
+		m_map[j.first.x][j.first.y].dealDamage((*projectile)->getDamage());
+
+		if (m_map[j.first.x][j.first.y].getIsSolid())
+		{
+			cout << "erasing" << endl;
+			projectile = m_projectiles.erase(projectile);
+			return;
+		}
+	}
+
+	++projectile;
 }
 
 void Board::playerPickUpDrop() // erases drop even if inventory is full!!!

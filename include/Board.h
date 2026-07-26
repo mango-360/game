@@ -57,6 +57,7 @@ private:
 	void handleEntityEntityCollisions();
 	void handleEntityProjectileCollisions();
 	void handleProjectileTileCollisions();
+	void projTileColl(vector<unique_ptr<Projectile>>::iterator& projectile);
 
 	void playerPickUpDrop();
 

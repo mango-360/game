@@ -21,7 +21,7 @@ public:
 	DROP_TYPE getTileDrop() { return m_drop; };
 
 	void dealDamage(int damage);
-	bool isBroken() { return m_hp <= 0; };
+	bool isBroken() const { return m_hp <= 0; };
 protected:
 
 	int m_hp;
