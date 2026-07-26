@@ -189,7 +189,7 @@ void Projectile::dealDamageToTile(int x, int y)
 {
 	for (int i = 0; i < size(canBreak); ++i)
 	{
-		if ((int)m_owner->m_map[x][y]->getTileType() == (int)canBreak[i])
+		if (m_owner->m_map[x][y]->getTileType() == canBreak[i])
 		{
 			m_owner->m_map[x][y]->dealDamage(damage);
 			break;
@@ -203,7 +203,7 @@ void Projectile::dealDamageToTile(int x, int y)
 			drop->init({y, x} , DROP_TYPE::LEAF);
 			m_spawnDrop(std::move(drop)); // hand ownership to Board via callback
 		}
-		else if (chance(rng) > 50.0f)
+		else
 		{
 			auto drop = std::make_unique<Drop>();
 			drop->init({ y, x }, m_owner->m_map[x][y]->getTileDrop());

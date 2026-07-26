@@ -126,18 +126,13 @@ void Board::initMap()
 void Board::update()
 {
 	for (Entity* entity : m_entities)
-	{
-		entity->updatePrePhysics();
-	}
+		entity->update();
 
 	handleCollisions();
 
-	for (auto& projectile : m_projectiles) projectile->update();
+	m_player.countFramesOnGround();
 
-	for (Entity* entity : m_entities)
-	{
-		entity->updatePostPhysics();
-	}
+	for (auto& projectile : m_projectiles) projectile->update();
 
 	destroyProjectiles();
 
@@ -233,6 +228,8 @@ void Board::handleEntityTileCollisions()
 {
 	for(Entity* entity : m_entities)
 	{
+		entity->calculateVelocity();
+
 		bool hitsGround = false;
 		float2 friction = { 0, 0 };
 
@@ -304,6 +301,9 @@ void Board::handleEntityTileCollisions()
 
 
 		entity->calculateFriction(prevFriction);
+		entity->applyVelocity();
+		entity->stopOutOfBounds();
+
 		entity->isOnGround = hitsGround;
 		if (entity->isOnGround) entity->isJumping = false;
 		else if (!entity->isJumping) entity->landingStartSpriteFrame = entity->NoJumpLandingSpriteFrame;
@@ -336,9 +336,9 @@ void Board::playerPickUpDrop() // erases drop even if inventory is full!!!
 		if (FcollRectRect(m_player.getMapRect(), (*it)->getGridRect()))
 		{
 			// transfer ownership of the drop to the player
-			m_player.addToInventory(std::move(*it));
 			// remove null unique_ptr from board
-			it = m_drops.erase(it);
+			if(m_player.addToInventory(std::move(*it)))
+				it = m_drops.erase(it);
 			return;
 		}
 		else ++it;

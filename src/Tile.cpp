@@ -54,6 +54,16 @@ void Tile::destroy()
 	m_isSolid = false;
 }
 
+void Tile::dealDamage(int damage)
+{
+	m_hp -= damage;
+
+	if (isBroken())
+	{
+		
+	}
+}
+
 void Tile::updateZoom()
 {
 	if (InputManager::isZoomChanged())

@@ -13,12 +13,15 @@ public:
 	Entity();
 	~Entity();
 	virtual void init(Tile(*map)[MAP_WIDTH] , string configFile);
-	virtual void updatePrePhysics();
-	virtual void updatePostPhysics();
+	virtual void update();
 	virtual void draw(float2 camCoords); // camera-aware draw
+
+	virtual void calculateVelocity();
+	void applyVelocity();
 
 	void resolveCollision(SDL_FRect tileRect);
 	void calculateFriction(float frictionValue);
+	void stopOutOfBounds();
 
 	int2 getIntCoords();
 	SDL_FRect getMapRect() const { return hitbox.rect; }
@@ -43,11 +46,8 @@ protected:
 	virtual void moveVertical();
 	void drawHitBox(float2 camCoords); // for debugging
 
-	virtual void calculateVelocity();
 	void addFriction();
 	float2 calculateNetForce();
-	void applyVelocity();
-	void stopOutOfBounds();
 
 	float jumpStrength;
 	float2 maxInputVelocity;

@@ -29,7 +29,7 @@ private:
 
 	void dealDamageToTile(int x, int y);
 
-	std::function<void(std::unique_ptr<Drop>)> m_spawnDrop;
+	std::function<void(unique_ptr<Drop>)> m_spawnDrop;
 
 	Entity* m_owner;
 

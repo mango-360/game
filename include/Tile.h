@@ -20,7 +20,7 @@ public:
 	TILE_TYPE getTileType() { return m_type; };
 	DROP_TYPE getTileDrop() { return m_drop; };
 
-	void dealDamage(int damage) { m_hp -= damage; };
+	void dealDamage(int damage);
 	bool isBroken() { return m_hp <= 0; };
 protected:
 

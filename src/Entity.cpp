@@ -44,22 +44,11 @@ void Entity::init(Tile(*map)[MAP_WIDTH], string configFile)
 	}
 }
 
-void Entity::updatePrePhysics()
+void Entity::update()
 {
 	zoomUpdate();
 
 	move();
-
-	calculateVelocity();
-}
-
-void Entity::updatePostPhysics()
-{
-	addFriction();
-
-	applyVelocity();
-
-	stopOutOfBounds();
 }
 
 void Entity::draw(float2 camCoords)
@@ -170,6 +159,8 @@ float2 Entity::calculateNetForce()
 
 void Entity::applyVelocity()
 {
+	addFriction();
+
 	hitbox.rect.x += velocity.x;
 	hitbox.rect.y += velocity.y;
 }

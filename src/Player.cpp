@@ -50,7 +50,7 @@ void Player::init(Tile(*map)[MAP_WIDTH])
 	initInventory();
 }
 
-void Player::updatePrePhysics()
+void Player::update()
 {
 	zoomUpdate();
 
@@ -79,19 +79,6 @@ void Player::updatePrePhysics()
 	animateJump();
 	animateFall();
 	animateLand();
-
-	calculateVelocity();
-}
-
-void Player::updatePostPhysics()
-{
-	addFriction();
-
-	applyVelocity();
-
-	stopOutOfBounds();
-
-	countFramesOnGround();
 }
 
 void Player::setProjectileSpawner(function<void(unique_ptr<Projectile>)> spawner)
@@ -231,7 +218,7 @@ void Player::initDropInInventory(int index)
 	}
 }
 
-void Player::addToInventory(unique_ptr<Drop> drop)
+bool Player::addToInventory(unique_ptr<Drop> drop)
 {
 	int openSlot = -1;
 
@@ -252,11 +239,14 @@ void Player::addToInventory(unique_ptr<Drop> drop)
 	{
 		inventory[openSlot].first = *drop;
 		inventory[openSlot].second++;
-		
+
 		initDropInInventory(openSlot);
 
 		SoundManager::playSound(SOUND::ITEM_PICK_UP);
+
+		return true;
 	}
+	else return false;
 }
 
 void Player::updateInventory()
