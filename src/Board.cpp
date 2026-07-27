@@ -35,7 +35,7 @@ void Board::init()
 	m_mob.init(m_map, "player.txt");
 	m_mob.setPlayer(&m_player);
 
-	m_entities.push_back(&m_mob);
+	//m_entities.push_back(&m_mob);
 	m_entities.push_back(&m_player);
 
   // register spawner after player init: set a projectile spawner that also
@@ -217,6 +217,8 @@ void Board::handleCollisions()
 	handleEntityProjectileCollisions();
 
 	handleProjectileTileCollisions();
+
+	handleDropTileCollisions();
 }
 
 void Board::handleEntityTileCollisions()
@@ -263,21 +265,17 @@ void Board::handleEntityTileCollisions()
 			}
 		}
 
-		SDL_FRect FutureEntityRect = { entity->getMapRect() };
+		SDL_FRect entityRect = { entity->getMapRect() };
 
-		for (int x = floor(FutureEntityRect.x); x <= ceil(FutureEntityRect.x + FutureEntityRect.w); ++x) //check nonsolid blocks for friction
+		for (int x = floor(entityRect.x); x <= floor(entityRect.x + entityRect.w); ++x) //check nonsolid blocks for friction
 		{
-			for (int y = floor(FutureEntityRect.y); y <= ceil(FutureEntityRect.y + FutureEntityRect.h); ++y)
+			for (int y = floor(entityRect.y); y <= floor(entityRect.y + entityRect.h); ++y)
 			{
 				if (y < 0 || y >= MAP_HEIGHT || x < 0 || x >= MAP_WIDTH)
-				{
 					continue;
-				}
 
-				if (!m_map[y][x].getIsSolid() && m_map[y][x].getFriction() > prevFriction && FcollRectRect(FutureEntityRect, m_map[y][x].getTileGridRect()))
-				{
+				if (!m_map[y][x].getIsSolid() && m_map[y][x].getFriction() > prevFriction)
 					prevFriction = m_map[y][x].getFriction();
-				}
 			}
 		}
 
@@ -419,11 +417,74 @@ void Board::handleBrokenTile(int y, int x)
 	}
 }
 
+void Board::handleDropTileCollisions()
+{
+	for (Drop& drop : m_drops)
+	{
+		drop.calculateVelocity();
+
+		float2 friction = { 0, 0 };
+
+		float2 cp, cn;
+		float t = 0, min_t = INFINITY, prevFriction = 0;
+		vector<pair<int2, float>> collsList;
+
+		// Work out collision point, add it to vector along with rect ID
+		for (int i = floor(drop.getHitbox().y) - 1; i <= ceil(drop.getHitbox().y + drop.getHitbox().h); ++i)
+		{
+			for (int j = floor(drop.getHitbox().x) - 1; j <= ceil(drop.getHitbox().x + drop.getHitbox().w); ++j)
+			{
+				if (!m_map[i][j].getIsSolid())
+					continue;
+
+				const SDL_FRect& mapRect = drop.getHitbox();
+
+				if (DynamicRectVsRect(&mapRect, drop.getVelocity(), m_map[i][j].getTileGridRect(), cp, cn, t))
+				{
+					collsList.push_back({ {i, j}, t });
+
+					if (cn.y == -1 && m_map[i][j].getFriction() > prevFriction)
+						prevFriction = m_map[i][j].getFriction();
+				}
+			}
+		}
+
+		SDL_FRect dropHitbox = { drop.getHitbox()};
+
+		for (int x = floor(dropHitbox.x); x <= floor(dropHitbox.x + dropHitbox.w); ++x) //check nonsolid blocks for friction
+		{
+			for (int y = floor(dropHitbox.y); y <= floor(dropHitbox.y + dropHitbox.h); ++y)
+			{
+				if (!m_map[y][x].getIsSolid() && m_map[y][x].getFriction() > prevFriction)
+					prevFriction = m_map[y][x].getFriction();
+			}
+		}
+
+		// Do the sort
+		sort(collsList.begin(), collsList.end(), [](const pair<int2, float>& a, const pair<int2, float>& b)
+			{
+				return a.second < b.second;
+			});
+
+		// Now resolve the collision in correct order 
+		for (auto j : collsList)
+		{
+			// Avoid taking the address of a temporary returned by getTileGridRect():
+			SDL_FRect tileRect = m_map[j.first.x][j.first.y].getTileGridRect();
+			drop.resolveCollision(tileRect);
+		}
+
+		drop.calculateFriction(prevFriction);
+		drop.applyVelocity();
+		drop.stopOutOfBounds();
+	}
+}
+
 void Board::playerPickUpDrop() // erases drop even if inventory is full!!!
 {
 	for (auto it = m_drops.begin(); it != m_drops.end(); )
 	{
-		if (FcollRectRect(m_player.getMapRect(), it->getGridRect()))
+		if (FcollRectRect(m_player.getMapRect(), it->getHitbox()))
 		{
 			// transfer ownership of the drop to the player
 			// remove null unique_ptr from board

@@ -27,10 +27,8 @@ public:
 	TILE_TYPE canBreak[1] = { TILE_TYPE::BUSH };
 private:
 	void zoomUpdate();
-	float2 calculateNetForce();
 	void applyVelocity();
 	void stopOutOfBounds();
-	void firstFrameColl();
 
 	Entity* m_owner;
 

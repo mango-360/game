@@ -93,15 +93,10 @@ void Projectile::zoomUpdate()
 
 void Projectile::calculateVelocity()
 {
-	velocity += calculateNetForce();
+	velocity += GRAVITY;
 
 	if (velocity.x != 0 && abs(velocity.x) < 0.001f) velocity.x = 0;
 	if (velocity.y != 0 && abs(velocity.y) < 0.001f) velocity.y = 0;
-}
-
-float2 Projectile::calculateNetForce()
-{
-	return GRAVITY;
 }
 
 void Projectile::applyVelocity()

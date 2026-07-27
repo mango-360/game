@@ -46,9 +46,6 @@ protected:
 	virtual void moveVertical();
 	void drawHitBox(float2 camCoords); // for debugging
 
-	void addFriction();
-	float2 calculateNetForce();
-
 	float jumpStrength;
 	float2 maxInputVelocity;
 	float2 velocity = { 0, 0 };

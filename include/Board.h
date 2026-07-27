@@ -59,6 +59,7 @@ private:
 	void handleProjectileTileCollisions();
 	void projTileColl(vector<unique_ptr<Projectile>>::iterator& projectile);
 	void handleBrokenTile(int y, int x);
+	void handleDropTileCollisions();
 
 	void playerPickUpDrop();
 

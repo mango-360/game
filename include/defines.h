@@ -6,6 +6,7 @@
 #include <SDL_ttf.h>
 #include <vector>
 #include <random>
+#include <numbers>
 
 using namespace std;
 
@@ -36,6 +37,11 @@ static const float INV_ITEM_COUNT_ITEM_RATIO = 0.7f;
 static const float OPEN_INV_END_MARGIN = 10.0f;
 static const float HOLD_ITEM_SLOT_SIZE_RATIO = 1.3f;
 
+static const double PI = 3.14159265358979323846;
+
+static const float DROP_SPREAD_ANGLE = PI / 6.0f; // radians
+static const float DROP_INITIAL_SPEED = 0.09f;
+static const float DROP_SPEED_DEVIATION = 0.03f;
 
 struct float2 
 {

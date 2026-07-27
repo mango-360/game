@@ -474,7 +474,7 @@ void Player::drawInventory()
 
 void Player::calculateVelocity()
 {
-	velocity += calculateNetForce();
+	velocity += GRAVITY;
 
 	if(velocity.x > 0) inputVelocity.x = clamp(inputVelocity.x, -maxInputVelocity.x, max(0.0f, maxInputVelocity.x - velocity.x)); // clamps x input velocity
 	else	inputVelocity.x = clamp(inputVelocity.x, min(0.0f, -maxInputVelocity.x - velocity.x), maxInputVelocity.x); 

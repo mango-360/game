@@ -124,7 +124,7 @@ void Entity::drawHitBox(float2 camCoords) //for debugging
 
 	drawObject(tmp);
 }
-
+	
 void Entity::resolveCollision(SDL_FRect tileRect)
 {
 	ResolveDynamicRectVsRect(&hitbox.rect, velocity, &tileRect);
@@ -141,25 +141,15 @@ void Entity::calculateFriction(float frictionValue)
 
 void Entity::calculateVelocity()
 {
-	velocity += calculateNetForce();
+	velocity += GRAVITY;
 
 	if (velocity.x != 0 && abs(velocity.x) < 0.001f) velocity.x = 0;
 	if (velocity.y != 0 && abs(velocity.y) < 0.001f) velocity.y = 0;
 }
 
-void Entity::addFriction()
-{
-	velocity += friction;
-}
-
-float2 Entity::calculateNetForce()
-{
-	return GRAVITY;
-}
-
 void Entity::applyVelocity()
 {
-	addFriction();
+	velocity += friction;
 
 	hitbox.rect.x += velocity.x;
 	hitbox.rect.y += velocity.y;
