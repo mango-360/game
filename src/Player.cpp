@@ -218,7 +218,7 @@ void Player::initDropInInventory(int index)
 	}
 }
 
-bool Player::addToInventory(unique_ptr<Drop> drop)
+bool Player::addToInventory(Drop drop)
 {
 	int openSlot = -1;
 
@@ -228,7 +228,7 @@ bool Player::addToInventory(unique_ptr<Drop> drop)
 		{
 			openSlot = i;
 		}
-		else if(inventory[i].first.getDropType() == drop->getDropType() && inventory[i].second < inventory[i].first.getStackSize())
+		else if(inventory[i].first.getDropType() == drop.getDropType() && inventory[i].second < inventory[i].first.getStackSize())
 		{
 			openSlot = i;
 			break;
@@ -237,7 +237,7 @@ bool Player::addToInventory(unique_ptr<Drop> drop)
 
 	if (openSlot != -1)
 	{
-		inventory[openSlot].first = *drop;
+		inventory[openSlot].first = drop;
 		inventory[openSlot].second++;
 
 		initDropInInventory(openSlot);

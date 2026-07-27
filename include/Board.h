@@ -18,7 +18,7 @@
 
 #include "Projectile.h"
 
-
+#include "LootTable.h"
 #include "Tile.h"
 #include "GrassBlock.h"
 #include "DirtBlock.h"
@@ -45,7 +45,7 @@ public:
 
 	vector<unique_ptr<Projectile>> m_projectiles;
 
-	vector<unique_ptr<Drop>> m_drops;
+	vector<Drop> m_drops;
 
 private:
 	void updateMap();
@@ -58,6 +58,7 @@ private:
 	void handleEntityProjectileCollisions();
 	void handleProjectileTileCollisions();
 	void projTileColl(vector<unique_ptr<Projectile>>::iterator& projectile);
+	void handleBrokenTile(int y, int x);
 
 	void playerPickUpDrop();
 

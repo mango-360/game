@@ -16,8 +16,6 @@ public:
 
 	void calculateVelocity();
 	
-	void setDropSpawner(function<void(unique_ptr<Drop>)> spawner);
-
 	SDL_FRect getMapRect() { return hitbox.rect; };
 	bool getFirstFrame() { return firstFrame; };
 	int getDamage() { return damage; };
@@ -34,8 +32,6 @@ private:
 	void stopOutOfBounds();
 	void firstFrameColl();
 
-	std::function<void(unique_ptr<Drop>)> m_spawnDrop;
-
 	Entity* m_owner;
 
 	float2 velocity = { 0, 0 };
@@ -44,7 +40,6 @@ private:
 	FDrawable hitbox;
 
 	vector<float2> normalDirs;
-
 
 	int damage;
 };

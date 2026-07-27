@@ -36,6 +36,7 @@ static const float INV_ITEM_COUNT_ITEM_RATIO = 0.7f;
 static const float OPEN_INV_END_MARGIN = 10.0f;
 static const float HOLD_ITEM_SLOT_SIZE_RATIO = 1.3f;
 
+
 struct float2 
 {
 	float x = 0.0f, y = 0.0f;

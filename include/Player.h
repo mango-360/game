@@ -20,7 +20,7 @@ public:
 	void update();
 	void setProjectileSpawner(function<void(unique_ptr<Projectile>)> spawner);
 	
-	bool addToInventory(unique_ptr<Drop> drop);
+	bool addToInventory(Drop drop);
 	void drawInventory();
 
 	void countFramesOnGround();

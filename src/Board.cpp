@@ -43,11 +43,6 @@ void Board::init()
 	// back to the Board when a tile breaks.
 	m_player.setProjectileSpawner([this](unique_ptr<Projectile> p) {
 
-		// set how this projectile should hand spawned drops to the board
-		p->setDropSpawner([this](unique_ptr<Drop> d) {
-			m_drops.push_back(std::move(d));
-		});
-
 		m_projectiles.push_back(std::move(p));
 	});
 
@@ -137,7 +132,7 @@ void Board::update()
 	destroyProjectiles();
 
 	for (auto& drop : m_drops) 
-		drop->update();
+		drop.update();
 
 	playerPickUpDrop();
 
@@ -159,7 +154,7 @@ void Board::draw()
 	drawMap();
 
 	for (auto& projectile : m_projectiles) projectile->draw({ m_camera.getCameraRect().x, m_camera.getCameraRect().y });
-	for (auto& drop : m_drops) drop->draw({ m_camera.getCameraRect().x, m_camera.getCameraRect().y });
+	for (auto& drop : m_drops) drop.draw({ m_camera.getCameraRect().x, m_camera.getCameraRect().y });
 	for (auto& entity : m_entities) entity->draw({ m_camera.getCameraRect().x, m_camera.getCameraRect().y });
 
 	if (m_statistics.drawStatistics) m_statistics.draw();
@@ -347,13 +342,13 @@ void Board::projTileColl(vector<unique_ptr<Projectile>>::iterator& projectile)
 					if (m_map[i][j].getTileType() == (*projectile)->canBreak[k])
 					{
 						m_map[i][j].dealDamage((*projectile)->getDamage());
+						handleBrokenTile(i, j);
 						break;
 					}
 				}
 
 				if (m_map[i][j].getIsSolid())
 				{
-					cout << "erasing in first frame" << endl;
 					projectile = m_projectiles.erase(projectile);
 					return;
 				}
@@ -364,9 +359,9 @@ void Board::projTileColl(vector<unique_ptr<Projectile>>::iterator& projectile)
 	}
 
 	// Work out collision point, add it to vector along with rect ID
-	for (int i = (int)((*projectile)->getMapRect().y); i <= (int)((*projectile)->getMapRect().y + (*projectile)->getMapRect().h); ++i)
+	for (int i = floor((*projectile)->getMapRect().y) - 1; i <= ceil((*projectile)->getMapRect().y + (*projectile)->getMapRect().h); ++i)
 	{
-		for (int j = (int)((*projectile)->getMapRect().x); j <= (int)((*projectile)->getMapRect().x + (*projectile)->getMapRect().w); ++j)
+		for (int j = floor((*projectile)->getMapRect().x) - 1; j <= ceil((*projectile)->getMapRect().x + (*projectile)->getMapRect().w); ++j)
 		{
 			if (m_map[i][j].getTileType() == TILE_TYPE::AIR) continue;
 
@@ -375,7 +370,6 @@ void Board::projTileColl(vector<unique_ptr<Projectile>>::iterator& projectile)
 			if (DynamicRectVsRect(&mapRect, (*projectile)->getVelocity(), m_map[i][j].getTileGridRect(), cp, cn, t))
 			{
 				collsList.push_back({ {i, j}, t });
-				cout << "pushing back collisions" << endl;
 			}
 		}
 	}
@@ -388,12 +382,18 @@ void Board::projTileColl(vector<unique_ptr<Projectile>>::iterator& projectile)
 
 	for (auto j : collsList)
 	{
-		cout << "checking collisions" << endl;
-		m_map[j.first.x][j.first.y].dealDamage((*projectile)->getDamage());
+		for (int k = 0; k < size((*projectile)->canBreak); ++k)
+		{
+			if (m_map[j.first.x][j.first.y].getTileType() == (*projectile)->canBreak[k])
+			{
+				m_map[j.first.x][j.first.y].dealDamage((*projectile)->getDamage());
+				handleBrokenTile(j.first.x, j.first.y);
+				break;
+			}
+		}
 
 		if (m_map[j.first.x][j.first.y].getIsSolid())
 		{
-			cout << "erasing" << endl;
 			projectile = m_projectiles.erase(projectile);
 			return;
 		}
@@ -402,11 +402,28 @@ void Board::projTileColl(vector<unique_ptr<Projectile>>::iterator& projectile)
 	++projectile;
 }
 
+void Board::handleBrokenTile(int y, int x)
+{
+	if (m_map[y][x].isBroken())
+	{
+		for (auto& loot : LootTable::generateLoot(m_map[y][x].getTileType()))
+		{
+			for (int i = 0; i < loot.second; ++i)
+			{
+				Drop drop;
+				drop.init({ x, y }, loot.first);
+				m_drops.push_back(drop);
+			}
+		}
+		m_map[y][x].destroy();
+	}
+}
+
 void Board::playerPickUpDrop() // erases drop even if inventory is full!!!
 {
 	for (auto it = m_drops.begin(); it != m_drops.end(); )
 	{
-		if (FcollRectRect(m_player.getMapRect(), (*it)->getGridRect()))
+		if (FcollRectRect(m_player.getMapRect(), it->getGridRect()))
 		{
 			// transfer ownership of the drop to the player
 			// remove null unique_ptr from board

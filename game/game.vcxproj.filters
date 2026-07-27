@@ -120,6 +120,9 @@
     <ClCompile Include="..\src\Drop.cpp">
       <Filter>Source Files\Drops</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\LootTable.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\defines.h">
@@ -202,6 +205,9 @@
     </ClInclude>
     <ClInclude Include="..\include\Drop.h">
       <Filter>Header Files\Drops</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\LootTable.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

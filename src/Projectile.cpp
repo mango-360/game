@@ -91,11 +91,6 @@ void Projectile::zoomUpdate()
 	rect.h = TILE_SIZE * InputManager::getZoom() * PROJECTILE_SIZE;
 }
 
-	void Projectile::setDropSpawner(function<void(unique_ptr<Drop>)> spawner)
-{
-	m_spawnDrop = move(spawner);
-}
-
 void Projectile::calculateVelocity()
 {
 	velocity += calculateNetForce();
