@@ -3,6 +3,8 @@
 #include "Game.h"
 #include "TitleScreen.h"
 #include "WinScreen.h"
+#include "LoginScreen.h"
+#include "ProfileScreen.h"
 #include "defines.h"
 
 class StateManager
@@ -16,6 +18,8 @@ public:
 	Game* m_game;
 	TitleScreen* m_titleScreen;
 	WinScreen* m_WinScreen;
+	LoginScreen* m_loginScreen;
+	ProfileScreen* m_profileScreen;
 
 	State* m_state;
 

@@ -363,3 +363,5 @@ MigrationBackup/
 FodyWeavers.xsd
 
 /run/*.exe
+# Saved log in of the local player
+run/config/session.txt

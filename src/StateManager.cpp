@@ -36,6 +36,12 @@ void StateManager::initNewState()
 	case GAME_STATE::GAME:
 		m_state = m_game;
 		break;
+	case GAME_STATE::LOGIN_SCREEN:
+		m_state = m_loginScreen;
+		break;
+	case GAME_STATE::PROFILE_SCREEN:
+		m_state = m_profileScreen;
+		break;
 	default:
 		break;
 	}
@@ -48,6 +54,8 @@ void StateManager::init(GAME_STATE state)
 	m_titleScreen = new TitleScreen();
 	m_game = new Game();
 	m_WinScreen = new WinScreen();
+	m_loginScreen = new LoginScreen();
+	m_profileScreen = new ProfileScreen();
 
 	m_currentState = state;
 

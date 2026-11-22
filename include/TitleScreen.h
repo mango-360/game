@@ -4,6 +4,7 @@
 #include "State.h"
 #include "Presenter.h"
 #include "InputManager.h"
+#include "Button.h"
 
 class TitleScreen : public State
 {
@@ -16,13 +17,8 @@ public:
 	void destroy();
 
 private:
-	Drawable m_background;
+	Drawable m_background = {};
+	Drawable m_welcomeText = {};
 
-	// Player profile: the player types a name and presses Enter
-	string m_playerName;
-	Drawable m_nameText;
-
-	void typeName();
-	void updateNameText();
-	void logIn();
+	Button m_profileButton; // top left, opens the profile page
 };

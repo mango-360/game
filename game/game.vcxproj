@@ -23,6 +23,10 @@
     <ClInclude Include="..\include\Bush.h" />
     <ClInclude Include="..\include\Camera.h" />
     <ClInclude Include="..\include\Database.h" />
+    <ClInclude Include="..\include\ProfileScreen.h" />
+    <ClInclude Include="..\include\LoginScreen.h" />
+    <ClInclude Include="..\include\Button.h" />
+    <ClInclude Include="..\include\Account.h" />
     <ClInclude Include="..\include\defines.h" />
     <ClInclude Include="..\include\DialogPopUp.h" />
     <ClInclude Include="..\include\DirtBlock.h" />
@@ -54,6 +58,10 @@
     <ClCompile Include="..\src\Bush.cpp" />
     <ClCompile Include="..\src\Camera.cpp" />
     <ClCompile Include="..\src\Database.cpp" />
+    <ClCompile Include="..\src\ProfileScreen.cpp" />
+    <ClCompile Include="..\src\LoginScreen.cpp" />
+    <ClCompile Include="..\src\Button.cpp" />
+    <ClCompile Include="..\src\Account.cpp" />
     <ClCompile Include="..\src\DialogPopUp.cpp" />
     <ClCompile Include="..\src\DirtBlock.cpp" />
     <ClCompile Include="..\src\Drop.cpp" />
@@ -91,26 +99,26 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v145</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v145</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v145</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v145</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>

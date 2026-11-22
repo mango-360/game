@@ -5,6 +5,7 @@
 #include "SoundManager.h"
 #include "ImgManager.h"
 #include "World.h"
+#include "Account.h"
 
 extern World world;
 
@@ -35,6 +36,10 @@ void Player::init(Tile(*map)[MAP_WIDTH])
 	stream >> tmp >> jumpStrength;
 
 	texture = loadTexture(playerImg);
+
+	// Tint the player with the skin chosen in the profile
+	const Skin& skin = SKINS[world.m_playerSkin];
+	SDL_SetTextureColorMod(texture, skin.r, skin.g, skin.b);
 	hitbox.texture = loadTexture(hitboxImg);
 
 	stream.close();

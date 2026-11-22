@@ -20,8 +20,10 @@ public:
 	ImgManager m_imgManager;
 	Database m_database;
 
-	// Id of the logged in player in dbo.Players, -1 if nobody is logged in
+	// The logged in player (see Account.h), m_playerId is -1 if nobody is logged in
 	int m_playerId = -1;
+	string m_playerName;
+	int m_playerSkin = 0;
 
 	void init();
 	void run();

@@ -30,6 +30,15 @@ void Presenter::init()
 	
 	m_mainRenderer = SDL_CreateRenderer(m_mainWindow, -1, SDL_RENDERER_PRESENTVSYNC);
 	
+	string cursorImg = IMG_FOLDER + "cursor.bmp";
+
+	SDL_Surface* loadSurface = SDL_LoadBMP((cursorImg.c_str()));
+	SDL_Cursor* cursor = SDL_CreateColorCursor(loadSurface, 10, 5);
+	SDL_SetCursor(cursor);
+
+	loadSurface = nullptr;
+	cursor = nullptr;
+
 	improveRederer();
 	m_writer->init();
 }

@@ -1,4 +1,5 @@
 #include "World.h"
+#include "Account.h"
 
 World::World()
 {
@@ -14,7 +15,9 @@ void World::init()
 {
 	m_presenter.init();
 	m_database.connect("database.txt");
-	m_stateManager.init(GAME_STATE::TITLE_SCREEN);
+	m_database.executeScript("create_test_db.sql"); // creates any missing tables
+	// Skip the log in screen if the player logged in last time
+	m_stateManager.init(Account::tryAutoLogIn() ? GAME_STATE::TITLE_SCREEN : GAME_STATE::LOGIN_SCREEN);
 	m_soundManager.init();
 	m_imgManager.loadAllTextures();
 }
