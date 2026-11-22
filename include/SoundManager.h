@@ -16,6 +16,5 @@ public:
 
 private:
 	static Mix_Chunk* m_backgroundMusic;
-	static Mix_Chunk* m_xPlace;
-	static Mix_Chunk* m_oPlace;
+	static Mix_Chunk* m_itemPickUp;
 };

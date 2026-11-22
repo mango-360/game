@@ -2,6 +2,8 @@
 
 #include "Mob.h"
 
+class Drop;
+
 class Projectile : public DrawableWithSrc
 {
 public:
@@ -13,12 +15,18 @@ public:
 	void draw(float2 camCoords);
 
 	void calculateVelocity();
-	void collision();
+	
+	SDL_FRect getMapRect() { return hitbox.rect; };
+	bool getFirstFrame() { return firstFrame; };
+	int getDamage() { return damage; };
+	float2 getVelocity() { return velocity; };
 
 	bool isAlive = true;
+	bool firstFrame = true;
+
+	TILE_TYPE canBreak[1] = { TILE_TYPE::BUSH };
 private:
 	void zoomUpdate();
-	float2 calculateNetForce();
 	void applyVelocity();
 	void stopOutOfBounds();
 

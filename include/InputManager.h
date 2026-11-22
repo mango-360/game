@@ -17,27 +17,33 @@ public:
 	void handleInput();
 	void setMouseMultiply(float2 multiplier);
 
-	static bool isMousePressed();
+	static bool isMouseClicked();
+	static bool isMouseReleased();
+	static bool isMouseDown();
+	static bool isMouseRightClicked();
 	static bool isAnyKeyPressed();
 	static bool isKeyPressed(SDL_Scancode code);
 	static bool isKeyClicked(SDL_Scancode code); 
 	static bool isKeyUnclicked(SDL_Scancode code); 
 	static bool isZoomChanged() { return hasZoomChanged; };
 	static float getZoom() { return m_zoom; };
-
+	static bool changeZoom(float newZoom);
 
 private:
 	SDL_Event m_event;
 
 	float2 m_mouseMultiplier;
 
-	static bool m_mousePressed;
+	static bool m_mouseClicked;
+	static bool m_mouseReleased;
+	static bool m_mouseDown;
+	static bool m_mouseRightClicked;
 	static bool hasZoomChanged;
 
-	const float zoomStep = 0.125f;
-	const float minZoom = 1.0f;
-	const float maxZoom = 5.0f;
-	
 	static float m_zoom;
+	static constexpr float zoomStep = 0.125f;
+	static constexpr float minZoom = 1.0f;
+	static constexpr float maxZoom = 5.0f;
+	
 	static Uint8 m_keyboardStateCopy[SDL_NUM_SCANCODES];  // ADD THIS
 }; 

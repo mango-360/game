@@ -10,28 +10,6 @@ Mob::~Mob()
 {
 }
 
-void Mob::update()
-{
-	updatePrePhysics();
-	updatePostPhysics();
-}
-
-void Mob::updatePrePhysics()
-{
-	zoomUpdate();
-
-	move();
-
-	calculateVelocity();
-}
-
-void Mob::updatePostPhysics()
-{
-	applyVelocity();
-
-	stopOutOfBounds();
-}
-
 void Mob::move()
 {
 	moveVertical();

@@ -20,6 +20,9 @@ public:
 	ImgManager m_imgManager;
 	Database m_database;
 
+	// Id of the logged in player in dbo.Players, -1 if nobody is logged in
+	int m_playerId = -1;
+
 	void init();
 	void run();
 	void destroy();

@@ -48,8 +48,8 @@ void Camera::updateZoom()
 void Camera::smoothFollow()
 {
 	float2 playerCenteredPos = //cameraPos where player is centered
-	{ m_player->getMapRect().x + 0.5f - rect.w / 2,
-	  m_player->getMapRect().y + 0.5f - rect.h / 2 };
+	{ m_player->getMapRect().x + m_player->getMapRect().w / 2 - rect.w / 2,
+	  m_player->getMapRect().y + m_player->getMapRect().h / 2 - rect.h / 2 };
 
 	int n = 5; //temporary follow speed factor
 

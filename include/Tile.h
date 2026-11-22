@@ -18,10 +18,10 @@ public:
 	SDL_Rect getTileRect() { return m_tile.rect; };
 	SDL_FRect getTileGridRect() { return m_gridRect; };
 	TILE_TYPE getTileType() { return m_type; };
-	TYLE_DROP getTileDrop() { return m_drop; };
+	DROP_TYPE getTileDrop() { return m_drop; };
 
-	void dealDamage(int damage) { m_hp -= damage; };
-	bool isBroken() { return m_hp <= 0; };
+	void dealDamage(int damage);
+	bool isBroken() const { return m_hp <= 0; };
 protected:
 
 	int m_hp;
@@ -34,7 +34,7 @@ protected:
 
 	TILE_TYPE m_type;
 
-	TYLE_DROP m_drop;
+	DROP_TYPE m_drop;
 
 	SDL_FRect m_gridRect;
 

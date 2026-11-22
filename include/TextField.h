@@ -13,16 +13,19 @@ public:
 	void draw();
 	void destroy();
 
-	void setText(string text);
+	void setText(const string& text, int2 coords = { INT_MIN, INT_MIN }, bool makeCentered = true, int opacity = 255);
+	void setText(const string& text, bool makeCentered, int opacity = 255);
+	void setText(const string& text, int2 coords, int opacity);
+	void setText(const string& text, int opacity);
 
 	bool m_needToDrawBackground;
 protected:
-	Drawable m_text;
+	DrawableWithOpacity m_text;
 
 	int m_fontSize;
 	int m_color;
 
 	string m_textString;
 
-	Drawable m_background;
+	DrawableWithOpacity m_background;
 };

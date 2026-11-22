@@ -1,0 +1,7 @@
+startingCoords: 640 300
+width_height: 200
+gapWidth: 30
+rowSpacing: 40
+firstRow: 3
+secondRow: 5
+thirdRow: 7

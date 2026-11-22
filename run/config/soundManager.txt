@@ -1,3 +1,2 @@
 BackgroundMusic: background.wav
-xPlace: xPlace.wav
-oPlace: oPlace.wav
+PickUpItem: itemPickUp.wav

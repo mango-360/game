@@ -18,10 +18,11 @@ public:
 private:
 	Drawable m_background;
 
-	// Test button that inserts a row in dbo.TestData
-	SDL_Rect m_dbButton;
-	Drawable m_dbButtonText;
-	Drawable m_dbStatusText;
+	// Player profile: the player types a name and presses Enter
+	string m_playerName;
+	Drawable m_nameText;
 
-	void setStatusText(string text, COLOR color);
+	void typeName();
+	void updateNameText();
+	void logIn();
 };

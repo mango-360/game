@@ -5,8 +5,13 @@
 #include <SDL.h>
 #include <SDL_ttf.h>
 #include <vector>
+#include <random>
+#include <numbers>
 
 using namespace std;
+
+inline std::mt19937 rng(std::random_device{}());
+inline std::uniform_real_distribution<float> chance(0.0f, 100.0f);
 
 static const string IMG_FOLDER = "img\\";
 static const string CONFIG_FOLDER = "config\\";
@@ -14,16 +19,31 @@ static const string SOUND_FOLDER = "sound\\";
 static const string FONT_FOLDER = "font\\";
 static const string TEXT_FIELD_FOLDER = "textField\\";
 static const string TILES_FOLDER = "tiles\\";
+static const string DROPS_FOLDER = "drops\\";
 static const string STATISTICS_FOLDER = "statistics\\";
 
 static const int TILE_SIZE = 32;
 static const int MAP_WIDTH = 320;
 static const int MAP_HEIGHT = 240;
 static const int LANDING_SPRITE_FRAME_DURATION = 5; 
+static const int INVENTORY_SIZE = 11; 
+static const int BUSH_INVERSE_SPAWN_CHANCE = 4;
+static const int STATISTICS_DELAY = 60;
+static const int STATISTICS_HITBOX_OPACITY = 100;
 
 static const float PROJECTILE_SIZE = 0.5f;
+static const float INVENTORY_ZOOM = 40.0f;
+static const float INV_ITEM_COUNT_ITEM_RATIO = 0.7f;
+static const float OPEN_INV_END_MARGIN = 10.0f;
+static const float HOLD_ITEM_SLOT_SIZE_RATIO = 1.3f;
 
-struct float2
+static const double PI = 3.14159265358979323846;
+
+static const float DROP_SPREAD_ANGLE = PI / 6.0f; // radians
+static const float DROP_INITIAL_SPEED = 0.09f;
+static const float DROP_SPEED_DEVIATION = 0.03f;
+
+struct float2 
 {
 	float x = 0.0f, y = 0.0f;
 
@@ -107,6 +127,16 @@ struct FDrawableWithSrc : public FDrawable
 	SDL_FRect srcRect;
 };
 
+struct DrawableWithOpacity : public Drawable
+{
+	int opacity = 255;
+};
+
+struct FDrawableWithOpacity : public FDrawable
+{
+	int opacity = 255;
+};
+
 struct Camera_Rect
 {
 	float x, y, w, h;
@@ -115,8 +145,7 @@ struct Camera_Rect
 enum SOUND
 {
 	BACKGROUND_MUSIC,
-	X_PLACE,
-	O_PLACE,
+	ITEM_PICK_UP,
 };
 
 enum GAME_STATE
@@ -144,12 +173,13 @@ enum TILE_TYPE
 	BUSH = 4,
 };
 
-enum TYLE_DROP
+enum DROP_TYPE
 {
 	NONE_DROP = 0,
 	GRASSBLOCK_DROP = 2,
 	DIRTBLOCK_DROP = 3,
 	STICK = 4,
+	LEAF = 5,
 };
 
 inline istream& operator>>(istream& is, SDL_Rect& rect)

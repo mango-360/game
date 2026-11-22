@@ -1,6 +1,7 @@
 #include "Board.h"
 #include "InputManager.h"
 #include "SoundManager.h"
+#include "Drop.h"
 #include "World.h"
 
 extern World world;
@@ -34,11 +35,14 @@ void Board::init()
 	m_mob.init(m_map, "player.txt");
 	m_mob.setPlayer(&m_player);
 
-	m_entities.push_back(&m_mob);
+	//m_entities.push_back(&m_mob);
 	m_entities.push_back(&m_player);
 
-	// register spawner after player init:
+  // register spawner after player init: set a projectile spawner that also
+	// assigns a drop-spawner on the projectile so projectiles can hand drops
+	// back to the Board when a tile breaks.
 	m_player.setProjectileSpawner([this](unique_ptr<Projectile> p) {
+
 		m_projectiles.push_back(std::move(p));
 	});
 
@@ -58,7 +62,6 @@ void Board::initMap()
 
 	int surfaceLevel = 12;
 
-	// modern RNG, seeded from random_device
 	std::mt19937 rng(std::random_device{}());
 	std::uniform_int_distribution<int> startDist(0, 120);
 	int x = startDist(rng);
@@ -92,8 +95,7 @@ void Board::initMap()
 			m_map[y][i] = grassBlock;
 
 			// bush generation
-
-			uniform_int_distribution<int> bushChance(1, 10);
+			uniform_int_distribution<int> bushChance(1, BUSH_INVERSE_SPAWN_CHANCE);
 
 			if(bushChance(rng) == 1)
 			{
@@ -119,27 +121,27 @@ void Board::initMap()
 void Board::update()
 {
 	for (Entity* entity : m_entities)
-	{
-		entity->updatePrePhysics();
-	}
+		entity->update();
 
 	handleCollisions();
 
+	m_player.countFramesOnGround();
+
 	for (auto& projectile : m_projectiles) projectile->update();
 
-	for (Entity* entity : m_entities)
-	{
-		entity->updatePostPhysics();
-	}
-
 	destroyProjectiles();
+
+	for (auto& drop : m_drops) 
+		drop.update();
+
+	playerPickUpDrop();
 
 	m_camera.update();
 
 	updateMap();
 
-	toggleStatistics();
-	if(drawStatistics) m_statistics.update();
+	m_statistics.toggleStatistics();
+	if(m_statistics.drawStatistics) m_statistics.update();
 
 	m_dialog.update();
 	
@@ -151,12 +153,15 @@ void Board::draw()
 
 	drawMap();
 
-	for (auto& entity : m_entities) entity->draw({ m_camera.getCameraRect().x, m_camera.getCameraRect().y });
 	for (auto& projectile : m_projectiles) projectile->draw({ m_camera.getCameraRect().x, m_camera.getCameraRect().y });
+	for (auto& drop : m_drops) drop.draw({ m_camera.getCameraRect().x, m_camera.getCameraRect().y });
+	for (auto& entity : m_entities) entity->draw({ m_camera.getCameraRect().x, m_camera.getCameraRect().y });
 
-	if (drawStatistics) m_statistics.draw();
+	if (m_statistics.drawStatistics) m_statistics.draw();
 
 	m_dialog.draw();
+
+	m_player.drawInventory();
 }
 
 void Board::destroy()
@@ -193,11 +198,6 @@ void Board::drawMap()
 	}
 }
 
-void Board::toggleStatistics()
-{
-	if(InputManager::isKeyClicked(SDL_SCANCODE_F3)) drawStatistics = !drawStatistics;
-}
-
 void Board::destroyProjectiles()
 {
 	auto it = m_projectiles.begin();
@@ -217,12 +217,16 @@ void Board::handleCollisions()
 	handleEntityProjectileCollisions();
 
 	handleProjectileTileCollisions();
+
+	handleDropTileCollisions();
 }
 
 void Board::handleEntityTileCollisions()
 {
 	for(Entity* entity : m_entities)
 	{
+		entity->calculateVelocity();
+
 		bool hitsGround = false;
 		float2 friction = { 0, 0 };
 
@@ -244,7 +248,8 @@ void Board::handleEntityTileCollisions()
 				{
 					continue;
 				}
-				const SDL_FRect& mapRect = entity->getMapRect(); // bind to local ref
+
+				const SDL_FRect& mapRect = entity->getMapRect();
 
 				if (DynamicRectVsRect(&mapRect, entity->getVelocity(), m_map[i][j].getTileGridRect(), cp, cn, t))
 				{
@@ -260,21 +265,17 @@ void Board::handleEntityTileCollisions()
 			}
 		}
 
-		SDL_FRect FutureEntityRect = { entity->getMapRect() };
+		SDL_FRect entityRect = { entity->getMapRect() };
 
-		for (int x = floor(FutureEntityRect.x); x <= ceil(FutureEntityRect.x + FutureEntityRect.w); ++x) //check nonsolid blocks for friction
+		for (int x = floor(entityRect.x); x <= floor(entityRect.x + entityRect.w); ++x) //check nonsolid blocks for friction
 		{
-			for (int y = floor(FutureEntityRect.y); y <= ceil(FutureEntityRect.y + FutureEntityRect.h); ++y)
+			for (int y = floor(entityRect.y); y <= floor(entityRect.y + entityRect.h); ++y)
 			{
 				if (y < 0 || y >= MAP_HEIGHT || x < 0 || x >= MAP_WIDTH)
-				{
 					continue;
-				}
 
-				if (!m_map[y][x].getIsSolid() && m_map[y][x].getFriction() > prevFriction && FcollRectRect(FutureEntityRect, m_map[y][x].getTileGridRect()))
-				{
+				if (!m_map[y][x].getIsSolid() && m_map[y][x].getFriction() > prevFriction)
 					prevFriction = m_map[y][x].getFriction();
-				}
 			}
 		}
 
@@ -294,6 +295,9 @@ void Board::handleEntityTileCollisions()
 
 
 		entity->calculateFriction(prevFriction);
+		entity->applyVelocity();
+		entity->stopOutOfBounds();
+
 		entity->isOnGround = hitsGround;
 		if (entity->isOnGround) entity->isJumping = false;
 		else if (!entity->isJumping) entity->landingStartSpriteFrame = entity->NoJumpLandingSpriteFrame;
@@ -311,10 +315,183 @@ void Board::handleEntityProjectileCollisions()
 
 void Board::handleProjectileTileCollisions()
 {
-	for(unique_ptr<Projectile>& projectile : m_projectiles)
+	for(auto projectile = m_projectiles.begin(); projectile != m_projectiles.end(); )
 	{
-		projectile->calculateVelocity();
+		(*projectile)->calculateVelocity();
 
-		projectile->collision();
+		projTileColl(projectile);
+	}
+}
+
+void Board::projTileColl(vector<unique_ptr<Projectile>>::iterator& projectile)
+{
+	float2 cp, cn;
+	float t = 0, min_t = INFINITY;
+	vector<pair<int2, float>> collsList;
+
+	if ((*projectile)->firstFrame)
+	{
+		for (int i = (int)((*projectile)->getMapRect().y); i <= (int)((*projectile)->getMapRect().y + (*projectile)->getMapRect().h); ++i)
+		{
+			for (int j = (int)((*projectile)->getMapRect().x); j <= (int)((*projectile)->getMapRect().x + (*projectile)->getMapRect().w); ++j)
+			{
+				for (int k = 0; k < size((*projectile)->canBreak); ++k)
+				{
+					if (m_map[i][j].getTileType() == (*projectile)->canBreak[k])
+					{
+						m_map[i][j].dealDamage((*projectile)->getDamage());
+						handleBrokenTile(i, j);
+						break;
+					}
+				}
+
+				if (m_map[i][j].getIsSolid())
+				{
+					projectile = m_projectiles.erase(projectile);
+					return;
+				}
+			}
+		}
+
+		(*projectile)->firstFrame = false;
+	}
+
+	// Work out collision point, add it to vector along with rect ID
+	for (int i = floor((*projectile)->getMapRect().y) - 1; i <= ceil((*projectile)->getMapRect().y + (*projectile)->getMapRect().h); ++i)
+	{
+		for (int j = floor((*projectile)->getMapRect().x) - 1; j <= ceil((*projectile)->getMapRect().x + (*projectile)->getMapRect().w); ++j)
+		{
+			if (m_map[i][j].getTileType() == TILE_TYPE::AIR) continue;
+
+			const SDL_FRect& mapRect = (*projectile)->getMapRect();
+
+			if (DynamicRectVsRect(&mapRect, (*projectile)->getVelocity(), m_map[i][j].getTileGridRect(), cp, cn, t))
+			{
+				collsList.push_back({ {i, j}, t });
+			}
+		}
+	}
+
+	// Do the sort
+	sort(collsList.begin(), collsList.end(), [](const pair<int2, float>& a, const pair<int2, float>& b)
+		{
+			return a.second < b.second;
+		});
+
+	for (auto j : collsList)
+	{
+		for (int k = 0; k < size((*projectile)->canBreak); ++k)
+		{
+			if (m_map[j.first.x][j.first.y].getTileType() == (*projectile)->canBreak[k])
+			{
+				m_map[j.first.x][j.first.y].dealDamage((*projectile)->getDamage());
+				handleBrokenTile(j.first.x, j.first.y);
+				break;
+			}
+		}
+
+		if (m_map[j.first.x][j.first.y].getIsSolid())
+		{
+			projectile = m_projectiles.erase(projectile);
+			return;
+		}
+	}
+
+	++projectile;
+}
+
+void Board::handleBrokenTile(int y, int x)
+{
+	if (m_map[y][x].isBroken())
+	{
+		for (auto& loot : LootTable::generateLoot(m_map[y][x].getTileType()))
+		{
+			for (int i = 0; i < loot.second; ++i)
+			{
+				Drop drop;
+				drop.init({ x, y }, loot.first);
+				m_drops.push_back(drop);
+			}
+		}
+		m_map[y][x].destroy();
+	}
+}
+
+void Board::handleDropTileCollisions()
+{
+	for (Drop& drop : m_drops)
+	{
+		drop.calculateVelocity();
+
+		float2 friction = { 0, 0 };
+
+		float2 cp, cn;
+		float t = 0, min_t = INFINITY, prevFriction = 0;
+		vector<pair<int2, float>> collsList;
+
+		// Work out collision point, add it to vector along with rect ID
+		for (int i = floor(drop.getHitbox().y) - 1; i <= ceil(drop.getHitbox().y + drop.getHitbox().h); ++i)
+		{
+			for (int j = floor(drop.getHitbox().x) - 1; j <= ceil(drop.getHitbox().x + drop.getHitbox().w); ++j)
+			{
+				if (!m_map[i][j].getIsSolid())
+					continue;
+
+				const SDL_FRect& mapRect = drop.getHitbox();
+
+				if (DynamicRectVsRect(&mapRect, drop.getVelocity(), m_map[i][j].getTileGridRect(), cp, cn, t))
+				{
+					collsList.push_back({ {i, j}, t });
+
+					if (cn.y == -1 && m_map[i][j].getFriction() > prevFriction)
+						prevFriction = m_map[i][j].getFriction();
+				}
+			}
+		}
+
+		SDL_FRect dropHitbox = { drop.getHitbox()};
+
+		for (int x = floor(dropHitbox.x); x <= floor(dropHitbox.x + dropHitbox.w); ++x) //check nonsolid blocks for friction
+		{
+			for (int y = floor(dropHitbox.y); y <= floor(dropHitbox.y + dropHitbox.h); ++y)
+			{
+				if (!m_map[y][x].getIsSolid() && m_map[y][x].getFriction() > prevFriction)
+					prevFriction = m_map[y][x].getFriction();
+			}
+		}
+
+		// Do the sort
+		sort(collsList.begin(), collsList.end(), [](const pair<int2, float>& a, const pair<int2, float>& b)
+			{
+				return a.second < b.second;
+			});
+
+		// Now resolve the collision in correct order 
+		for (auto j : collsList)
+		{
+			// Avoid taking the address of a temporary returned by getTileGridRect():
+			SDL_FRect tileRect = m_map[j.first.x][j.first.y].getTileGridRect();
+			drop.resolveCollision(tileRect);
+		}
+
+		drop.calculateFriction(prevFriction);
+		drop.applyVelocity();
+		drop.stopOutOfBounds();
+	}
+}
+
+void Board::playerPickUpDrop() // erases drop even if inventory is full!!!
+{
+	for (auto it = m_drops.begin(); it != m_drops.end(); )
+	{
+		if (FcollRectRect(m_player.getMapRect(), it->getHitbox()))
+		{
+			// transfer ownership of the drop to the player
+			// remove null unique_ptr from board
+			if(m_player.addToInventory(std::move(*it)))
+				it = m_drops.erase(it);
+			return;
+		}
+		else ++it;
 	}
 }

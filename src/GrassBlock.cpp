@@ -14,7 +14,7 @@ void GrassBlock::init(float2 coords)
 {
 	m_tile.texture = ImgManager::m_grassBlockTexture;
 	m_type = TILE_TYPE::GRASSBLOCK;
-	m_drop = TYLE_DROP::GRASSBLOCK_DROP;
+	m_drop = DROP_TYPE::GRASSBLOCK_DROP;
 	m_tile.rect = { 0, 0, static_cast<int>(TILE_SIZE * InputManager::getZoom()), static_cast<int>(TILE_SIZE * InputManager::getZoom()) };
 	m_hp = 1;
 	m_gridRect = { coords.x, coords.y, 1, 1 };

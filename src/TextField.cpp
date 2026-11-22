@@ -46,7 +46,7 @@ void TextField::update()
 		m_text.rect.h = text.first.y;
 	}
 
-	if (InputManager::isZoomChanged) setText(m_textString);
+	if (InputManager::isZoomChanged()) setText(m_textString);
 }
 
 void TextField::draw()
@@ -65,16 +65,34 @@ void TextField::destroy()
 	m_textString = "";
 }
 
-void TextField::setText(string text)
+void TextField::setText(const string& text, int2 coords, bool makeCentered, int opacity)
 {
-	if (m_textString != text || InputManager::isZoomChanged())
+	if (m_textString != text || InputManager::isZoomChanged() || coords != int2{ INT_MIN , INT_MIN })
 	{
 		m_textString = text;
+		m_text.opacity = opacity;
 
 		auto result = Presenter::m_writer->getText(m_textString, (COLOR)m_color, m_fontSize);
 
-		m_text.rect.x = m_background.rect.x + (m_background.rect.w - result.first.x) / 2;
-		m_text.rect.y = m_background.rect.y + (m_background.rect.h - result.first.y) / 2;
+		if (coords == int2{ INT_MIN , INT_MIN })
+		{
+			if (makeCentered)
+			{
+				m_text.rect.x = m_background.rect.x + (m_background.rect.w - result.first.x) / 2;
+				m_text.rect.y = m_background.rect.y + (m_background.rect.h - result.first.y) / 2;
+			}
+			else
+			{
+				m_text.rect.x = m_background.rect.x;
+				m_text.rect.y = m_background.rect.y;
+			}
+		}
+		else
+		{
+			m_text.rect.x = coords.x;
+			m_text.rect.y = coords.y;
+		}
+		
 		m_text.rect.w = result.first.x;
 		m_text.rect.h = result.first.y;
 
@@ -85,4 +103,19 @@ void TextField::setText(string text)
 
 		m_text.texture = result.second;
 	}
+}
+
+void TextField::setText(const string& text, bool makeCentered, int opacity)
+{
+	setText(text, { INT_MIN, INT_MIN }, makeCentered, opacity);
+}
+
+void TextField::setText(const string& text, int2 coords, int opacity)
+{
+	setText(text, coords, true, opacity);
+}
+
+void TextField::setText(const string& text, int opacity)
+{
+	setText(text, { INT_MIN, INT_MIN }, true, opacity);
 }

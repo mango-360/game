@@ -1,7 +1,7 @@
 #include "Projectile.h"
-#include "Player.h"
 #include "InputManager.h"
 #include "Presenter.h"
+#include "Drop.h"
 
 Projectile::Projectile()
 {
@@ -49,7 +49,6 @@ void Projectile::init(Entity* owner)
 	}
 
 	velocity += m_owner->velocity; 
-
 }
 
 void Projectile::update()
@@ -92,80 +91,12 @@ void Projectile::zoomUpdate()
 	rect.h = TILE_SIZE * InputManager::getZoom() * PROJECTILE_SIZE;
 }
 
-void Projectile::collision()
-{
-	float2 cp, cn;
-	float t = 0, min_t = INFINITY;
-	vector<pair<int2, float>> collsList;
-
-	// Work out collision point, add it to vector along with rect ID
-	for (int i = floor(hitbox.rect.y) - 1; i <= ceil(hitbox.rect.y + hitbox.rect.h); ++i)
-	{
-		for (int j = floor(hitbox.rect.x) - 1; j <= ceil(hitbox.rect.x + hitbox.rect.w); ++j)
-		{
-			if (m_owner->m_map[i][j]->getTileType() == TILE_TYPE::NONE_TYPE) continue;
-
-			if (DynamicRectVsRect(&hitbox.rect, velocity, m_owner->m_map[i][j]->getTileGridRect(), cp, cn, t))
-			{
-				collsList.push_back({ {i, j}, t });
-
-				normalDirs.push_back(cn);
-			}
-		}
-	}
-
-	// Do the sort
-	sort(collsList.begin(), collsList.end(), [](const pair<int2, float>& a, const pair<int2, float>& b)
-		{
-			return a.second < b.second;
-		});
-
-	for (auto j : collsList)
-	{
-		cout << "Projectile collided with tile at: " << j.first.x << ", " << j.first.y << " with normal: " << normalDirs[0].x << ", " << normalDirs[0].y << endl;
-
-		if(!m_owner->m_map[j.first.x][j.first.y]->getIsSolid())
-		{
-			m_owner->m_map[j.first.x][j.first.y]->dealDamage(damage);
-			if(m_owner->m_map[j.first.x][j.first.y]->isBroken())
-			{
-				// If the player broke the tile, they pick up its drop
-				Player* player = dynamic_cast<Player*>(m_owner);
-				if (player != nullptr)
-					player->pickUpDrop(m_owner->m_map[j.first.x][j.first.y]->getTileDrop());
-
-				m_owner->m_map[j.first.x][j.first.y]->destroy();
-			}
-		}
-		else
-		{
-			isAlive = false;
-			return;
-		}
-	}
-
-	//for (Mob& mob : *m_mobs)
-	//{
-	//	if (DynamicRectVsRect(&hitbox.rect, velocity, mob.getMapRect(), cp, cn, t))
-	//	{
-	//		//mob.health -= damage;
-	//		isAlive = false;
-	//		return;
-	//	}
-	//}
-}
-
 void Projectile::calculateVelocity()
 {
-	velocity += calculateNetForce();
+	velocity += GRAVITY;
 
 	if (velocity.x != 0 && abs(velocity.x) < 0.001f) velocity.x = 0;
 	if (velocity.y != 0 && abs(velocity.y) < 0.001f) velocity.y = 0;
-}
-
-float2 Projectile::calculateNetForce()
-{
-	return GRAVITY;
 }
 
 void Projectile::applyVelocity()

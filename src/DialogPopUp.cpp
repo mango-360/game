@@ -80,7 +80,7 @@ void DialogPopUp::updateTriggerRect()
 
 void DialogPopUp::getNextLine()
 {
-	if(InputManager::isMousePressed())
+	if(InputManager::isMouseClicked())
 	{
 		if (dialogLine < dialog.size() - 1)
 		{

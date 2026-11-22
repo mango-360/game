@@ -1,11 +1,14 @@
 #include "Player.h"
 #include <Presenter.h>
+
 #include "InputManager.h"
-#include "Projectile.h"
+#include "SoundManager.h"
+#include "ImgManager.h"
 #include "World.h"
 
 extern World world;
 
+#include "Projectile.h"
 
 Player::Player()
 {
@@ -46,47 +49,49 @@ void Player::init(Tile(*map)[MAP_WIDTH])
 
 	landingStartSpriteFrame = 11;
 	NoJumpLandingSpriteFrame = 12;
+
+	initInventory();
 }
 
 void Player::update()
 {
-	updatePrePhysics();
-	updatePostPhysics();
-}
-
-void Player::updatePrePhysics()
-{
 	zoomUpdate();
 
-	shoot();
+	toggleInventory();
 
-	move();
+	if (isInvOpen)
+	{
+		if(!InputManager::changeZoom(INVENTORY_ZOOM)) 
+		{
+			updateInventory();
+		}
+	}
+	else 
+	{
+		if(closingInv) 		
+		{
+			closeInventory();
+
+			if(!InputManager::changeZoom(prevZoom)) 
+				closingInv = false;
+		}  
+		shoot();
+		move();
+	}
+
 	animateJump();
 	animateFall();
 	animateLand();
-
-	calculateVelocity();
 }
 
-void Player::updatePostPhysics()
-{
-	addFriction();
-
-	applyVelocity();
-
-	stopOutOfBounds();
-
-	countFramesOnGround();
-}
-
-void Player::setProjectileSpawner(std::function<void(std::unique_ptr<Projectile>)> spawner)
+void Player::setProjectileSpawner(function<void(unique_ptr<Projectile>)> spawner)
 {
 	m_spawnProjectile = std::move(spawner);
 }
 
 void Player::shoot()
 {
-    if ((InputManager::isKeyClicked(SDL_SCANCODE_P) || InputManager::isMousePressed()) && m_spawnProjectile)
+    if ((InputManager::isKeyClicked(SDL_SCANCODE_P) || InputManager::isMouseClicked()) && m_spawnProjectile)
     {
         auto projectile = std::make_unique<Projectile>();
         projectile->init(this);
@@ -190,9 +195,293 @@ void Player::animateLand()
 	}
 }
 
+void Player::toggleInventory()
+{
+	if(InputManager::isKeyClicked(SDL_SCANCODE_GRAVE))
+	{
+		isInvOpen = !isInvOpen;
+		
+		if (isInvOpen)
+		{
+			if(!closingInv) prevZoom = InputManager::getZoom();
+		}
+		else closingInv = true;
+	}
+}
+
+void Player::initDropInInventory(int index)
+{
+	inventory[index].first.m_dropDrawable.rect = m_inventorySlots[index].rect;
+	inventory[index].first.m_dropDrawable.opacity = 0;
+
+	if (inventory[index].second <= 0)
+	{
+		inventory[index].first.reset();
+		inventory[index].second = 0;
+	}
+}
+
+bool Player::addToInventory(Drop drop)
+{
+	int openSlot = -1;
+
+	for(int i = INVENTORY_SIZE - 1; i >= 0; --i)
+	{
+		if(inventory[i].second == 0)
+		{
+			openSlot = i;
+		}
+		else if(inventory[i].first.getDropType() == drop.getDropType() && inventory[i].second < inventory[i].first.getStackSize())
+		{
+			openSlot = i;
+			break;
+		}
+	}
+
+	if (openSlot != -1)
+	{
+		inventory[openSlot].first = drop;
+		inventory[openSlot].second++;
+
+		initDropInInventory(openSlot);
+
+		saveDropToDatabase(drop.getDropType());
+
+		SoundManager::playSound(SOUND::ITEM_PICK_UP);
+
+		return true;
+	}
+	else return false;
+}
+
+void Player::updateInventory()
+{
+	if (InputManager::isMouseClicked())
+	{
+		for (int i = 0; i < INVENTORY_SIZE; ++i)
+		{
+			if (isMouseInRect(m_inventorySlots[i].rect))
+			{
+				if (activeSlotIndex == -1)
+				{
+					activeSlotIndex = i;
+					m_inventorySlots[activeSlotIndex].texture = ImgManager::m_activeSlotImg;
+					m_inventoryHoldItem = inventory[activeSlotIndex];
+					inventory[activeSlotIndex].first.reset();
+					inventory[activeSlotIndex].second = 0;
+				}
+				else if (i == activeSlotIndex)
+				{
+					m_inventorySlots[activeSlotIndex].texture = ImgManager::m_slotImg;
+					inventory[activeSlotIndex].first = m_inventoryHoldItem.first;
+					inventory[activeSlotIndex].second += m_inventoryHoldItem.second;
+					initDropInInventory(i);
+					m_inventoryHoldItem.first.reset();
+					m_inventoryHoldItem.first.m_dropDrawable.rect = { 0, 0, (int)(m_inventorySlots[activeSlotIndex].rect.w * HOLD_ITEM_SLOT_SIZE_RATIO), (int)(m_inventorySlots[activeSlotIndex].rect.h * HOLD_ITEM_SLOT_SIZE_RATIO) };
+					m_inventoryHoldItem.second = 0;
+					activeSlotIndex = -1;
+				}
+				else if (m_inventoryHoldItem.first.getDropType() == DROP_TYPE::NONE_DROP)
+				{
+					m_inventorySlots[activeSlotIndex].texture = ImgManager::m_slotImg;
+
+					activeSlotIndex = i;
+					m_inventorySlots[activeSlotIndex].texture = ImgManager::m_activeSlotImg;
+					m_inventoryHoldItem = inventory[activeSlotIndex];
+					inventory[activeSlotIndex].first.reset();
+					inventory[activeSlotIndex].second = 0;
+				}
+				else if (inventory[i].first.getDropType() == DROP_TYPE::NONE_DROP)
+				{
+					m_inventorySlots[activeSlotIndex].texture = ImgManager::m_slotImg;
+					swap(inventory[i], m_inventoryHoldItem);
+					initDropInInventory(i);
+					m_inventoryHoldItem.first.m_dropDrawable.rect = { 0, 0, (int)(m_inventorySlots[activeSlotIndex].rect.w * HOLD_ITEM_SLOT_SIZE_RATIO), (int)(m_inventorySlots[activeSlotIndex].rect.h * HOLD_ITEM_SLOT_SIZE_RATIO) };
+					m_inventoryHoldItem.second = 0;
+					activeSlotIndex = -1;
+				}
+				else if	(m_inventoryHoldItem.first.getDropType() != inventory[i].first.getDropType())
+				{
+					swap(inventory[i], m_inventoryHoldItem);
+					initDropInInventory(i);
+				}
+				else if (m_inventoryHoldItem.second + inventory[i].second <= inventory[i].first.getStackSize())
+				{
+					inventory[i].second += m_inventoryHoldItem.second;
+					m_inventoryHoldItem.first.reset();
+					m_inventoryHoldItem.second = 0;
+					m_inventorySlots[activeSlotIndex].texture = ImgManager::m_slotImg;
+					activeSlotIndex = -1;
+				}
+				else
+				{
+					int spaceLeft = inventory[i].first.getStackSize() - inventory[i].second;
+					inventory[i].second += spaceLeft;
+					m_inventoryHoldItem.second -= spaceLeft;
+				}
+				break;
+			}
+		}
+	}
+
+	if (InputManager::isMouseRightClicked())
+	{
+		for (int i = 0; i < INVENTORY_SIZE; ++i)
+		{
+			if (isMouseInRect(m_inventorySlots[i].rect))
+			{
+				if (activeSlotIndex == -1)
+				{
+					activeSlotIndex = i;
+					m_inventorySlots[activeSlotIndex].texture = ImgManager::m_activeSlotImg;
+					m_inventoryHoldItem = inventory[activeSlotIndex];
+					inventory[activeSlotIndex].second = m_inventoryHoldItem.second / 2;
+					m_inventoryHoldItem.second -= inventory[activeSlotIndex].second;
+					initDropInInventory(i);
+					
+					if (m_inventoryHoldItem.second <= 0)
+					{
+						m_inventoryHoldItem.first.reset();
+						m_inventoryHoldItem.second = 0;
+						m_inventorySlots[activeSlotIndex].texture = ImgManager::m_slotImg;
+						activeSlotIndex = -1;
+					}
+				}
+				else if (inventory[i].first.getDropType() == DROP_TYPE::NONE_DROP 
+					|| (inventory[i].first.getDropType() == m_inventoryHoldItem.first.getDropType() && inventory[i].second < inventory[i].first.getStackSize()))
+				{
+					inventory[i].first = m_inventoryHoldItem.first;
+					inventory[i].second++;
+					initDropInInventory(i);
+					m_inventoryHoldItem.second--;
+
+					if (m_inventoryHoldItem.second <= 0)
+					{
+						m_inventoryHoldItem.first.reset();
+						m_inventoryHoldItem.second = 0;
+						m_inventorySlots[activeSlotIndex].texture = ImgManager::m_slotImg;
+						activeSlotIndex = -1;
+					}
+				}
+			}
+		}
+	}
+	if(activeSlotIndex != -1) // selected item mouse track
+	{
+		m_inventoryHoldItem.first.m_dropDrawable.rect.x = InputManager::m_mouseCoor.x - m_inventoryHoldItem.first.m_dropDrawable.rect.w / 2;
+		m_inventoryHoldItem.first.m_dropDrawable.rect.y = InputManager::m_mouseCoor.y - m_inventoryHoldItem.first.m_dropDrawable.rect.h / 2;
+	}
+}
+
+void Player::closeInventory()
+{
+	if(activeSlotIndex != -1)
+	{
+		m_inventorySlots[activeSlotIndex].texture = ImgManager::m_slotImg;
+		inventory[activeSlotIndex].first = m_inventoryHoldItem.first;
+		inventory[activeSlotIndex].second += m_inventoryHoldItem.second;
+		initDropInInventory(activeSlotIndex);
+		m_inventoryHoldItem.first.reset();
+		m_inventoryHoldItem.first.m_dropDrawable.rect = { 0, 0, (int)(m_inventorySlots[activeSlotIndex].rect.w * HOLD_ITEM_SLOT_SIZE_RATIO), (int)(m_inventorySlots[activeSlotIndex].rect.h * HOLD_ITEM_SLOT_SIZE_RATIO) };
+		m_inventoryHoldItem.second = 0;
+		activeSlotIndex = -1;
+	}
+}
+
+void Player::initInventory()
+{
+	string tmp;
+
+	int2 startPos;
+
+	int dimentions, gapWidth, rowSpacing;
+	int firstRowNum, secondRowNum, thirdRowNum;
+
+	fstream stream;
+
+	stream.open(CONFIG_FOLDER + "inventory.txt");
+
+	stream >> tmp >> startPos;
+	stream >> tmp >> dimentions;
+	stream >> tmp >> gapWidth;
+	stream >> tmp >> rowSpacing;
+
+	stream >> tmp >> firstRowNum;
+	stream >> tmp >> secondRowNum;
+	stream >> tmp >> thirdRowNum;
+
+	stream.close();
+
+	for (int i = 0; i < INVENTORY_SIZE; ++i)
+	{
+		m_inventorySlots[i].texture = ImgManager::m_slotImg;
+		if(i < firstRowNum) m_inventorySlots[i].rect = { startPos.x + (dimentions + gapWidth) * i, startPos.y, dimentions, dimentions };
+		else if(i < firstRowNum + secondRowNum) m_inventorySlots[i].rect = { startPos.x + (dimentions + gapWidth) * (i - firstRowNum - 1), startPos.y + rowSpacing + dimentions, dimentions, dimentions };
+		else m_inventorySlots[i].rect = { startPos.x + (dimentions + gapWidth) * (i - firstRowNum - secondRowNum), startPos.y + rowSpacing * 2 + dimentions * 2, dimentions, dimentions };
+	}
+
+	//empty inventory
+	for (int i = 0; i < INVENTORY_SIZE; ++i)
+	{
+		inventory[i].second = 0;
+		inventory[i].first.reset();
+	}
+
+	m_inventoryHoldItem.first.reset();
+	m_inventoryHoldItem.second = 0;
+	m_inventoryHoldItem.first.m_dropDrawable.rect = { 0, 0, (int)(dimentions * HOLD_ITEM_SLOT_SIZE_RATIO), (int)(dimentions * HOLD_ITEM_SLOT_SIZE_RATIO) };
+
+	m_inventoryItemCount.init("inventoryTextField.txt");
+
+	loadInventoryFromDatabase();
+}
+
+void Player::drawInventory()
+{
+	if ((isInvOpen || closingInv) && InputManager::getZoom() >= INVENTORY_ZOOM - OPEN_INV_END_MARGIN)
+	{
+		for (int i = 0; i < INVENTORY_SIZE; ++i)
+		{
+			m_inventorySlots[i].opacity = (int)((InputManager::getZoom() - INVENTORY_ZOOM + OPEN_INV_END_MARGIN) * (255.0f / OPEN_INV_END_MARGIN));
+			inventory[i].first.m_dropDrawable.opacity = m_inventorySlots[i].opacity;
+
+			drawObject(m_inventorySlots[i]);
+		}
+
+		for (int i = 0; i < INVENTORY_SIZE; ++i)
+		{
+			drawObject(inventory[i].first.m_dropDrawable);
+			
+			if (inventory[i].second > 1)
+			{
+				m_inventoryItemCount.setText(to_string(inventory[i].second),
+					{ (int)(inventory[i].first.m_dropDrawable.rect.x + inventory[i].first.m_dropDrawable.rect.w * INV_ITEM_COUNT_ITEM_RATIO), (int)(inventory[i].first.m_dropDrawable.rect.y + inventory[i].first.m_dropDrawable.rect.h * INV_ITEM_COUNT_ITEM_RATIO) },
+					true,
+					inventory[i].first.m_dropDrawable.opacity);
+
+				m_inventoryItemCount.draw();
+			}
+		}
+
+		if (activeSlotIndex != -1)
+		{
+			drawObject(m_inventoryHoldItem.first.m_dropDrawable);
+
+			if (m_inventoryHoldItem.second > 1)
+			{
+				m_inventoryItemCount.setText(to_string(m_inventoryHoldItem.second),
+						{ (int)(m_inventoryHoldItem.first.m_dropDrawable.rect.x + m_inventoryHoldItem.first.m_dropDrawable.rect.w * INV_ITEM_COUNT_ITEM_RATIO), (int)(m_inventoryHoldItem.first.m_dropDrawable.rect.y + m_inventoryHoldItem.first.m_dropDrawable.rect.h * INV_ITEM_COUNT_ITEM_RATIO) },
+						true,
+						m_inventoryHoldItem.first.m_dropDrawable.opacity);
+				m_inventoryItemCount.draw();
+			}
+		}
+	}
+}
+
 void Player::calculateVelocity()
 {
-	velocity += calculateNetForce();
+	velocity += GRAVITY;
 
 	if(velocity.x > 0) inputVelocity.x = clamp(inputVelocity.x, -maxInputVelocity.x, max(0.0f, maxInputVelocity.x - velocity.x)); // clamps x input velocity
 	else	inputVelocity.x = clamp(inputVelocity.x, min(0.0f, -maxInputVelocity.x - velocity.x), maxInputVelocity.x); 
@@ -210,25 +499,44 @@ void Player::countFramesOnGround()
 	else framesOnGround++;
 }
 
-void Player::pickUpDrop(TYLE_DROP drop)
+void Player::saveDropToDatabase(DROP_TYPE dropType)
 {
-	if (drop == TYLE_DROP::NONE_DROP) return;
+	if (world.m_playerId == -1) return;
 
-	string itemId = to_string((int)drop);
+	string playerId = to_string(world.m_playerId);
+	string itemId = to_string((int)dropType);
 
 	// Add 1 to the item's quantity, or create the row if the player doesn't have it yet
 	world.m_database.execute(
-		"IF EXISTS (SELECT 1 FROM dbo.Inventory WHERE ItemId = " + itemId + ") "
-		"	UPDATE dbo.Inventory SET Quantity = Quantity + 1 WHERE ItemId = " + itemId + " "
+		"IF EXISTS (SELECT 1 FROM dbo.Inventory WHERE PlayerId = " + playerId + " AND ItemId = " + itemId + ") "
+		"	UPDATE dbo.Inventory SET Quantity = Quantity + 1 WHERE PlayerId = " + playerId + " AND ItemId = " + itemId + " "
 		"ELSE "
-		"	INSERT INTO dbo.Inventory (ItemId, Quantity) VALUES (" + itemId + ", 1)");
+		"	INSERT INTO dbo.Inventory (PlayerId, ItemId, Quantity) VALUES (" + playerId + ", " + itemId + ", 1)");
+}
 
-	// Read it back to show how many the player has now
+void Player::loadInventoryFromDatabase()
+{
+	if (world.m_playerId == -1) return;
+
 	vector<vector<string>> rows = world.m_database.select(
-		"SELECT i.Name, inv.Quantity FROM dbo.Inventory inv "
-		"JOIN dbo.Items i ON i.Id = inv.ItemId "
-		"WHERE inv.ItemId = " + itemId);
+		"SELECT ItemId, Quantity FROM dbo.Inventory WHERE PlayerId = " + to_string(world.m_playerId));
 
-	if (!rows.empty())
-		cout << "Picked up " << rows[0][0] << ", now have: " << rows[0][1] << endl;
+	int slot = 0;
+
+	for (vector<string>& row : rows)
+	{
+		DROP_TYPE dropType = (DROP_TYPE)stoi(row[0]);
+		int quantity = stoi(row[1]);
+
+		// Fill slots with this item, up to its stack size per slot
+		while (quantity > 0 && slot < INVENTORY_SIZE)
+		{
+			inventory[slot].first.init({ 0, 0 }, dropType);
+			inventory[slot].second = min(quantity, inventory[slot].first.getStackSize());
+			quantity -= inventory[slot].second;
+
+			initDropInInventory(slot);
+			slot++;
+		}
+	}
 }

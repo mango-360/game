@@ -1,6 +1,7 @@
 #include "Entity.h"
 #include "Presenter.h"
 #include "InputManager.h"
+#include "Statistics.h"
 
 Tile* Entity::m_map[MAP_HEIGHT][MAP_WIDTH] = { nullptr };
 
@@ -45,26 +46,9 @@ void Entity::init(Tile(*map)[MAP_WIDTH], string configFile)
 
 void Entity::update()
 {
-	updatePrePhysics();
-	updatePostPhysics();
-}
-
-void Entity::updatePrePhysics()
-{
 	zoomUpdate();
 
 	move();
-
-	calculateVelocity();
-}
-
-void Entity::updatePostPhysics()
-{
-	addFriction();
-
-	applyVelocity();
-
-	stopOutOfBounds();
 }
 
 void Entity::draw(float2 camCoords)
@@ -73,11 +57,11 @@ void Entity::draw(float2 camCoords)
 	{
 		round((hitbox.rect.x - camCoords.x) * (TILE_SIZE * InputManager::getZoom())),
 		round((hitbox.rect.y - camCoords.y) * (TILE_SIZE * InputManager::getZoom())),
-		round(hitbox.rect.w * (TILE_SIZE * InputManager::getZoom())),
+		round(hitbox.rect.w * (TILE_SIZE * InputManager::getZoom())), 
 		round(hitbox.rect.h * (TILE_SIZE * InputManager::getZoom()))
 	};
 
-	Drawable tmp = { hitbox.img, hitbox.texture, tmpHitboxRect };
+	DrawableWithOpacity tmp = { hitbox.img, hitbox.texture, tmpHitboxRect, STATISTICS_HITBOX_OPACITY };
 	DrawableWithSrc tmpEntity = { tmp, srcRect };
 	tmpEntity.rect =
 	{
@@ -89,7 +73,7 @@ void Entity::draw(float2 camCoords)
 	tmpEntity.texture = texture;
 
 	drawObject(tmpEntity);
-	//drawObject(tmp); //hitbox
+	Statistics::drawHitboxes(tmp);
 }
 
 int2 Entity::getIntCoords()
@@ -140,7 +124,7 @@ void Entity::drawHitBox(float2 camCoords) //for debugging
 
 	drawObject(tmp);
 }
-
+	
 void Entity::resolveCollision(SDL_FRect tileRect)
 {
 	ResolveDynamicRectVsRect(&hitbox.rect, velocity, &tileRect);
@@ -157,24 +141,16 @@ void Entity::calculateFriction(float frictionValue)
 
 void Entity::calculateVelocity()
 {
-	velocity += calculateNetForce();
+	velocity += GRAVITY;
 
 	if (velocity.x != 0 && abs(velocity.x) < 0.001f) velocity.x = 0;
 	if (velocity.y != 0 && abs(velocity.y) < 0.001f) velocity.y = 0;
 }
 
-void Entity::addFriction()
-{
-	velocity += friction;
-}
-
-float2 Entity::calculateNetForce()
-{
-	return GRAVITY;
-}
-
 void Entity::applyVelocity()
 {
+	velocity += friction;
+
 	hitbox.rect.x += velocity.x;
 	hitbox.rect.y += velocity.y;
 }

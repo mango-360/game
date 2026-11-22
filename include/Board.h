@@ -18,6 +18,7 @@
 
 #include "Projectile.h"
 
+#include "LootTable.h"
 #include "Tile.h"
 #include "GrassBlock.h"
 #include "DirtBlock.h"
@@ -44,10 +45,11 @@ public:
 
 	vector<unique_ptr<Projectile>> m_projectiles;
 
+	vector<Drop> m_drops;
+
 private:
 	void updateMap();
 	void drawMap();
-	void toggleStatistics();
 	void destroyProjectiles();
 
 	void handleCollisions();
@@ -55,8 +57,11 @@ private:
 	void handleEntityEntityCollisions();
 	void handleEntityProjectileCollisions();
 	void handleProjectileTileCollisions();
+	void projTileColl(vector<unique_ptr<Projectile>>::iterator& projectile);
+	void handleBrokenTile(int y, int x);
+	void handleDropTileCollisions();
 
-	bool drawStatistics = false;
+	void playerPickUpDrop();
 
 	SDL_Texture* m_background;
 

@@ -2,9 +2,12 @@
 
 #include "Entity.h"
 #include "Tile.h"
+#include "Drop.h"
+#include "TextField.h"
 #include <functional>
 #include <utility>
 #include <memory>
+#include <string>
 
 class Projectile;
 
@@ -14,14 +17,20 @@ public:
 	Player();
 	~Player();
 	void init(Tile(*map)[MAP_WIDTH]);
-	void update() override;
-	void updatePrePhysics() override;
-	void updatePostPhysics() override;
-	void setProjectileSpawner(std::function<void(std::unique_ptr<Projectile>)> spawner);
+	void update();
+	void setProjectileSpawner(function<void(unique_ptr<Projectile>)> spawner);
+	
+	bool addToInventory(Drop drop);
+	void drawInventory();
 
-	// Saves a picked up drop in the database (dbo.Inventory)
-	void pickUpDrop(TYLE_DROP drop);
+	void countFramesOnGround();
 private:
+	void initInventory();
+
+	// Database: every picked up drop is saved for the logged in player
+	void saveDropToDatabase(DROP_TYPE dropType);
+	void loadInventoryFromDatabase();
+
 	void shoot();
 	void move() override;
 	void moveVertical() override;
@@ -29,13 +38,31 @@ private:
 	void animateFall();
 	void animateLand();
 
+	void toggleInventory();
+	void initDropInInventory(int index);
+	void updateInventory();
+	void closeInventory();
+
 	void calculateVelocity() override;
-	void countFramesOnGround();
 
 	std::function<void(std::unique_ptr<Projectile>)> m_spawnProjectile;
 
+	bool isInvOpen = false;
+	bool closingInv = false;
+
 	int lastKeyPressed = -1;
 	int framesOnGround = 0;
+	int activeSlotIndex = -1;
+
 	float moveSpeed;
+	float prevZoom;
 	float2 inputVelocity = { 0, 0 };
+
+	std::pair<Drop, int> inventory[INVENTORY_SIZE];
+
+	std::pair<Drop, int> m_inventoryHoldItem;
+
+	DrawableWithOpacity m_inventorySlots[INVENTORY_SIZE];
+
+	TextField m_inventoryItemCount;
 };

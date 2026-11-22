@@ -8,20 +8,19 @@ GO
 USE PlatformerTestDB;
 GO
 
--- Used by the test button on the title screen
-IF OBJECT_ID(N'dbo.TestData', N'U') IS NULL
+-- One row per player profile
+IF OBJECT_ID(N'dbo.Players', N'U') IS NULL
 BEGIN
-	CREATE TABLE dbo.TestData
+	CREATE TABLE dbo.Players
 	(
 		Id INT IDENTITY(1,1) PRIMARY KEY,
-		PlayerName NVARCHAR(50) NOT NULL,
-		Score INT NOT NULL,
+		Name NVARCHAR(50) NOT NULL UNIQUE,
 		CreatedAt DATETIME2 NOT NULL DEFAULT SYSDATETIME()
 	);
 END
 GO
 
--- All item types that can drop. Ids match the TYLE_DROP enum in defines.h
+-- All item types that can drop. Ids match the DROP_TYPE enum in defines.h
 IF OBJECT_ID(N'dbo.Items', N'U') IS NULL
 BEGIN
 	CREATE TABLE dbo.Items
@@ -33,17 +32,20 @@ BEGIN
 	INSERT INTO dbo.Items (Id, Name) VALUES
 		(2, N'Grass block'),
 		(3, N'Dirt block'),
-		(4, N'Stick');
+		(4, N'Stick'),
+		(5, N'Leaf');
 END
 GO
 
--- How many of each item the player has picked up
+-- How many of each item every player has picked up
 IF OBJECT_ID(N'dbo.Inventory', N'U') IS NULL
 BEGIN
 	CREATE TABLE dbo.Inventory
 	(
-		ItemId INT PRIMARY KEY REFERENCES dbo.Items(Id),
-		Quantity INT NOT NULL DEFAULT 0
+		PlayerId INT NOT NULL REFERENCES dbo.Players(Id),
+		ItemId INT NOT NULL REFERENCES dbo.Items(Id),
+		Quantity INT NOT NULL DEFAULT 0,
+		PRIMARY KEY (PlayerId, ItemId)
 	);
 END
 GO
