@@ -2,6 +2,9 @@
 #include <Presenter.h>
 #include "InputManager.h"
 #include "Projectile.h"
+#include "World.h"
+
+extern World world;
 
 
 Player::Player()
@@ -205,4 +208,27 @@ void Player::countFramesOnGround()
 {
 	if (!isOnGround) framesOnGround = 0;
 	else framesOnGround++;
+}
+
+void Player::pickUpDrop(TYLE_DROP drop)
+{
+	if (drop == TYLE_DROP::NONE_DROP) return;
+
+	string itemId = to_string((int)drop);
+
+	// Add 1 to the item's quantity, or create the row if the player doesn't have it yet
+	world.m_database.execute(
+		"IF EXISTS (SELECT 1 FROM dbo.Inventory WHERE ItemId = " + itemId + ") "
+		"	UPDATE dbo.Inventory SET Quantity = Quantity + 1 WHERE ItemId = " + itemId + " "
+		"ELSE "
+		"	INSERT INTO dbo.Inventory (ItemId, Quantity) VALUES (" + itemId + ", 1)");
+
+	// Read it back to show how many the player has now
+	vector<vector<string>> rows = world.m_database.select(
+		"SELECT i.Name, inv.Quantity FROM dbo.Inventory inv "
+		"JOIN dbo.Items i ON i.Id = inv.ItemId "
+		"WHERE inv.ItemId = " + itemId);
+
+	if (!rows.empty())
+		cout << "Picked up " << rows[0][0] << ", now have: " << rows[0][1] << endl;
 }

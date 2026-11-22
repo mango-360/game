@@ -1,4 +1,5 @@
 #include "Projectile.h"
+#include "Player.h"
 #include "InputManager.h"
 #include "Presenter.h"
 
@@ -127,7 +128,14 @@ void Projectile::collision()
 		{
 			m_owner->m_map[j.first.x][j.first.y]->dealDamage(damage);
 			if(m_owner->m_map[j.first.x][j.first.y]->isBroken())
+			{
+				// If the player broke the tile, they pick up its drop
+				Player* player = dynamic_cast<Player*>(m_owner);
+				if (player != nullptr)
+					player->pickUpDrop(m_owner->m_map[j.first.x][j.first.y]->getTileDrop());
+
 				m_owner->m_map[j.first.x][j.first.y]->destroy();
+			}
 		}
 		else
 		{

@@ -18,6 +18,9 @@ public:
 	void updatePrePhysics() override;
 	void updatePostPhysics() override;
 	void setProjectileSpawner(std::function<void(std::unique_ptr<Projectile>)> spawner);
+
+	// Saves a picked up drop in the database (dbo.Inventory)
+	void pickUpDrop(TYLE_DROP drop);
 private:
 	void shoot();
 	void move() override;

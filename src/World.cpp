@@ -13,6 +13,7 @@ World::~World()
 void World::init()
 {
 	m_presenter.init();
+	m_database.connect("database.txt");
 	m_stateManager.init(GAME_STATE::TITLE_SCREEN);
 	m_soundManager.init();
 	m_imgManager.loadAllTextures();
@@ -34,6 +35,7 @@ void World::destroy()
 	SDL_DestroyWindow(Presenter::m_mainWindow);
 	m_soundManager.destroy();
 	m_imgManager.destroyAllTextures();
+	m_database.disconnect();
 }
 
 bool World::isRunning()
